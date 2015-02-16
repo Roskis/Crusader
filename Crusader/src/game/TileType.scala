@@ -3,7 +3,7 @@ package game
 import Output.loadTexture
 import org.newdawn.slick.opengl.Texture
 
-/** There is several Tiletypes */
+/** There is a defined number of Tiletypes */
 object TileType extends Enumeration {
 
   type Type = Value
@@ -11,11 +11,12 @@ object TileType extends Enumeration {
   val WALL = Value
   val STAIRS = Value
   
-  val tempGrass = loadTexture("tempGrass")
-  val tempWall = loadTexture("tempWall")
-  val tempStairs = loadTexture("tempStairs")
-  val missing = loadTexture("missing")
+  private val tempGrass = loadTexture("tempGrass")
+  private val tempWall = loadTexture("tempWall")
+  private val tempStairs = loadTexture("tempStairs")
+  private val missing = loadTexture("missing")
   
+  /** returns texture of the given tile type */
   def image(tileType: Type): Texture = {
     tileType match {
       case t if (t == FLOOR) => tempGrass
@@ -25,6 +26,7 @@ object TileType extends Enumeration {
     }
   }
   
+  /** returns true if given tiletype blocks movement */
   def blockMovement(tileType: Type): Boolean = {
     tileType match {
       case t if (t == FLOOR) => false
@@ -34,6 +36,7 @@ object TileType extends Enumeration {
     }
   }
   
+  /** returns true if given tiletype blocks vision */
   def blockVision(tileType: Type): Boolean = {
     tileType match {
       case t if (t == FLOOR) => false

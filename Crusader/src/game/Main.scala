@@ -17,11 +17,11 @@ object Main {
   var gameState: GameState.Value = MAIN_MENU
   var monsterList = Buffer[Monster]()
   
-  /** These will be completed later, but they need to be defined now */
   var frameRate: Int = 0
   var height: Int = 0
   var width: Int = 0
   var version: String = "alpha 0.01"
+  
   var player: Player = null
   var grid: Grid = null
   var episode: Int = 1
@@ -45,7 +45,6 @@ object Main {
     * input and asking Output to draw window.
     */
   def main(args:Array[String]) {
-    
     startDisplay()
     /** Gameloop */
     while (!Display.isCloseRequested) {
@@ -60,12 +59,13 @@ object Main {
       Display.update()
       Display.sync(frameRate)
     }
-    /** Since gameloop has ended display wil be removed */
+    /** Since gameloop has ended display will be removed */
     Display.destroy()
     System.exit(0)
     
   }
   
+  /** Start new game */
   def newGame() {
     makeTestMap()
     val playerPosition = grid.giveRandomNonBlockinCoordinates
@@ -76,6 +76,7 @@ object Main {
     while (Keyboard.next) {}
   }
   
+  /** Initialize test map */
   def makeTestMap() {
     grid = new Grid(rnd.nextInt(5)+30)
     monsterList.clear()
@@ -87,6 +88,7 @@ object Main {
     }
   }
   
+  /** Advance one level */
   def nextTestMap() {
     grid = new Grid(rnd.nextInt(5)+30)
     val playerPosition = grid.giveRandomNonBlockinCoordinates
@@ -101,14 +103,13 @@ object Main {
     level += 1
   }
   
-  /** Method to follow user input in gamemenu */
+  /** Follow user input in gamemenu */
   def menuKeys {
     if ((Mouse.isButtonDown(0) && Mouse.getX >= 910 && Mouse.getX <= 1158 && 
         (height - Mouse.getY) >= 324 && (height - Mouse.getY) <= 372) || 
         Keyboard.isKeyDown(Keyboard.KEY_N)) {
       gameState = GAME
       newGame
-
     }
     else if ((Mouse.isButtonDown(0) && Mouse.getX >= 910 && Mouse.getX <= 1158 && 
         (height - Mouse.getY) >= 424 && (height - Mouse.getY) <= 472) || 
@@ -118,7 +119,7 @@ object Main {
     }
   }
   
-  /** Method to follow user input in game */
+  /** Follow user input in game */
   def gameKeys {
     while (Keyboard.next) {
       if (Keyboard.getEventKey == Keyboard.KEY_ESCAPE && Keyboard.getEventKeyState) gameState = MAIN_MENU
@@ -132,10 +133,10 @@ object Main {
           && Keyboard.getEventKeyState) player.moveOrAttack(player.getX, player.getY + 1)
           
       if (Keyboard.getEventKeyState) playTurn
-      
     }
   }
   
+  /** Play one turn */
   def playTurn() {
     for (monster <- monsterList)
       monster.turn

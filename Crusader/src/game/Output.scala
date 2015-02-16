@@ -21,25 +21,24 @@ import java.awt.Font
  */
 object Output {
   
-  val antiAlias: Boolean = true
-  val vSync: Boolean = false
-  val height: Int = Main.height
-  val width: Int = Main.width
-  val version: String = Main.version
+  private val antiAlias: Boolean = true
+  private val vSync: Boolean = false
+  private val height: Int = Main.height
+  private val width: Int = Main.width
+  private val version: String = Main.version
   
-  /** These will be completed later, but they need to be defined now */
-  var font: TrueTypeFont = null
-  var fontMenu: TrueTypeFont = null  
-  var awtFont: Font = null
-  var background:Texture = null
-  var continue:Texture = null
-  var continue2:Texture = null
-  var newgame:Texture = null
-  var quit:Texture = null
-  var tempHeart: Texture = null
-  var tempXp: Texture = null
-  var tempUIBackground: Texture = null
-  var tempBlack: Texture = null
+  private var font: TrueTypeFont = null
+  private var fontMenu: TrueTypeFont = null  
+  private var awtFont: Font = null
+  private var background:Texture = null
+  private var continue:Texture = null
+  private var continue2:Texture = null
+  private var newgame:Texture = null
+  private var quit:Texture = null
+  private var tempHeart: Texture = null
+  private var tempXp: Texture = null
+  private var tempUIBackground: Texture = null
+  private var tempBlack: Texture = null
   
   /** Prepares, launches and initializes the display.
    *
@@ -149,7 +148,7 @@ object Output {
     glLoadIdentity
   }
   
-  /** Draws the main menu */
+  /** Draw the main menu */
   def drawMainMenu() {
     glClear(GL_COLOR_BUFFER_BIT)
     drawQuadTex(background, (width-background.getImageWidth)/2, 
@@ -162,18 +161,16 @@ object Output {
     font.drawString(130, height - 24, "Y: " + (height - Mouse.getY).toString, Color.red)
   }
   
-  /** Draws game screen */
+  /** Draw game screen */
   def drawGame() {
     glClear(GL_COLOR_BUFFER_BIT)
     drawQuadTex(tempUIBackground, 0, 0, tempUIBackground.getImageWidth, tempUIBackground.getImageHeight)
-    
     drawlog
     drawSideBar
     drawFloor
     drawObjects
     drawPlayer
     drawFog
-    
     font.drawString(2, 0, Main.player.name + " the Holy", Color.white)
     font.drawString(width - 155, height - 27, "Esc to quit", Color.black)
     font.drawString(2, height - 245, "Mouse X: " + (Mouse.getX * 1.0 / 32 + Main.player.getX - 16).toInt.toString, Color.red)
@@ -183,12 +180,11 @@ object Output {
     font.drawString(2, height - 205, "Version: " + version, Color.white)
     font.drawString(900, height - 205, "Episode: " + Main.episode, Color.white)
     font.drawString(990, height - 205, "Level: " + Main.level, Color.white)
-    
     if (Main.player.health <= 0) fontMenu.drawString(width/4, height/4, "You died!", Color.white)
     
   }
   
-  /** Draws gamelog to bottom of the screen */
+  /** Draw gamelog to bottom of the screen */
   def drawlog() {
     val alice = "Alice was beginning to get very tired of sitting by her sister on the bank, and of having nothing to do: once or twice she had peeped into the book her sister was reading, but it had no pictures or conversations in it, 'and what is the use of a book,' thought Alice 'without pictures or conversations?' So she was considering in her own mind (as well as she could, for the hot day made her feel very sleepy and stupid), whether the pleasure of making a daisy-chain would be worth the trouble of getting up and picking the daisies, when suddenly a White Rabbit with pink eyes ran close by her. There was nothing so very remarkable in that; nor did Alice think it so very much out of the way to hear the Rabbit say to itself, 'Oh dear! Oh dear! I shall be late!' (when she thought it over afterwards, it occurred to her that she ought to have wondered at this, but at the time it all seemed quite natural); but when the Rabbit actually took a watch out of its waistcoat-pocket, and looked at it, and then hurried on, Alice started to her feet, for it flashed across her mind that she had never before seen a rabbit with either a waistcoat-pocket, or a watch to take out of it, and burning with curiosity, she ran across the field after it, and fortunately was just in time to see it pop down a large rabbit-hole under the hedge. In another moment down went Alice after it, never once considering how in the world she was to get out again. "
     val tempTextLines = wordWrap(alice, 1030)
@@ -215,7 +211,7 @@ object Output {
     lines
   }
   
-  /** Draws sidebar to right of the screen */
+  /** Draw sidebar to right of the screen */
   def drawSideBar() {
     drawQuadTex(tempHeart, width-239, -25, tempHeart.getImageWidth, tempHeart.getImageHeight)
     font.drawString(width-153, 80, "HP: " + Main.player.health + "/" + Main.player.maxHealth, Color.black)
@@ -224,7 +220,7 @@ object Output {
     font.drawString(width-200, 410, "Items and stuff here", Color.black)
   }
   
-  /** Draws player to the middle of screen */
+  /** Draw player to the middle of screen */
   def drawPlayer() = Main.player.draw
   
   /** Draws Tiles */
@@ -237,16 +233,16 @@ object Output {
     Main.grid.draw
   }
   
-  /** Draws objets */
+  /** Draw objects */
   def drawObjects() {
     for (monster <- Main.monsterList) 
       if (monster.xDif(Main.player) <= 16 && monster.yDif(Main.player) <= 8) 
         monster.draw
   }
   
-  /** Draws fog */
+  /** Draw fog */
   def drawFog() {
-    
+    // not implemented yet
   }
   
 }
