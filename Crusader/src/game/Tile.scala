@@ -9,7 +9,6 @@ import Math.abs
 
   /** Tile represents single tile in the game. The whole map is made of them.
    *
-
    * @param Xcoord is tile's x-coordinate
    * @param Ycoord is tile's y-coordinate
    * @param tileType is tile's type that it is made of

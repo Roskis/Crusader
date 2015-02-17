@@ -14,7 +14,7 @@ object TileType extends Enumeration {
   private val tempGrass = loadTexture("tempGrass")
   private val tempWall = loadTexture("tempWall")
   private val tempStairs = loadTexture("tempStairs")
-  private val missing = loadTexture("missing")
+  private val missing = loadTexture("UI/missing")
   
   /** returns texture of the given tile type */
   def image(tileType: Type): Texture = {

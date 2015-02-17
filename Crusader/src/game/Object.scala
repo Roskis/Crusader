@@ -62,7 +62,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   var description = "the player"
   var x = startX * 32
   var y = startY * 32
-  var image = loadTexture("icon")
+  var image = loadTexture("UI/icon")
   var blockMovement = true
   var blockVision = false
   

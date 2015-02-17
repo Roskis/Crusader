@@ -81,22 +81,22 @@ object Output {
     
     try {
       awtFont = Font.createFont(Font.TRUETYPE_FONT, 
-          ResourceLoader.getResourceAsStream("data/Kingthings Petrock.ttf"))
+          ResourceLoader.getResourceAsStream("data/UI/Kingthings Petrock.ttf"))
       awtFont = awtFont.deriveFont(70f)
       fontMenu = new TrueTypeFont(awtFont, antiAlias)
       awtFont = Font.createFont(Font.TRUETYPE_FONT, 
-          ResourceLoader.getResourceAsStream("data/Kingthings Petrock light.ttf"))
+          ResourceLoader.getResourceAsStream("data/UI/Kingthings Petrock light.ttf"))
       awtFont = awtFont.deriveFont(24f)
       font = new TrueTypeFont(awtFont, antiAlias)
     } catch {
       case e: Throwable => e.printStackTrace()
     }
     
-    background = loadTexture("Background")
-    continue = loadTexture("Continue")
-    continue2 = loadTexture("Continue2")
-    newgame = loadTexture("Newgame")
-    quit = loadTexture("Quit")
+    background = loadTexture("tempBackground")
+    continue = loadTexture("UI/Continue")
+    continue2 = loadTexture("UI/Continue2")
+    newgame = loadTexture("UI/Newgame")
+    quit = loadTexture("UI/Quit")
     tempHeart = loadTexture("tempHeart")
     tempXp = loadTexture("tempXp")
     tempUIBackground = loadTexture("tempUIBackground")
@@ -118,7 +118,7 @@ object Output {
       tex = TextureLoader.getTexture("PNG", in)
     } catch {
       case e:IOException => e.printStackTrace()
-      tex = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("data/missing.png"))
+      tex = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("data/UI/missing.png"))
     }
     tex
   }

@@ -83,7 +83,7 @@ object Main {
     for (n <- Range(0, 3)) {
       var lizardPosition = grid.giveRandomNonBlockinCoordinates
       var lizard = new Monster("Lizard", "Nasty looking reptile.", 
-          lizardPosition._1, lizardPosition._2, "tempLizard")
+          lizardPosition._1, lizardPosition._2, "Monsters/ep1/lizarda1")
       monsterList.append(lizard)
     }
   }
@@ -97,7 +97,7 @@ object Main {
     for (n <- Range(0,monsterList.size)) {
       var lizardPosition = grid.giveRandomNonBlockinCoordinates
       var lizard = new Monster("Lizard", "Nasty looking reptile.", 
-          lizardPosition._1, lizardPosition._2, "tempLizard")
+          lizardPosition._1, lizardPosition._2, "Monsters/ep1/lizarda1")
       monsterList.append(lizard)
     }
     level += 1
@@ -122,17 +122,26 @@ object Main {
   /** Follow user input in game */
   def gameKeys {
     while (Keyboard.next) {
-      if (Keyboard.getEventKey == Keyboard.KEY_ESCAPE && Keyboard.getEventKeyState) gameState = MAIN_MENU
-      else if ((Keyboard.getEventKey == Keyboard.KEY_D || Keyboard.getEventKey == Keyboard.KEY_RIGHT) 
-          && Keyboard.getEventKeyState) player.moveOrAttack(player.getX + 1, player.getY)
-      else if ((Keyboard.getEventKey == Keyboard.KEY_A || Keyboard.getEventKey == Keyboard.KEY_LEFT) 
-          && Keyboard.getEventKeyState) player.moveOrAttack(player.getX - 1, player.getY)
-      else if ((Keyboard.getEventKey == Keyboard.KEY_W || Keyboard.getEventKey == Keyboard.KEY_UP) 
-          && Keyboard.getEventKeyState) player.moveOrAttack(player.getX, player.getY - 1)
-      else if ((Keyboard.getEventKey == Keyboard.KEY_S || Keyboard.getEventKey == Keyboard.KEY_DOWN) 
-          && Keyboard.getEventKeyState) player.moveOrAttack(player.getX, player.getY + 1)
-          
-      if (Keyboard.getEventKeyState) playTurn
+      Keyboard.getEventKey match {
+        case k if (k == Keyboard.KEY_ESCAPE) => gameState = MAIN_MENU
+        case k if ((k == Keyboard.KEY_D || Keyboard.getEventKey == Keyboard.KEY_RIGHT) && Keyboard.getEventKeyState) => {
+          player.moveOrAttack(player.getX + 1, player.getY)
+          playTurn
+        }
+        case k if ((k == Keyboard.KEY_A || Keyboard.getEventKey == Keyboard.KEY_LEFT) && Keyboard.getEventKeyState) => {
+          player.moveOrAttack(player.getX - 1, player.getY)
+          playTurn
+        }
+        case k if ((k == Keyboard.KEY_W || Keyboard.getEventKey == Keyboard.KEY_UP) && Keyboard.getEventKeyState) => {
+          player.moveOrAttack(player.getX, player.getY - 1)
+          playTurn
+        }
+        case k if ((k == Keyboard.KEY_S || Keyboard.getEventKey == Keyboard.KEY_DOWN) && Keyboard.getEventKeyState) => {
+          player.moveOrAttack(player.getX, player.getY + 1)
+          playTurn
+        }
+        case _ => {}
+      }
     }
   }
   
