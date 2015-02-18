@@ -5,6 +5,8 @@ import Output.{loadTexture, drawQuadTex}
 import Math.sqrt
 import Math.abs
 
+import Main._
+
 /** All of the game's objects will be under this trait */
 trait Object {
   
@@ -17,8 +19,8 @@ trait Object {
   var blockVision: Boolean
   
   /** Draw the object to the screen */
-  def draw = drawQuadTex(image, x - (Main.player.getX - 16) * 32, 
-    y - (Main.player.getY - 8) * 32, image.getImageWidth, image.getImageHeight)
+  def draw = drawQuadTex(image, x - (getPlayer.getX - 16) * 32, 
+    y - (getPlayer.getY - 8) * 32, image.getImageWidth, image.getImageHeight)
   
   /** Changes the position of this object
    *
@@ -71,19 +73,20 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   var experience: Int = 0
   
   /** Temporary move and attack command */
-  def moveOrAttack(newX: Int, newY: Int) = if (!Main.grid.getTile(newX, newY).blockMovement &&
-      Main.grid.isWithinGrid(newX, newY) && health > 0) {
+  def moveOrAttack(newX: Int, newY: Int) = 
+    if (!getGrid.getTile(newX, newY).blockMovement &&
+      getGrid.isWithinGrid(newX, newY) && health > 0) {
     
-    var target: Monster = null
-    for (monster <- Main.monsterList) {
-      if (monster.getX == newX && monster.getY == newY) {
-        target = monster
+      var target: Monster = null
+      for (monster <- getMonsterList) {
+        if (monster.getX == newX && monster.getY == newY) {
+          target = monster
+        }
       }
-    }
-    
-    if (target != null) health -= 1
-    else if (Main.grid.getTile(newX, newY) == Main.grid.stairs) Main.nextTestMap
-    else changePosition(newX, newY)
+      
+      if (target != null) health -= 1
+      else if (getGrid.getTile(newX, newY) == getGrid.getStairs) Main.nextMap
+      else changePosition(newX, newY)
     
   }
   
@@ -96,7 +99,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
 class Monster(monsterName: String, monsterdescription: String, startX: Int, startY: Int, 
     monsterImage: String) extends Object {
   
-  val rnd = Main.rnd
+  val rnd = getRnd
   var name = monsterName
   var description = monsterdescription
   var x = startX * 32
@@ -115,8 +118,8 @@ class Monster(monsterName: String, monsterdescription: String, startX: Int, star
    * @param newX x-coordinate
    * @param newY y-coordinate
    */
-  def move(newX: Int, newY: Int) = if (!Main.grid.getTile(newX, newY).blockMovement &&
-      Main.grid.isWithinGrid(newX, newY) && !(newX == Main.player.getX && newY == Main.player.getY)) 
+  def move(newX: Int, newY: Int) = if (!getGrid.getTile(newX, newY).blockMovement &&
+      getGrid.isWithinGrid(newX, newY) && !(newX == getPlayer.getX && newY == getPlayer.getY)) 
     changePosition(newX, newY)
   
 }

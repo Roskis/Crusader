@@ -2,16 +2,120 @@ package game
 
 import collection.mutable.Buffer
 import Math.sqrt
+import Main._
 
 /** Grid is reponsible for handling the map */
-class Grid(val size: Int) {
+class Grid() {
   
-  private val rnd = Main.rnd
-  private val map = Array.ofDim[Tile](size, size)
-  var stairs: Tile = null
+  private val rnd = getRnd
+  private var size: Int = 100
+  private var map = Array.ofDim[Tile](size, size)
+  var stairs: Tile = new Tile(-100, -100, TileType.STAIRS)
   
-  /** We will redo the map while it's not continuous */
-  do {
+  /** Different levels make different maps */
+  if (getLevel < 5) {
+    size = rnd.nextInt(5)+40
+    map = Array.ofDim[Tile](size, size)
+    /** We will redo the map while it's not continuous */
+    do {
+      makeMap1(45, 4, 4)
+    }
+    while (!mapIsContinuous)
+  }
+  else if (getLevel == 5) {
+    size = 21
+    map = Array.ofDim[Tile](size, size)
+    makeBoss1
+  }
+  else {
+    size = 10
+    map = Array.ofDim[Tile](size, size)
+    testMap
+  }
+
+  /** Temporary bossmap */
+  def makeBoss1() {
+    map(size/2)(size/2) = new Tile(size/2, size/2, TileType.FLOOR)
+    for (i <- Range(0,size)) {
+      for (j <- Range(0,size)) {
+        map(i)(j) = new Tile(i, j, TileType.FLOOR)
+        map(i)(j) = new Tile(i, j, if (map(i)(j).distance(map(size/2)(size/2)) <= 9) TileType.FLOOR
+        else TileType.WALL)
+      }
+    }
+  getPlayer.setX(size/8)
+  getPlayer.setY(size/2)
+  }
+  
+  /** Make first episode map.
+   *
+   * @param startProcent chances the starting floor area
+   * @param birthlimit and deathlimit change how cellular automata work for map
+   */
+  def makeMap1(startProcent: Int, birthlimit: Int, deathlimit: Int) = {
+    for (i <- Range(0,size)) {
+      for (j <- Range(0,size)) {
+        map(i)(j) = new Tile(i, j, 
+            if (rnd.nextInt(100) < startProcent) TileType.WALL 
+            else if (i == 0 || j == 0 || i + 1 == size || j + 1 == size) TileType.WALL 
+            else TileType.FLOOR)
+      }
+    }
+    roundEdges(birthlimit, deathlimit)
+    roundEdges(birthlimit, deathlimit)
+    roundEdges(birthlimit, deathlimit)
+    
+    var playerPosition = giveRandomNonBlockinCoordinates
+    do {
+      addStairs
+      playerPosition = giveRandomNonBlockinCoordinates
+      getPlayer.setX(playerPosition._1)
+      getPlayer.setY(playerPosition._2)
+    }
+    while (getPlayer.distance(getStairs) < 15)
+    
+  }
+  
+  /** cellular automata function to round map a bit */
+  def roundEdges(birthlimit: Int, deathlimit: Int) = {
+    var nbs = 0
+    for (i <- Range(0,size)) {
+      for (j <- Range(0,size)) {
+        nbs = countAliveNeighbours(map(i)(j))
+        if (getTile(i,j).getType == TileType.FLOOR) {
+          if (nbs < deathlimit) map(i)(j).label = 0
+          else map(i)(j).label = 1
+        }
+        else {
+          if (nbs > birthlimit) map(i)(j).label = 1
+          else map(i)(j).label = 0
+        }
+        
+      }
+    }
+    
+    for (i <- Range(0,size)) {
+      for (j <- Range(0,size)) {
+        if (map(i)(j).label == 1) setTile(i, j, new Tile(i, j, TileType.FLOOR))
+        else setTile(i,j, new Tile(i, j, TileType.WALL))
+      }
+    }
+    
+  }
+  
+  //* Helper function for roundEdges method*/
+  def countAliveNeighbours(tile: Tile): Int = {
+    var num = 0
+    for (i <- Range(-1,2))
+      for (j <- Range(-1,2))
+        if (i == 0 && j == 0) {}
+        else if (!isWithinGrid(tile.getX+i, tile.getY+j)) {}
+        else if (getTile(tile.getX+i,tile.getY+j).getType == TileType.FLOOR) num += 1
+    num
+  }
+  
+  /** Make testmap */
+  def testMap() {
     for (i <- Range(0,size)) {
       for (j <- Range(0,size)) {
         map(i)(j) = new Tile(i, j, 
@@ -20,11 +124,25 @@ class Grid(val size: Int) {
             else TileType.FLOOR)
       }
     }
-    
-    stairs = new Tile(rnd.nextInt(size-2)+1, rnd.nextInt(size-2)+1, TileType.STAIRS)
-    setTile(stairs.getX, stairs.getY, stairs)
+    addStairs()
+    getPlayer.setX(size/2)
+    getPlayer.setY(size/2)
   }
-  while (!mapIsContinuous)
+  
+  /** getter for stairs */
+  def getStairs() = stairs
+  
+  /** Add stairs */
+  def addStairs() {
+    var coord: Tuple2[Int, Int] = (0, 0)
+    if (stairs.getX != -100) setTile(stairs.getX, stairs.getY, new Tile(stairs.getX, stairs.getY, TileType.FLOOR))
+    do {
+      coord = giveRandomNonBlockinCoordinates
+      stairs = new Tile(giveRandomNonBlockinCoordinates._1, giveRandomNonBlockinCoordinates._2, TileType.STAIRS)
+    }
+    while ((stairs.getX > size/3 && stairs.getX < size*2/3) || (stairs.getY > size/3 && stairs.getY < size*2/3))
+    setTile(stairs.getX, stairs.getY, stairs)
+  }  
   
   /** Returns the neighbors of given tile */
   def neighbors(tile: Tile):Buffer[Tile] = {
@@ -53,7 +171,7 @@ class Grid(val size: Int) {
   def draw() {
     for (i <- Range(0,size)) {
       for (j <- Range(0,size)) {
-        if (getTile(i, j).xDif(Main.player) <= 16 && getTile(i, j).yDif(Main.player) <= 8) 
+        if (getTile(i, j).xDif(getPlayer) <= 16 && getTile(i, j).yDif(getPlayer) <= 8) 
           map(i)(j).draw
       }
     }
@@ -80,6 +198,12 @@ class Grid(val size: Int) {
   def mapIsContinuous(): Boolean = {
     var checkList = Map[Int, Tile]()
     var patternNumber: Int = 0
+    
+    for (i <- Range(0,size)) {
+      for (j <- Range(0,size)) {
+        map(i)(j).label = 0
+      }
+    }
     
     for (i <- Range(0,size)) {
       for (j <- Range(0,size)) {

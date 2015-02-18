@@ -25,7 +25,7 @@ object Main {
   var player: Player = null
   var grid: Grid = null
   var episode: Int = 1
-  var level: Int = 0
+  var level: Int = 1
   var turn: Int = 0
   
   /** Loads some data from init-file */
@@ -62,48 +62,35 @@ object Main {
     /** Since gameloop has ended display will be removed */
     Display.destroy()
     System.exit(0)
-    
   }
   
   /** Start new game */
   def newGame() {
-    makeTestMap()
-    val playerPosition = grid.giveRandomNonBlockinCoordinates
-    player = new Player("Paladin", playerPosition._1, playerPosition._2)
+    monsterList.clear
+    level = 0
     episode = 1
-    level = 1
     turn = 0
     while (Keyboard.next) {}
-  }
-  
-  /** Initialize test map */
-  def makeTestMap() {
-    grid = new Grid(rnd.nextInt(5)+30)
-    monsterList.clear()
-    for (n <- Range(0, 3)) {
-      var lizardPosition = grid.giveRandomNonBlockinCoordinates
-      var lizard = new Monster("Lizard", "Nasty looking reptile.", 
-          lizardPosition._1, lizardPosition._2, "Monsters/ep1/lizarda1")
-      monsterList.append(lizard)
-    }
+    player = new Player("Paladin", 0, 0)
+    nextMap()
   }
   
   /** Advance one level */
-  def nextTestMap() {
-    grid = new Grid(rnd.nextInt(5)+30)
-    val playerPosition = grid.giveRandomNonBlockinCoordinates
-    player.setX(playerPosition._1)
-    player.setY(playerPosition._2)
-    for (n <- Range(0,monsterList.size)) {
+  def nextMap() {
+    level += 1
+    grid = new Grid()
+    /**
+    monsterList.clear
+    for (n <- Range(0,2)) {
       var lizardPosition = grid.giveRandomNonBlockinCoordinates
       var lizard = new Monster("Lizard", "Nasty looking reptile.", 
           lizardPosition._1, lizardPosition._2, "Monsters/ep1/lizarda1")
       monsterList.append(lizard)
     }
-    level += 1
+    */
   }
   
-  /** Follow user input in gamemenu */
+  /** Follow user input in menu */
   def menuKeys {
     if ((Mouse.isButtonDown(0) && Mouse.getX >= 910 && Mouse.getX <= 1158 && 
         (height - Mouse.getY) >= 324 && (height - Mouse.getY) <= 372) || 
@@ -151,4 +138,19 @@ object Main {
       monster.turn
     turn += 1
   }
+  
+  /** Some getters */
+  def getRnd() = rnd
+  def getGameState() = gameState
+  def getMonsterList() = monsterList
+  def getFrameRate() = frameRate
+  def getHeight() = height
+  def getWidth() = width
+  def getVersion() = version
+  def getPlayer() = player
+  def getGrid() = grid
+  def getEpisode() = episode
+  def getLevel() = level
+  def getTurn() = turn
+  
 }

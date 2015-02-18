@@ -5,17 +5,14 @@ import org.lwjgl.LWJGLException
 import org.lwjgl.opengl.{Display, DisplayMode, GL11}
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.input.Mouse
-
 import org.newdawn.slick.opengl.{Texture, TextureLoader}
 import org.newdawn.slick.{Color, TrueTypeFont}
 import org.newdawn.slick.util.ResourceLoader
-
 import scala.io.Source
-
 import collection.mutable.Buffer
-
 import java.io.{IOException, InputStream, File}
 import java.awt.Font
+import Main._
 
 /** Output is responsible for everything that is drawn on the screen.
  */
@@ -23,11 +20,11 @@ object Output {
   
   private val antiAlias: Boolean = true
   private val vSync: Boolean = false
-  private val height: Int = Main.height
-  private val width: Int = Main.width
-  private val version: String = Main.version
+  private val height: Int = getHeight
+  private val width: Int = getWidth
+  private val version: String = getVersion
   
-  private var font: TrueTypeFont = null
+  var font: TrueTypeFont = null
   private var fontMenu: TrueTypeFont = null  
   private var awtFont: Font = null
   private var background:Texture = null
@@ -171,17 +168,16 @@ object Output {
     drawObjects
     drawPlayer
     drawFog
-    font.drawString(2, 0, Main.player.name + " the Holy", Color.white)
+    font.drawString(2, 0, getPlayer.name + " the Holy", Color.white)
     font.drawString(width - 155, height - 27, "Esc to quit", Color.black)
-    font.drawString(2, height - 245, "Mouse X: " + (Mouse.getX * 1.0 / 32 + Main.player.getX - 16).toInt.toString, Color.red)
-    font.drawString(130, height - 245, "Y: " + ((height - Mouse.getY) * 1.0 / 32 + Main.player.getY - 8).toInt.toString, Color.red)
+    font.drawString(2, height - 245, "Mouse X: " + (Mouse.getX * 1.0 / 32 + getPlayer.getX - 16).toInt.toString, Color.red)
+    font.drawString(130, height - 245, "Y: " + ((height - Mouse.getY) * 1.0 / 32 + getPlayer.getY - 8).toInt.toString, Color.red)
     font.drawString(2, height - 225, "Mouse X: " + Mouse.getX.toString, Color.red)
     font.drawString(130, height - 225, "Y: " + (height - Mouse.getY).toString, Color.red)
     font.drawString(2, height - 205, "Version: " + version, Color.white)
-    font.drawString(900, height - 205, "Episode: " + Main.episode, Color.white)
-    font.drawString(990, height - 205, "Level: " + Main.level, Color.white)
-    if (Main.player.health <= 0) fontMenu.drawString(width/4, height/4, "You died!", Color.white)
-    
+    font.drawString(900, height - 205, "Episode: " + getEpisode, Color.white)
+    font.drawString(990, height - 205, "Level: " + getLevel, Color.white)
+    if (getPlayer.health <= 0) fontMenu.drawString(width/4, height/4, "You died!", Color.white)
   }
   
   /** Draw gamelog to bottom of the screen */
@@ -197,7 +193,6 @@ object Output {
    * @param maxLenght is the maximum lenght (in pixels) for one line
    * @return Buffer containing smaller strings
    */
-
   def wordWrap(text: String, maxLength: Int): Buffer[String] = {
     val lines = Buffer[String]()
     var line = ""
@@ -214,14 +209,14 @@ object Output {
   /** Draw sidebar to right of the screen */
   def drawSideBar() {
     drawQuadTex(tempHeart, width-239, -25, tempHeart.getImageWidth, tempHeart.getImageHeight)
-    font.drawString(width-153, 80, "HP: " + Main.player.health + "/" + Main.player.maxHealth, Color.black)
+    font.drawString(width-153, 80, "HP: " + getPlayer.health + "/" + getPlayer.maxHealth, Color.black)
     drawQuadTex(tempXp, width-239, 100, tempXp.getImageWidth, tempXp.getImageHeight)
-    font.drawString(width-153, 210, "XP: " + Main.player.experience + "/10", Color.black)
+    font.drawString(width-153, 210, "XP: " + getPlayer.experience + "/10", Color.black)
     font.drawString(width-200, 410, "Items and stuff here", Color.black)
   }
   
   /** Draw player to the middle of screen */
-  def drawPlayer() = Main.player.draw
+  def drawPlayer() = getPlayer.draw
   
   /** Draws Tiles */
   def drawFloor() {
@@ -230,13 +225,13 @@ object Output {
         drawQuadTex(tempBlack, i * 32, j * 32, tempBlack.getImageWidth, tempBlack.getImageHeight)
       }
     }
-    Main.grid.draw
+    getGrid.draw
   }
   
   /** Draw objects */
   def drawObjects() {
-    for (monster <- Main.monsterList) 
-      if (monster.xDif(Main.player) <= 16 && monster.yDif(Main.player) <= 8) 
+    for (monster <- getMonsterList) 
+      if (monster.xDif(getPlayer) <= 16 && monster.yDif(getPlayer) <= 8) 
         monster.draw
   }
   

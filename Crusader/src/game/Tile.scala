@@ -6,6 +6,7 @@ import TileType.{FLOOR, WALL}
 import org.newdawn.slick.opengl.Texture
 import Math.sqrt
 import Math.abs
+import Main._
 
   /** Tile represents single tile in the game. The whole map is made of them.
    *
@@ -24,8 +25,13 @@ class Tile(Xcoord: Int, Ycoord: Int, tileType: TileType.Value) {
   var blockVision: Boolean = TileType.blockVision(tileType)
   
   /** Draw object */
-  def draw = drawQuadTex(image, x - (Main.player.getX - 16) * 32, 
-      y - (Main.player.getY - 8) * 32, image.getImageWidth, image.getImageHeight)
+  def draw = {
+    drawQuadTex(image, x - (getPlayer.getX - 16) * 32, 
+      y - (getPlayer.getY - 8) * 32, image.getImageWidth, image.getImageHeight)
+  }
+  
+  /** getter for tile type */
+  def getType() = tileType
   
   /** x and y getters */
   def getX(): Int = x/32
