@@ -230,9 +230,16 @@ object Output {
   
   /** Draw objects */
   def drawObjects() {
-    for (monster <- getMonsterList) 
-      if (monster.xDif(getPlayer) <= 16 && monster.yDif(getPlayer) <= 8) 
-        monster.draw
+    for (passive <- getPassiveObjectList)
+      if (passive.xDif(getPlayer) <= 16 && passive.yDif(getPlayer) <= 8) passive.draw
+    for (equipment <- getEquipmentList)
+      if (equipment.xDif(getPlayer) <= 16 && equipment.yDif(getPlayer) <= 8) equipment.draw
+    for (scroll <- getScrollList)
+      if (scroll.xDif(getPlayer) <= 16 && scroll.yDif(getPlayer) <= 8) scroll.draw
+    for (consumable <- getConsumableList)
+      if (consumable.xDif(getPlayer) <= 16 && consumable.yDif(getPlayer) <= 8) consumable.draw
+    for (monster <- getMonsterList)
+      if (monster.xDif(getPlayer) <= 16 && monster.yDif(getPlayer) <= 8) monster.draw
   }
   
   /** Draw fog */

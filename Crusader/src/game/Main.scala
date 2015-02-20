@@ -16,6 +16,10 @@ object Main {
   val rnd = new Random
   var gameState: GameState.Value = MAIN_MENU
   var monsterList = Buffer[Monster]()
+  var passiveObjectList = Buffer[PassiveObject]()
+  var equipmentList = Buffer[Equipment]()
+  var consumableList = Buffer[Consumable]()
+  var scrollList = Buffer[Scroll]()
   
   var frameRate: Int = 0
   var height: Int = 0
@@ -46,6 +50,7 @@ object Main {
     */
   def main(args:Array[String]) {
     startDisplay()
+    Keyboard.enableRepeatEvents(true)
     /** Gameloop */
     while (!Display.isCloseRequested) {
       gameState match {
@@ -77,10 +82,14 @@ object Main {
   
   /** Advance one level */
   def nextMap() {
+    monsterList.clear
+    passiveObjectList.clear
+    equipmentList.clear
+    consumableList.clear
+    scrollList.clear
     level += 1
     grid = new Grid()
     /**
-    monsterList.clear
     for (n <- Range(0,2)) {
       var lizardPosition = grid.giveRandomNonBlockinCoordinates
       var lizard = new Monster("Lizard", "Nasty looking reptile.", 
@@ -111,20 +120,36 @@ object Main {
     while (Keyboard.next) {
       Keyboard.getEventKey match {
         case k if (k == Keyboard.KEY_ESCAPE) => gameState = MAIN_MENU
-        case k if ((k == Keyboard.KEY_D || Keyboard.getEventKey == Keyboard.KEY_RIGHT) && Keyboard.getEventKeyState) => {
+        case k if ((k == Keyboard.KEY_D || k == Keyboard.KEY_RIGHT || k == Keyboard.KEY_NUMPAD6) && Keyboard.getEventKeyState) => {
           player.moveOrAttack(player.getX + 1, player.getY)
           playTurn
         }
-        case k if ((k == Keyboard.KEY_A || Keyboard.getEventKey == Keyboard.KEY_LEFT) && Keyboard.getEventKeyState) => {
+        case k if ((k == Keyboard.KEY_A || k == Keyboard.KEY_LEFT || k == Keyboard.KEY_NUMPAD4) && Keyboard.getEventKeyState) => {
           player.moveOrAttack(player.getX - 1, player.getY)
           playTurn
         }
-        case k if ((k == Keyboard.KEY_W || Keyboard.getEventKey == Keyboard.KEY_UP) && Keyboard.getEventKeyState) => {
+        case k if ((k == Keyboard.KEY_W || k == Keyboard.KEY_UP || k == Keyboard.KEY_NUMPAD8) && Keyboard.getEventKeyState) => {
           player.moveOrAttack(player.getX, player.getY - 1)
           playTurn
         }
-        case k if ((k == Keyboard.KEY_S || Keyboard.getEventKey == Keyboard.KEY_DOWN) && Keyboard.getEventKeyState) => {
+        case k if ((k == Keyboard.KEY_S || k == Keyboard.KEY_DOWN || k == Keyboard.KEY_NUMPAD2) && Keyboard.getEventKeyState) => {
           player.moveOrAttack(player.getX, player.getY + 1)
+          playTurn
+        }
+        case k if ((k == Keyboard.KEY_NUMPAD7) && Keyboard.getEventKeyState) => {
+          player.moveOrAttack(player.getX - 1, player.getY - 1)
+          playTurn
+        }
+        case k if ((k == Keyboard.KEY_NUMPAD9) && Keyboard.getEventKeyState) => {
+          player.moveOrAttack(player.getX + 1, player.getY - 1)
+          playTurn
+        }
+        case k if ((k == Keyboard.KEY_NUMPAD3) && Keyboard.getEventKeyState) => {
+          player.moveOrAttack(player.getX + 1, player.getY + 1)
+          playTurn
+        }
+        case k if ((k == Keyboard.KEY_NUMPAD1) && Keyboard.getEventKeyState) => {
+          player.moveOrAttack(player.getX - 1, player.getY + 1)
           playTurn
         }
         case _ => {}
@@ -143,6 +168,10 @@ object Main {
   def getRnd() = rnd
   def getGameState() = gameState
   def getMonsterList() = monsterList
+  def getPassiveObjectList() = passiveObjectList
+  def getEquipmentList() = equipmentList
+  def getConsumableList() = consumableList
+  def getScrollList() = scrollList
   def getFrameRate() = frameRate
   def getHeight() = height
   def getWidth() = width

@@ -3,6 +3,18 @@ package game
 import collection.mutable.Buffer
 import Math.sqrt
 import Main._
+import Direction._
+
+/** Simple coordinate system */
+class Coordinate(var x: Int, var y: Int) {
+  
+  /** Getters and setters for coordinates */
+  def getX = x
+  def getY = y
+  def setX(newX: Int) = x = newX
+  def setY(newY: Int) = y = newY
+  
+}
 
 /** Grid is reponsible for handling the map */
 class Grid() {
@@ -10,7 +22,10 @@ class Grid() {
   private val rnd = getRnd
   private var size: Int = 100
   private var map = Array.ofDim[Tile](size, size)
-  var stairs: Tile = new Tile(-100, -100, TileType.STAIRS)
+  private var stairs: Tile = new Tile(-100, -100, TileType.STAIRS)
+  private var altar: Object = new PassiveObject("Altar", "Make your sacrifices here.", -100, -100, 
+    "tempAltar")
+  var djinn = new PassiveObject("Djinn", "merchant", -100, -100, "tempDJINN")
   
   /** Different levels make different maps */
   if (getLevel < 5) {
@@ -49,7 +64,7 @@ class Grid() {
   
   /** Make first episode map.
    *
-   * @param startProcent chances the starting floor area
+   * @param startProcent defines starting floor area
    * @param birthlimit and deathlimit change how cellular automata work for map
    */
   def makeMap1(startProcent: Int, birthlimit: Int, deathlimit: Int) = {
@@ -65,14 +80,25 @@ class Grid() {
     roundEdges(birthlimit, deathlimit)
     roundEdges(birthlimit, deathlimit)
     
+    if (rnd.nextInt(3) == 0) addShop
+    else {
+      djinn.setX(-100)
+      djinn.setY(-100)
+    }
+    if (rnd.nextInt(3) == 0) addAltar
+    else {
+      altar.setX(-100)
+      altar.setY(-100)
+    }
+    addStairs
+    
     var playerPosition = giveRandomNonBlockinCoordinates
     do {
-      addStairs
       playerPosition = giveRandomNonBlockinCoordinates
-      getPlayer.setX(playerPosition._1)
-      getPlayer.setY(playerPosition._2)
+      getPlayer.setX(playerPosition.getX)
+      getPlayer.setY(playerPosition.getY)
     }
-    while (getPlayer.distance(getStairs) < 15)
+    while (getPlayer.distance(getStairs) < 15 || getTile(playerPosition.getX, playerPosition.getY).getType != TileType.FLOOR)
     
   }
   
@@ -96,8 +122,8 @@ class Grid() {
     
     for (i <- Range(0,size)) {
       for (j <- Range(0,size)) {
-        if (map(i)(j).label == 1) setTile(i, j, new Tile(i, j, TileType.FLOOR))
-        else setTile(i,j, new Tile(i, j, TileType.WALL))
+        if (map(i)(j).label == 1) setTile(new Tile(i, j, TileType.FLOOR))
+        else setTile(new Tile(i, j, TileType.WALL))
       }
     }
     
@@ -129,28 +155,110 @@ class Grid() {
     getPlayer.setY(size/2)
   }
   
+  /** Adds shop to the map */
+  def addShop() {
+    var coord = new Coordinate(randomX, randomY)
+    var door = new Tile(-100, -100, TileType.DJINNDOORH)
+    var direction: Direction = Direction.N
+    
+    do {
+      direction = randomDirection(4)
+      coord = new Coordinate(randomX, randomY)
+    }
+    while (!isWithinGrid(coord.getX-4, coord.getY-4) || !isWithinGrid(coord.getX+4, coord.getY-4) || 
+        !isWithinGrid(coord.getX+4, coord.getY+4) || !isWithinGrid(coord.getX-4, coord.getY+4))
+      
+    for (x <- Range(coord.getX-3, coord.getX+4)) {
+      for (y <- Range(coord.getY-3, coord.getY+4)) {
+        if (map(x)(y).distance(coord.getX, coord.getY) > 2 && map(x)(y).distance(coord.getX, coord.getY) < 3.5) map(x)(y) = new Tile(x, y, TileType.DJINNWALL)
+        else if (map(x)(y).distance(coord.getX, coord.getY) <= 2) map(x)(y) = new Tile(x, y, TileType.DJINNFLOOR)
+      }
+    }
+    
+    var slotList = Buffer[Coordinate] (new Coordinate(coord.getX-1, coord.getY-1), 
+        new Coordinate(coord.getX-1, coord.getY+1), new Coordinate(coord.getX+1, coord.getY+1), 
+        new Coordinate(coord.getX+1, coord.getY-1), new Coordinate(coord.getX-2, coord.getY), 
+        new Coordinate(coord.getX+2, coord.getY), new Coordinate(coord.getX, coord.getY-2), 
+        new Coordinate(coord.getX, coord.getY+2))
+        
+    direction match {
+      case d if (d == N) => {
+        door.setX(coord.getX)
+        door.setY(coord.getY-3)
+        slotList.filter(_.getY ==  coord.getY-2) foreach {slotList -= _}
+        slotList.filter(_.getY == coord.getY+2) foreach {slotList -= _}
+        djinn.setX(coord.getX)
+        djinn.setY(coord.getY+2)
+      }
+      case d if (d == E) => {
+        door.setX(coord.getX+3)
+        door.setY(coord.getY)
+        slotList.filter(_.getX == coord.getX-2) foreach {slotList -= _}
+        slotList.filter(_.getX == coord.getX+2) foreach {slotList -= _}
+        djinn.setX(coord.getX-2)
+        djinn.setY(coord.getY)
+      }
+      case d if (d == S) => {
+        door.setX(coord.getX)
+        door.setY(coord.getY+3)
+        slotList.filter(_.getY == coord.getY-2) foreach {slotList -= _}
+        slotList.filter(_.getY == coord.getY+2) foreach {slotList -= _}
+        djinn.setX(coord.getX)
+        djinn.setY(coord.getY-2)
+      }
+      case d if (d == W) => {
+        door.setX(coord.getX-3)
+        door.setY(coord.getY)
+        slotList.filter(_.getX == coord.getX+2) foreach {slotList -= _}
+        slotList.filter(_.getX == coord.getX-2) foreach {slotList -= _}
+        djinn.setX(coord.getX+2)
+        djinn.setY(coord.getY)
+      }
+    }
+    for (tile <- slotList) {
+      setTile(new Tile(tile.getX, tile.getY, TileType.DJINNSLOT))
+    }
+    setTile(new Tile(door.getX, door.getY, 
+        if(direction == E || direction == W) TileType.DJINNDOORH else TileType.DJINNDOORV))
+  }
+  
+  /** getter for altar */
+  def getAltar() = altar
+  
+  /** Add altar */
+  def addAltar() = {
+    var coord: Coordinate = new Coordinate(-100, -100)
+    do {
+      coord = giveRandomNonBlockinCoordinates
+      altar.setX(coord.getX)
+      altar.setY(coord.getY)
+    }
+    while (!(getTile(altar.getX, altar.getY).getType == TileType.FLOOR))
+  }
+  
   /** getter for stairs */
   def getStairs() = stairs
   
   /** Add stairs */
   def addStairs() {
-    var coord: Tuple2[Int, Int] = (0, 0)
-    if (stairs.getX != -100) setTile(stairs.getX, stairs.getY, new Tile(stairs.getX, stairs.getY, TileType.FLOOR))
+    var coord: Coordinate = new Coordinate(-100, -100)
     do {
       coord = giveRandomNonBlockinCoordinates
-      stairs = new Tile(giveRandomNonBlockinCoordinates._1, giveRandomNonBlockinCoordinates._2, TileType.STAIRS)
+      stairs.setX(coord.getX)
+      stairs.setY(coord.getY)
     }
-    while ((stairs.getX > size/3 && stairs.getX < size*2/3) || (stairs.getY > size/3 && stairs.getY < size*2/3))
-    setTile(stairs.getX, stairs.getY, stairs)
+    while ((stairs.getX > size/3 && stairs.getX < size*2/3) || (stairs.getY > size/3 && stairs.getY < size*2/3) || getTile(stairs.getX, stairs.getY).getType != TileType.FLOOR)
+    setTile(stairs)
   }  
   
   /** Returns the neighbors of given tile */
   def neighbors(tile: Tile):Buffer[Tile] = {
     val list = Buffer[Tile]()
-    if (isWithinGrid(tile.getX()+1, tile.getY)) list.append(getTile(tile.getX()+1, tile.getY))
-    if (isWithinGrid(tile.getX()-1, tile.getY)) list.append(getTile(tile.getX()-1, tile.getY))
-    if (isWithinGrid(tile.getX(), tile.getY+1)) list.append(getTile(tile.getX(), tile.getY+1))
-    if (isWithinGrid(tile.getX(), tile.getY-1)) list.append(getTile(tile.getX(), tile.getY-1))
+    var coord: Coordinate = new Coordinate(-100, -100)
+    for (dir <- List(N, E, S, W))  {
+      coord = getCoordinates(dir, tile.getX, tile.getY)
+      if (isWithinGrid(coord.getX, coord.getY)) list.append(getTile(coord.getX, coord.getY))
+    }
     list
   }
   
@@ -162,7 +270,7 @@ class Grid() {
   def isWithinGrid(x: Int, y: Int): Boolean = x < size && x >= 0 && y < size && y >= 0
   
   /** Setter to handle the map */
-  def setTile(x: Int, y: Int, tile: Tile) = map(x)(y) = tile
+  def setTile(tile: Tile) = map(tile.getX)(tile.getY) = tile
   
   /** Getter to handle the map, note that will return null if tile at the given location doesn't exist */
   def getTile(x: Int, y: Int) = if (isWithinGrid(x, y)) map(x)(y) else map(1)(1)
@@ -178,12 +286,12 @@ class Grid() {
   }
   
   /** Calculate distance between two points */
-  def distance(tile1: Tile, tile2: Tile): Int = tile1.distance(tile2)
+  def distance(tile1: Tile, tile2: Tile): Double = tile1.distance(tile2)
   
   /** Returns random nonblocking coordinates */
-  def giveRandomNonBlockinCoordinates(): Tuple2[Int, Int] = {
+  def giveRandomNonBlockinCoordinates(): Coordinate = {
     val tile = giveRandomNonBlockingTile 
-    (tile.getX, tile.getY)
+    new Coordinate(tile.getX, tile.getY)
   }
   
   /** Returns one random nonblocking tile */

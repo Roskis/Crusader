@@ -30,6 +30,10 @@ class Tile(Xcoord: Int, Ycoord: Int, tileType: TileType.Value) {
       y - (getPlayer.getY - 8) * 32, image.getImageWidth, image.getImageHeight)
   }
   
+  /** x and y setters */
+  def setX(newX: Int) = x = newX * 32
+  def setY(newY: Int) = y = newY * 32
+  
   /** getter for tile type */
   def getType() = tileType
   
@@ -48,8 +52,10 @@ class Tile(Xcoord: Int, Ycoord: Int, tileType: TileType.Value) {
   def yDif(y: Int): Int = abs(getY-y).toInt
   
   /** Calculate distance */
-  def distance(tile: Tile): Int = sqrt((xDif(tile))*(xDif(tile)) + (yDif(tile))*(yDif(tile))).toInt
-  def distance(obj: Object): Int = sqrt((xDif(obj))*(xDif(obj)) + (yDif(obj))*(yDif(obj))).toInt
-  def distance(x: Int, y: Int): Int = sqrt((xDif(x))*(xDif(x)) + (yDif(y))*(yDif(y))).toInt
+  def distance(tile: Tile): Double = sqrt((xDif(tile))*(xDif(tile)) + (yDif(tile))*(yDif(tile)))
+  def distance(obj: Object): Double = sqrt((xDif(obj))*(xDif(obj)) + (yDif(obj))*(yDif(obj)))
+  def distance(x: Int, y: Int): Double = sqrt((xDif(x))*(xDif(x)) + (yDif(y))*(yDif(y)))
+  def distance(coordinate: Coordinate): Double = sqrt((xDif(coordinate.getX))*(xDif(coordinate.getX)) + 
+      (yDif(coordinate.getY))*(yDif(coordinate.getY)))
   
 }

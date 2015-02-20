@@ -54,6 +54,8 @@ trait Object {
   def distance(tile: Tile): Int = sqrt((xDif(tile))*(xDif(tile)) + (yDif(tile))*(yDif(tile))).toInt
   def distance(obj: Object): Int = sqrt((xDif(obj))*(xDif(obj)) + (yDif(obj))*(yDif(obj))).toInt
   def distance(x: Int, y: Int): Int = sqrt((xDif(x))*(xDif(x)) + (yDif(y))*(yDif(y))).toInt
+  def distance(coordinate: Coordinate): Double = sqrt((xDif(coordinate.getX))*(xDif(coordinate.getX)) + 
+      (yDif(coordinate.getY))*(yDif(coordinate.getY)))
   
 }
 
@@ -64,7 +66,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   var description = "the player"
   var x = startX * 32
   var y = startY * 32
-  var image = loadTexture("UI/icon")
+  var image = loadTexture("tempPlayer")
   var blockMovement = true
   var blockVision = false
   
@@ -95,18 +97,37 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   
 }
 
+/** Passive objects are mostly decorative, but might also block some movement */
+class PassiveObject(objectName: String, objectDescription: String, startX: Int, startY: Int, 
+    objectImage: String) extends Object {
+  
+  val rnd = getRnd
+  var name = objectName
+  var description = objectDescription
+  var x = startX * 32
+  var y = startY * 32
+  var image = loadTexture(objectImage)
+  var blockMovement = true
+  var blockVision = false
+  
+  getPassiveObjectList.append(this)
+  
+}
+
 /** All of monsters and npc will be under this class */
-class Monster(monsterName: String, monsterdescription: String, startX: Int, startY: Int, 
+class Monster(monsterName: String, monsterDescription: String, startX: Int, startY: Int, 
     monsterImage: String) extends Object {
   
   val rnd = getRnd
   var name = monsterName
-  var description = monsterdescription
+  var description = monsterDescription
   var x = startX * 32
   var y = startY * 32
   var image = loadTexture(monsterImage)
   var blockMovement = true
   var blockVision = false
+  
+  getMonsterList.append(this)
   
   /** Temporary method until monster ai is working */
   def turn() {
@@ -133,11 +154,11 @@ trait Item extends Object {
 }
 
 /** Player usable equipments */
-class Equipment(equipmentName: String, equipmentdescription: String, startX: Int, startY: Int, 
+class Equipment(equipmentName: String, equipmentDescription: String, startX: Int, startY: Int, 
     equipmentImage: String, equipmentPrice: Int) extends Item {
   
   var name = equipmentName
-  var description = equipmentdescription
+  var description = equipmentDescription
   var x = startX * 32
   var y = startY * 32
   var image = loadTexture(equipmentImage)
@@ -146,14 +167,16 @@ class Equipment(equipmentName: String, equipmentdescription: String, startX: Int
   var price = equipmentPrice
   var inShop = false
   
+  getEquipmentList.append(this)
+  
 }
 
 /** Player usable consumables */
-class Consumable(consumableName: String, consumabledescription: String, startX: Int, startY: Int, 
+class Consumable(consumableName: String, consumableDescription: String, startX: Int, startY: Int, 
     consumableImage: String, consumablePrice: Int) extends Item {
   
   var name = consumableName
-  var description = consumabledescription
+  var description = consumableDescription
   var x = startX * 32
   var y = startY * 32
   var image = loadTexture(consumableImage)
@@ -162,14 +185,16 @@ class Consumable(consumableName: String, consumabledescription: String, startX: 
   var price = consumablePrice
   var inShop = false
   
+  getConsumableList.append(this)
+  
 }
 
 /** Player usable scrolls */
-class Scroll(scrollName: String, scrolldescription: String, startX: Int, startY: Int, 
+class Scroll(scrollName: String, scrollDescription: String, startX: Int, startY: Int, 
     scrollImage: String, scrollPrice: Int) extends Item {
   
   var name = scrollName
-  var description = scrolldescription
+  var description = scrollDescription
   var x = startX * 32
   var y = startY * 32
   var image = loadTexture(scrollImage)
@@ -177,5 +202,7 @@ class Scroll(scrollName: String, scrolldescription: String, startX: Int, startY:
   var blockVision = false
   var price = scrollPrice
   var inShop = false
+  
+  getScrollList.append(this)
   
 }
