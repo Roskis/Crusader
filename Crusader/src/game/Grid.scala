@@ -25,7 +25,7 @@ class Grid() {
   private var stairs: Tile = new Tile(-100, -100, TileType.STAIRS)
   private var altar: Object = new PassiveObject("Altar", "Make your sacrifices here.", -100, -100, 
     "tempAltar")
-  var djinn = new PassiveObject("Djinn", "merchant", -100, -100, "tempDJINN")
+  var djinn = new PassiveObject("Djinn", "merchant", -100, -100, "tempDjinn")
   
   /** Different levels make different maps */
   if (getLevel < 5) {
