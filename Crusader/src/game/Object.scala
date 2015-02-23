@@ -64,18 +64,18 @@ trait Object {
   def setY(newY: Int) = y = newY * 32
   
   /** Calculate x difference */
-  def xDif(tile: Tile): Int = abs(getX-tile.getX).toInt
-  def xDif(obj: Object): Int = abs(getX-obj.getX).toInt
+  def xDif(tile: Tile): Int = xDif(tile.getX)
+  def xDif(obj: Object): Int = xDif(obj.getX)
   def xDif(x: Int): Int = abs(getX-x).toInt
   
   /** Calculate y difference */
-  def yDif(tile: Tile): Int = abs(getY-tile.getY).toInt
-  def yDif(obj: Object): Int = abs(getY-obj.getY).toInt
+  def yDif(tile: Tile): Int = yDif(tile.getY)
+  def yDif(obj: Object): Int = yDif(obj.getY)
   def yDif(y: Int): Int = abs(getY-y).toInt
   
   /** Calculate distance */
-  def distance(tile: Tile): Int = sqrt((xDif(tile))*(xDif(tile)) + (yDif(tile))*(yDif(tile))).toInt
-  def distance(obj: Object): Int = sqrt((xDif(obj))*(xDif(obj)) + (yDif(obj))*(yDif(obj))).toInt
+  def distance(tile: Tile): Int = distance(tile.getX, tile.getY)
+  def distance(obj: Object): Int = distance(obj.getX, obj.getY)
   def distance(x: Int, y: Int): Int = sqrt((xDif(x))*(xDif(x)) + (yDif(y))*(yDif(y))).toInt
   def distance(coordinate: Coordinate): Double = sqrt((xDif(coordinate.getX))*(xDif(coordinate.getX)) + 
       (yDif(coordinate.getY))*(yDif(coordinate.getY)))
@@ -98,6 +98,11 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   var maxHealth: Int = 20
   var experience: Int = 0
   
+  val robesE = loadTexture("Player/robesE")
+  val steelSwordE = loadTexture("Player/steelSwordE")
+  val woodenShieldE = loadTexture("Player/woodenShieldE")
+  val grave = loadTexture("Environment/grave")
+  
   /** Temporary move and attack command */
   def moveOrAttack(direction: Direction.Value) = {
     val newX = getCoordinates(direction, getX, getY).getX
@@ -118,16 +123,15 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
     }
   }
   
-  var goldArmor = loadTexture("Player/goldArmor")
-  var magicSword = loadTexture("Player/magicSword")
-  var heaterShield = loadTexture("Player/heaterShield")
-  
   /** Since player is always drawn in the middle of the screen the draw method is overriden */
   override def draw = {
-    drawQuadTex(image, 16 * 32, 8 * 32, image.getImageWidth, image.getImageHeight)
-    drawQuadTex(goldArmor, 16 * 32, 8 * 32, goldArmor.getImageWidth, goldArmor.getImageHeight)
-    drawQuadTex(magicSword, 16 * 32, 8 * 32, magicSword.getImageWidth, magicSword.getImageHeight)
-    drawQuadTex(heaterShield, 16 * 32, 8 * 32, heaterShield.getImageWidth, heaterShield.getImageHeight)
+    if (health > 0) {
+      drawQuadTex(image, 16 * 32, 8 * 32, image.getImageWidth, image.getImageHeight)
+      drawQuadTex(robesE, 16 * 32, 8 * 32, robesE.getImageWidth, robesE.getImageHeight)
+      drawQuadTex(steelSwordE, 16 * 32, 8 * 32, steelSwordE.getImageWidth, steelSwordE.getImageHeight)
+      drawQuadTex(woodenShieldE, 16 * 32, 8 * 32, woodenShieldE.getImageWidth, woodenShieldE.getImageHeight)
+    }
+    else drawQuadTex(grave, 16 * 32, 8 * 32, grave.getImageWidth, grave.getImageHeight)
   }
   
 }

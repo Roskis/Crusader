@@ -30,6 +30,16 @@ object Direction extends Enumeration {
     }
   }
   
+  def getCoordinates(dir: Direction, startCoord: Coordinate): Coordinate = {
+    getCoordinates(dir: Direction, startCoord.getX, startCoord.getY)
+  }
+  def getCoordinates(dir: Direction, tile: Tile): Coordinate = {
+    getCoordinates(dir: Direction, tile.getX, tile.getY)
+  }
+  def getCoordinates(dir: Direction, obj: Object): Coordinate = {
+    getCoordinates(dir: Direction, obj.getX, obj.getY)
+  }
+  
   /** Return random direction. Insert 4 if you want to move only with main directions and 8 if you 
    *  want to allow intermediate directions.
    *

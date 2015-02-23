@@ -51,18 +51,18 @@ class Tile(Xcoord: Int, Ycoord: Int, tileType: TileType.Value) {
   def getY(): Int = y/32
   
   /** Calculate x difference */
-  def xDif(tile: Tile): Int = abs(getX-tile.getX).toInt
-  def xDif(obj: Object): Int = abs(getX-obj.getX).toInt
+  def xDif(tile: Tile): Int = xDif(tile.getX)
+  def xDif(obj: Object): Int = xDif(obj.getX)
   def xDif(x: Int): Int = abs(getX-x).toInt
   
   /** Calculate y difference */
-  def yDif(tile: Tile): Int = abs(getY-tile.getY).toInt
-  def yDif(obj: Object): Int = abs(getY-obj.getY).toInt
+  def yDif(tile: Tile): Int = yDif(tile.getY)
+  def yDif(obj: Object): Int = yDif(obj.getY)
   def yDif(y: Int): Int = abs(getY-y).toInt
   
   /** Calculate distance */
-  def distance(tile: Tile): Double = sqrt((xDif(tile))*(xDif(tile)) + (yDif(tile))*(yDif(tile)))
-  def distance(obj: Object): Double = sqrt((xDif(obj))*(xDif(obj)) + (yDif(obj))*(yDif(obj)))
+  def distance(tile: Tile): Double = distance(tile.getX, tile.getY)
+  def distance(obj: Object): Double = distance(obj.getX, obj.getY)
   def distance(x: Int, y: Int): Double = sqrt((xDif(x))*(xDif(x)) + (yDif(y))*(yDif(y)))
   def distance(coordinate: Coordinate): Double = sqrt((xDif(coordinate.getX))*(xDif(coordinate.getX)) + 
       (yDif(coordinate.getY))*(yDif(coordinate.getY)))

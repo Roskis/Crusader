@@ -7,13 +7,11 @@ import Direction._
 
 /** Simple coordinate system */
 class Coordinate(var x: Int, var y: Int) {
-  
   /** Getters and setters for coordinates */
   def getX = x
   def getY = y
   def setX(newX: Int) = x = newX
   def setY(newY: Int) = y = newY
-  
 }
 
 /** Grid is reponsible for handling the map */
@@ -35,7 +33,7 @@ class Grid() {
       do {
         clearLists
         altar = new PassiveObject("Altar", "Make your sacrifices here.", -100, -100, "tempAltar")
-        djinn = new PassiveObject("Djinn", "merchant", -100, -100, "tempDjinn")
+        djinn = new PassiveObject("Djinn", "Merchant running business.", -100, -100, "tempDjinn")
         makeMap1(45, 4, 4)
       }
       while (!mapIsContinuous)
@@ -174,7 +172,9 @@ class Grid() {
       coord = new Coordinate(randomX, randomY)
     }
     while (!isWithinGrid(coord.getX-4, coord.getY-4) || !isWithinGrid(coord.getX+4, coord.getY-4) || 
-        !isWithinGrid(coord.getX+4, coord.getY+4) || !isWithinGrid(coord.getX-4, coord.getY+4))
+        !isWithinGrid(coord.getX+4, coord.getY+4) || !isWithinGrid(coord.getX-4, coord.getY+4) || 
+        getTile(getCoordinates(direction, getCoordinates(direction, getCoordinates(direction, 
+            coord)))).getType != TileType.FLOOR)
       
     for (x <- Range(coord.getX-3, coord.getX+4)) {
       for (y <- Range(coord.getY-3, coord.getY+4)) {
@@ -240,7 +240,7 @@ class Grid() {
         coord = giveRandomNonBlockinCoordinates
       }
       while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR))
-      tree = new PassiveObject("Tree", "Large generic tree", coord.getX, coord.getY, "Items/tempTree")
+      tree = new PassiveObject("Tree", "Large generic tree.", coord.getX, coord.getY, "Items/tempTree")
       tree.blockVision = true
       getTile(tree.getX, tree.getY).blockVision = true
       i += 1
@@ -258,7 +258,7 @@ class Grid() {
         coord = giveRandomNonBlockinCoordinates
       }
       while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR))
-      rock = new PassiveObject("Rock", "Large boulder", coord.getX, coord.getY, "Items/tempRock")
+      rock = new PassiveObject("Rock", "Huge boulder.", coord.getX, coord.getY, "Items/tempRock")
       rock.blockVision = true
       getTile(rock.getX, rock.getY).blockVision = true
       i += 1
@@ -316,8 +316,11 @@ class Grid() {
   /** Setter to handle the map */
   def setTile(tile: Tile) = map(tile.getX)(tile.getY) = tile
   
-  /** Getter to handle the map, note that will return null if tile at the given location doesn't exist */
-  def getTile(x: Int, y: Int) = if (isWithinGrid(x, y)) map(x)(y) else map(1)(1)
+  /** Getter to handle the map, note that will return (x = 1, y = 1) if tile at the given location doesn't exist */
+  def getTile(x: Int, y: Int): Tile = if (isWithinGrid(x, y)) map(x)(y) else map(1)(1)
+  
+  /** Getter to handle the map, note that will return (x = 1, y = 1) if tile at the given location doesn't exist */
+  def getTile(coord: Coordinate): Tile = getTile(coord.getX, coord.getY)
   
   /** Getter for size */
   def getSize() = size
@@ -335,7 +338,7 @@ class Grid() {
   /** Calculate distance between two points */
   def distance(tile1: Tile, tile2: Tile): Double = tile1.distance(tile2)
   
-  /** TODO */
+  /** Simple ray casting method to draw field of vision */
   def FOV() = {
     var x: Float = 0
     var y: Float = 0
@@ -348,7 +351,7 @@ class Grid() {
     }
   }
   
-  /** TODO */
+  /** Single ray used by FOV */
   def FOVRay(x: Float, y: Float) {
     var ox: Float = getPlayer.getX.toFloat + 0.5f + x
     var oy: Float = getPlayer.getY.toFloat + 0.5f + y
@@ -361,7 +364,7 @@ class Grid() {
     }
   }
   
-  /** TODO */
+  /** Make whole level not visible */
   def hideMap() = {
     for (i <- Range(0,size)) {
       for (j <- Range(0,size)) {

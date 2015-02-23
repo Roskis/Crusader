@@ -21,6 +21,8 @@ object Main {
   private var equipmentList = Buffer[Equipment]()
   private var consumableList = Buffer[Consumable]()
   private var scrollList = Buffer[Scroll]()
+  private var gameLog = Buffer[String]()
+  private var lastWheel: Int = 0
   
   private var frameRate: Int = 0
   private var height: Int = 0
@@ -55,12 +57,14 @@ object Main {
     /** Gameloop */
     while (!Display.isCloseRequested) {
       gameState match {
-        case g if (g == MAIN_MENU) => menuKeys
-        case g if (g == GAME) => gameKeys
-      }
-      gameState match {
-        case g if (g == MAIN_MENU) => drawMainMenu
-        case g if (g == GAME) => drawGame
+        case g if (g == MAIN_MENU) => {
+          menuKeys
+          drawMainMenu
+        }
+        case g if (g == GAME) => {
+          gameKeys
+          drawGame
+        }
       }
       Display.update()
       Display.sync(frameRate)
@@ -149,6 +153,7 @@ object Main {
         case _ => {}
       }
     }
+    lastWheel = Mouse.getDWheel
   }
   
   /** Play one turn */
@@ -174,6 +179,7 @@ object Main {
   def getEquipmentList() = equipmentList
   def getConsumableList() = consumableList
   def getScrollList() = scrollList
+  def getGameLog() = gameLog
   def getFrameRate() = frameRate
   def getHeight() = height
   def getWidth() = width
@@ -183,5 +189,6 @@ object Main {
   def getEpisode() = episode
   def getLevel() = level
   def getTurn() = turn
+  def getLastWheel() = lastWheel
   
 }
