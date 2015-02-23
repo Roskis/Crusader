@@ -1,7 +1,7 @@
 package game
 
 import collection.mutable.Buffer
-import Math.sqrt
+import Math.{sqrt, abs, cos, sin}
 import Main._
 import Direction._
 
@@ -18,7 +18,6 @@ class Coordinate(var x: Int, var y: Int) {
 
 /** Grid is reponsible for handling the map */
 class Grid() {
-  
   private val rnd = getRnd
   private var size: Int = 100
   private var map = Array.ofDim[Tile](size, size)
@@ -27,25 +26,29 @@ class Grid() {
     "tempAltar")
   var djinn = new PassiveObject("Djinn", "merchant", -100, -100, "tempDjinn")
   
+  init()
+  
   /** Different levels make different maps */
-  if (getLevel < 5) {
-    size = rnd.nextInt(5)+40
-    map = Array.ofDim[Tile](size, size)
-    /** We will redo the map while it's not continuous */
-    do {
-      makeMap1(45, 4, 4)
+  def init() {
+    if (getLevel < 5) {
+      size = rnd.nextInt(5)+40
+      map = Array.ofDim[Tile](size, size)
+      do {
+        clearLists
+        makeMap1(45, 4, 4)
+      }
+      while (!mapIsContinuous)
     }
-    while (!mapIsContinuous)
-  }
-  else if (getLevel == 5) {
-    size = 21
-    map = Array.ofDim[Tile](size, size)
-    makeBoss1
-  }
-  else {
-    size = 10
-    map = Array.ofDim[Tile](size, size)
-    testMap
+    else if (getLevel == 5) {
+      size = 21
+      map = Array.ofDim[Tile](size, size)
+      makeBoss1
+    }
+    else {
+      size = 10
+      map = Array.ofDim[Tile](size, size)
+      testMap
+    }
   }
 
   /** Temporary bossmap */
@@ -60,6 +63,7 @@ class Grid() {
     }
   getPlayer.setX(size/8)
   getPlayer.setY(size/2)
+  map(getPlayer.getX)(getPlayer.getY).explored = true
   }
   
   /** Make first episode map.
@@ -79,18 +83,21 @@ class Grid() {
     roundEdges(birthlimit, deathlimit)
     roundEdges(birthlimit, deathlimit)
     roundEdges(birthlimit, deathlimit)
+    roundEdges(birthlimit, deathlimit)
     
-    if (rnd.nextInt(3) == 0) addShop
+    if (rnd.nextInt(4) != 0) addShop
     else {
       djinn.setX(-100)
       djinn.setY(-100)
     }
-    if (rnd.nextInt(3) == 0) addAltar
+    if (rnd.nextInt(5) != 0) addAltar
     else {
       altar.setX(-100)
       altar.setY(-100)
     }
     addStairs
+    addtrees(16)
+    addtrees(4)
     
     var playerPosition = giveRandomNonBlockinCoordinates
     do {
@@ -99,7 +106,7 @@ class Grid() {
       getPlayer.setY(playerPosition.getY)
     }
     while (getPlayer.distance(getStairs) < 15 || getTile(playerPosition.getX, playerPosition.getY).getType != TileType.FLOOR)
-    
+    map(getPlayer.getX)(getPlayer.getY).explored = true
   }
   
   /** cellular automata function to round map a bit */
@@ -222,6 +229,42 @@ class Grid() {
         if(direction == E || direction == W) TileType.DJINNDOORH else TileType.DJINNDOORV))
   }
   
+  /** Add a number of trees */
+  def addtrees(num: Int) = {
+    var tree: PassiveObject = null
+    var i = 0
+    var coord: Coordinate = new Coordinate(-100, -100)
+    do {
+      do {
+        coord = giveRandomNonBlockinCoordinates
+      }
+      while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR))
+      tree = new PassiveObject("Tree", "Large generic tree", coord.getX, coord.getY, "Items/tempTree")
+      tree.blockVision = true
+      getTile(tree.getX, tree.getY).blockVision = true
+      i += 1
+    }
+    while (i < num)
+  }
+  
+  /** Add a number of rocks */
+  def addrocks(num: Int) = {
+    var rock: PassiveObject = null
+    var i = 0
+    var coord: Coordinate = new Coordinate(-100, -100)
+    do {
+      do {
+        coord = giveRandomNonBlockinCoordinates
+      }
+      while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR))
+      rock = new PassiveObject("Rock", "Large boulder", coord.getX, coord.getY, "Items/tempRock")
+      rock.blockVision = true
+      getTile(rock.getX, rock.getY).blockVision = true
+      i += 1
+    }
+    while (i < num)
+  }
+  
   /** getter for altar */
   def getAltar() = altar
   
@@ -230,10 +273,10 @@ class Grid() {
     var coord: Coordinate = new Coordinate(-100, -100)
     do {
       coord = giveRandomNonBlockinCoordinates
-      altar.setX(coord.getX)
-      altar.setY(coord.getY)
     }
-    while (!(getTile(altar.getX, altar.getY).getType == TileType.FLOOR))
+    while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR))
+    altar.setX(coord.getX)
+    altar.setY(coord.getY)
   }
   
   /** getter for stairs */
@@ -275,6 +318,9 @@ class Grid() {
   /** Getter to handle the map, note that will return null if tile at the given location doesn't exist */
   def getTile(x: Int, y: Int) = if (isWithinGrid(x, y)) map(x)(y) else map(1)(1)
   
+  /** Getter for size */
+  def getSize() = size
+  
   /** Draw the whole map */
   def draw() {
     for (i <- Range(0,size)) {
@@ -287,6 +333,74 @@ class Grid() {
   
   /** Calculate distance between two points */
   def distance(tile1: Tile, tile2: Tile): Double = tile1.distance(tile2)
+  
+  /** TODO */
+  def FOV() = {
+    var x: Float = 0
+    var y: Float = 0
+    hideMap
+    map(getPlayer.getX)(getPlayer.getY).visible = true
+    for (i <- Range(0,360)) {
+      x = cos(i.toFloat*0.01745f).toFloat
+      y = sin(i.toFloat*0.01745f).toFloat
+      FOVRay(x,y)
+    }
+  }
+  
+  /** TODO */
+  def FOVRay(x: Float, y: Float) {
+    var ox: Float = getPlayer.getX.toFloat + 0.5f + x
+    var oy: Float = getPlayer.getY.toFloat + 0.5f + y
+    for (i <- Range(0, getPlayer.viewRadius)) {
+      map(ox.toInt)(oy.toInt).visible = true
+      map(ox.toInt)(oy.toInt).explored = true
+      if (map(ox.toInt)(oy.toInt).blockVision) return
+      ox += x
+      oy += y
+    }
+  }
+  
+  /** TODO */
+  def hideMap() = {
+    for (i <- Range(0,size)) {
+      for (j <- Range(0,size)) {
+        map(i)(j).visible = false
+      }
+    }
+  }
+  
+  /** Uses Bresenham's Line Algorithm to calculate straight line between two coordinates.
+   *
+   * @param coord1 is first given coordinate
+   * @param coord2 is second given coordinate
+   * @return Buffer containing coordinates between the two points (including starting and end point)
+   */
+  def line(coord1: Coordinate, coord2: Coordinate): Buffer[Coordinate] = {
+    val points = Buffer[Coordinate]()
+    var x1 = coord1.getX
+    var y1 = coord1.getY
+    var x2 = coord2.getX
+    var y2 = coord2.getY
+    var dx = abs(x2-x1)
+    var dy = abs(y2-y1)
+    var sx = if (x1 < x2) 1 else -1
+    var sy = if (y1 < y2) 1 else -1
+    var err = dx - dy
+    points.append(new Coordinate(x1, y1))
+    while (!((x1 == x2) && (y1 == y2))) {
+      var e2 = err << 1
+      if (e2 > -dy) {
+        err -= dy
+        x1 += sx
+      }
+      if (e2 < dx) {
+        err += dx
+        y1 += sy
+      }
+      points.append(new Coordinate(x1, y1))
+    }
+    points
+  }
   
   /** Returns random nonblocking coordinates */
   def giveRandomNonBlockinCoordinates(): Coordinate = {

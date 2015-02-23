@@ -7,30 +7,31 @@ import GameState.{MAIN_MENU, GAME}
 import org.lwjgl.input.{Mouse, Keyboard}
 import scala.util.Random
 import collection.mutable.Buffer
+import Direction._
 
 /** Main object is responsible for the allocation of tasks to other parts of the program and 
  *  running the mainloop.
  */
 object Main {
   
-  val rnd = new Random
-  var gameState: GameState.Value = MAIN_MENU
-  var monsterList = Buffer[Monster]()
-  var passiveObjectList = Buffer[PassiveObject]()
-  var equipmentList = Buffer[Equipment]()
-  var consumableList = Buffer[Consumable]()
-  var scrollList = Buffer[Scroll]()
+  private val rnd = new Random
+  private var gameState: GameState.Value = MAIN_MENU
+  private var monsterList = Buffer[Monster]()
+  private var passiveObjectList = Buffer[PassiveObject]()
+  private var equipmentList = Buffer[Equipment]()
+  private var consumableList = Buffer[Consumable]()
+  private var scrollList = Buffer[Scroll]()
   
-  var frameRate: Int = 0
-  var height: Int = 0
-  var width: Int = 0
-  var version: String = "alpha 0.01"
+  private var frameRate: Int = 0
+  private var height: Int = 0
+  private var width: Int = 0
+  private var version: String = "alpha 0.01"
   
-  var player: Player = null
-  var grid: Grid = null
-  var episode: Int = 1
-  var level: Int = 1
-  var turn: Int = 0
+  private var player: Player = null
+  private var grid: Grid = null
+  private var episode: Int = 1
+  private var level: Int = 1
+  private var turn: Int = 0
   
   /** Loads some data from init-file */
   val initFile = Source.fromFile("src/init.txt")
@@ -82,21 +83,14 @@ object Main {
   
   /** Advance one level */
   def nextMap() {
-    monsterList.clear
-    passiveObjectList.clear
-    equipmentList.clear
-    consumableList.clear
-    scrollList.clear
+    clearLists
     level += 1
     grid = new Grid()
-    /**
-    for (n <- Range(0,2)) {
+    for (n <- Range(0,5)) {
       var lizardPosition = grid.giveRandomNonBlockinCoordinates
       var lizard = new Monster("Lizard", "Nasty looking reptile.", 
-          lizardPosition._1, lizardPosition._2, "Monsters/ep1/lizarda1")
-      monsterList.append(lizard)
+          lizardPosition.getX, lizardPosition.getY, "Monsters/lizarda1")
     }
-    */
   }
   
   /** Follow user input in menu */
@@ -121,35 +115,35 @@ object Main {
       Keyboard.getEventKey match {
         case k if (k == Keyboard.KEY_ESCAPE) => gameState = MAIN_MENU
         case k if ((k == Keyboard.KEY_D || k == Keyboard.KEY_RIGHT || k == Keyboard.KEY_NUMPAD6) && Keyboard.getEventKeyState) => {
-          player.moveOrAttack(player.getX + 1, player.getY)
+          player.moveOrAttack(E)
           playTurn
         }
         case k if ((k == Keyboard.KEY_A || k == Keyboard.KEY_LEFT || k == Keyboard.KEY_NUMPAD4) && Keyboard.getEventKeyState) => {
-          player.moveOrAttack(player.getX - 1, player.getY)
+          player.moveOrAttack(W)
           playTurn
         }
         case k if ((k == Keyboard.KEY_W || k == Keyboard.KEY_UP || k == Keyboard.KEY_NUMPAD8) && Keyboard.getEventKeyState) => {
-          player.moveOrAttack(player.getX, player.getY - 1)
+          player.moveOrAttack(N)
           playTurn
         }
         case k if ((k == Keyboard.KEY_S || k == Keyboard.KEY_DOWN || k == Keyboard.KEY_NUMPAD2) && Keyboard.getEventKeyState) => {
-          player.moveOrAttack(player.getX, player.getY + 1)
+          player.moveOrAttack(S)
           playTurn
         }
-        case k if ((k == Keyboard.KEY_NUMPAD7) && Keyboard.getEventKeyState) => {
-          player.moveOrAttack(player.getX - 1, player.getY - 1)
+        case k if ((k == Keyboard.KEY_Q || k == Keyboard.KEY_NUMPAD7) && Keyboard.getEventKeyState) => {
+          player.moveOrAttack(NW)
           playTurn
         }
-        case k if ((k == Keyboard.KEY_NUMPAD9) && Keyboard.getEventKeyState) => {
-          player.moveOrAttack(player.getX + 1, player.getY - 1)
+        case k if ((k == Keyboard.KEY_E || k == Keyboard.KEY_NUMPAD9) && Keyboard.getEventKeyState) => {
+          player.moveOrAttack(NE)
           playTurn
         }
-        case k if ((k == Keyboard.KEY_NUMPAD3) && Keyboard.getEventKeyState) => {
-          player.moveOrAttack(player.getX + 1, player.getY + 1)
+        case k if ((k == Keyboard.KEY_C || k == Keyboard.KEY_NUMPAD3) && Keyboard.getEventKeyState) => {
+          player.moveOrAttack(SE)
           playTurn
         }
-        case k if ((k == Keyboard.KEY_NUMPAD1) && Keyboard.getEventKeyState) => {
-          player.moveOrAttack(player.getX - 1, player.getY + 1)
+        case k if ((k == Keyboard.KEY_Z || k == Keyboard.KEY_NUMPAD1) && Keyboard.getEventKeyState) => {
+          player.moveOrAttack(SW)
           playTurn
         }
         case _ => {}
@@ -162,6 +156,14 @@ object Main {
     for (monster <- monsterList)
       monster.turn
     turn += 1
+  }
+  
+  def clearLists() {
+    monsterList.clear
+    passiveObjectList.clear
+    equipmentList.clear
+    consumableList.clear
+    scrollList.clear
   }
   
   /** Some getters */

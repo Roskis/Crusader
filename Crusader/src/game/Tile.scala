@@ -16,18 +16,27 @@ import Main._
    */
 class Tile(Xcoord: Int, Ycoord: Int, tileType: TileType.Value) {
 
-  var x = Xcoord * 32
-  var y = Ycoord * 32
+  private var x = Xcoord * 32
+  private var y = Ycoord * 32
+  private var image: Texture = TileType.image(tileType)
   var explored: Boolean = false
   var label: Int = 0
-  var image: Texture = TileType.image(tileType)
   var blockMovement: Boolean = TileType.blockMovement(tileType)
   var blockVision: Boolean = TileType.blockVision(tileType)
+  var visible: Boolean = false
   
-  /** Draw object */
+  /** Draw Tile */
   def draw = {
-    drawQuadTex(image, x - (getPlayer.getX - 16) * 32, 
-      y - (getPlayer.getY - 8) * 32, image.getImageWidth, image.getImageHeight)
+    if (explored)
+      drawQuadTex(image, x - (getPlayer.getX - 16) * 32, 
+          y - (getPlayer.getY - 8) * 32, image.getImageWidth, image.getImageHeight)
+  }
+  
+  /** Draw Fog */
+  def drawFog = {
+    if (!visible && explored)
+      drawQuadTex(TileType.getFog, x - (getPlayer.getX - 16) * 32, 
+          y - (getPlayer.getY - 8) * 32, image.getImageWidth, image.getImageHeight)
   }
   
   /** x and y setters */

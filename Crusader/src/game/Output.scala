@@ -32,10 +32,10 @@ object Output {
   private var continue2:Texture = null
   private var newgame:Texture = null
   private var quit:Texture = null
+  private var unseen: Texture = null
   private var tempHeart: Texture = null
   private var tempXp: Texture = null
   private var tempUIBackground: Texture = null
-  private var tempBlack: Texture = null
   
   /** Prepares, launches and initializes the display.
    *
@@ -94,10 +94,10 @@ object Output {
     continue2 = loadTexture("UI/Continue2")
     newgame = loadTexture("UI/Newgame")
     quit = loadTexture("UI/Quit")
+    unseen = loadTexture("Tiles/unseen")
     tempHeart = loadTexture("tempHeart")
     tempXp = loadTexture("tempXp")
     tempUIBackground = loadTexture("tempUIBackground")
-    tempBlack = loadTexture("tempBlack")
     
   }
   
@@ -222,7 +222,7 @@ object Output {
   def drawFloor() {
     for (i <- Range(0,33)) {
       for (j <- Range(0,17)) {
-        drawQuadTex(tempBlack, i * 32, j * 32, tempBlack.getImageWidth, tempBlack.getImageHeight)
+        drawQuadTex(unseen, i * 32, j * 32, unseen.getImageWidth, unseen.getImageHeight)
       }
     }
     getGrid.draw
@@ -230,21 +230,22 @@ object Output {
   
   /** Draw objects */
   def drawObjects() {
-    for (passive <- getPassiveObjectList)
-      if (passive.xDif(getPlayer) <= 16 && passive.yDif(getPlayer) <= 8) passive.draw
-    for (equipment <- getEquipmentList)
-      if (equipment.xDif(getPlayer) <= 16 && equipment.yDif(getPlayer) <= 8) equipment.draw
-    for (scroll <- getScrollList)
-      if (scroll.xDif(getPlayer) <= 16 && scroll.yDif(getPlayer) <= 8) scroll.draw
-    for (consumable <- getConsumableList)
-      if (consumable.xDif(getPlayer) <= 16 && consumable.yDif(getPlayer) <= 8) consumable.draw
-    for (monster <- getMonsterList)
-      if (monster.xDif(getPlayer) <= 16 && monster.yDif(getPlayer) <= 8) monster.draw
+    for (list <- List(getPassiveObjectList, getEquipmentList, getScrollList, getConsumableList, getMonsterList)) {
+      for (obj <- list) {
+        if (obj.xDif(getPlayer) <= 16 && obj.yDif(getPlayer) <= 8 && 
+            getGrid.getTile(obj.getX, obj.getY).explored) obj.draw
+      }
+    }
   }
   
   /** Draw fog */
   def drawFog() {
-    // not implemented yet
+    getGrid.FOV
+    for (i <- Range(0, getGrid.getSize())) {
+      for (j <- Range(0, getGrid.getSize())) {
+        if (getPlayer.xDif(i) <= 16 && getPlayer.yDif(j) <= 8) getGrid.getTile(i, j).drawFog
+      }
+    }
   }
   
 }

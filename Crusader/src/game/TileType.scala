@@ -16,10 +16,11 @@ object TileType extends Enumeration {
   val DJINNSLOT = Value
   val DJINNWALL = Value
   
-  private val tempGrass = loadTexture("tempGrass")
-  private val tempWall = loadTexture("tempWall")
-  private val tempStairs = loadTexture("tempStairs")
   private val missing = loadTexture("UI/missing")
+  private val fog: Texture = loadTexture("Tiles/fog")
+  private val grass1 = loadTexture("Tiles/grass1")
+  private val wall1 = loadTexture("Tiles/wall1")
+  private val tempStairs = loadTexture("tempStairs")
   private val tempDjinnDoorH = loadTexture("tempDjinnDoorH")
   private val tempDjinnDoorV = loadTexture("tempDjinnDoorV")
   private val tempDjinnFloor = loadTexture("tempDjinnFloor")
@@ -29,8 +30,8 @@ object TileType extends Enumeration {
   /** returns texture of the given tile type */
   def image(tileType: Type): Texture = {
     tileType match {
-      case t if (t == FLOOR) => tempGrass
-      case t if (t == WALL) => tempWall
+      case t if (t == FLOOR) => grass1
+      case t if (t == WALL) => wall1
       case t if (t == STAIRS) => tempStairs
       case t if (t == DJINNDOORH) => tempDjinnDoorH
       case t if (t == DJINNDOORV) => tempDjinnDoorV
@@ -70,5 +71,8 @@ object TileType extends Enumeration {
       case _ => true
     }
   }
+  
+  /** fog */
+  def getFog = fog
 
 }
