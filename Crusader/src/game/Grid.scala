@@ -22,9 +22,8 @@ class Grid() {
   private var size: Int = 100
   private var map = Array.ofDim[Tile](size, size)
   private var stairs: Tile = new Tile(-100, -100, TileType.STAIRS)
-  private var altar: Object = new PassiveObject("Altar", "Make your sacrifices here.", -100, -100, 
-    "tempAltar")
-  var djinn = new PassiveObject("Djinn", "merchant", -100, -100, "tempDjinn")
+  private var altar: PassiveObject = null
+  private var djinn: PassiveObject = null
   
   init()
   
@@ -35,6 +34,8 @@ class Grid() {
       map = Array.ofDim[Tile](size, size)
       do {
         clearLists
+        altar = new PassiveObject("Altar", "Make your sacrifices here.", -100, -100, "tempAltar")
+        djinn = new PassiveObject("Djinn", "merchant", -100, -100, "tempDjinn")
         makeMap1(45, 4, 4)
       }
       while (!mapIsContinuous)
@@ -97,7 +98,7 @@ class Grid() {
     }
     addStairs
     addtrees(16)
-    addtrees(4)
+    addrocks(4)
     
     var playerPosition = giveRandomNonBlockinCoordinates
     do {
