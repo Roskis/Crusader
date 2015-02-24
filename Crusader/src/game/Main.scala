@@ -90,6 +90,7 @@ object Main {
     clearLists
     level += 1
     grid = new Grid()
+    grid.init
     for (n <- Range(0,5)) {
       var lizardPosition = grid.giveRandomNonBlockinCoordinates
       var lizard = new Monster("Lizard", "Nasty looking reptile.", 
@@ -119,36 +120,52 @@ object Main {
       Keyboard.getEventKey match {
         case k if (k == Keyboard.KEY_ESCAPE) => gameState = MAIN_MENU
         case k if ((k == Keyboard.KEY_D || k == Keyboard.KEY_RIGHT || k == Keyboard.KEY_NUMPAD6) && Keyboard.getEventKeyState) => {
-          player.moveOrAttack(E)
-          playTurn
+          if (getPlayer.health > 0) {
+            player.moveOrAttack(E)
+            playTurn
+          }
         }
         case k if ((k == Keyboard.KEY_A || k == Keyboard.KEY_LEFT || k == Keyboard.KEY_NUMPAD4) && Keyboard.getEventKeyState) => {
-          player.moveOrAttack(W)
-          playTurn
+          if (getPlayer.health > 0) {
+            player.moveOrAttack(W)
+            playTurn
+          }
         }
         case k if ((k == Keyboard.KEY_W || k == Keyboard.KEY_UP || k == Keyboard.KEY_NUMPAD8) && Keyboard.getEventKeyState) => {
-          player.moveOrAttack(N)
-          playTurn
+          if (getPlayer.health > 0) {
+            player.moveOrAttack(N)
+            playTurn
+          }
         }
         case k if ((k == Keyboard.KEY_S || k == Keyboard.KEY_DOWN || k == Keyboard.KEY_NUMPAD2) && Keyboard.getEventKeyState) => {
-          player.moveOrAttack(S)
-          playTurn
+          if (getPlayer.health > 0) {
+            player.moveOrAttack(S)
+            playTurn
+          }
         }
         case k if ((k == Keyboard.KEY_Q || k == Keyboard.KEY_NUMPAD7) && Keyboard.getEventKeyState) => {
-          player.moveOrAttack(NW)
-          playTurn
+          if (getPlayer.health > 0) {
+            player.moveOrAttack(NW)
+            playTurn
+          }
         }
         case k if ((k == Keyboard.KEY_E || k == Keyboard.KEY_NUMPAD9) && Keyboard.getEventKeyState) => {
-          player.moveOrAttack(NE)
-          playTurn
+          if (getPlayer.health > 0) {
+            player.moveOrAttack(NE)
+            playTurn
+          }
         }
         case k if ((k == Keyboard.KEY_C || k == Keyboard.KEY_NUMPAD3) && Keyboard.getEventKeyState) => {
-          player.moveOrAttack(SE)
-          playTurn
+          if (getPlayer.health > 0) {
+            player.moveOrAttack(SE)
+            playTurn
+          }
         }
         case k if ((k == Keyboard.KEY_Z || k == Keyboard.KEY_NUMPAD1) && Keyboard.getEventKeyState) => {
-          player.moveOrAttack(SW)
-          playTurn
+          if (getPlayer.health > 0) {
+            player.moveOrAttack(SW)
+            playTurn
+          }
         }
         case _ => {}
       }

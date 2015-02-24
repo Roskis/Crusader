@@ -17,13 +17,11 @@ class Coordinate(var x: Int, var y: Int) {
 /** Grid is reponsible for handling the map */
 class Grid() {
   private val rnd = getRnd
-  private var size: Int = 100
+  private var size: Int = 1
   private var map = Array.ofDim[Tile](size, size)
   private var stairs: Tile = new Tile(-100, -100, TileType.STAIRS)
   private var altar: PassiveObject = null
   private var djinn: PassiveObject = null
-  
-  init()
   
   /** Different levels make different maps */
   def init() {
@@ -97,6 +95,7 @@ class Grid() {
     addStairs
     addtrees(16)
     addrocks(4)
+    addItem
     
     var playerPosition = giveRandomNonBlockinCoordinates
     do {
@@ -280,6 +279,23 @@ class Grid() {
     altar.setY(coord.getY)
   }
   
+  /** Add random item */
+  def addItem() = {
+    var coord: Coordinate = new Coordinate(-100, -100)
+    do {
+      coord = giveRandomNonBlockinCoordinates
+    }
+    while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR))
+    var item: Equipment = null
+    rnd.nextInt(5) match {
+      case r if (r == 0) => item = new Equipment(coord.getX, coord.getY, EquipmentType.KNIFE, false)
+      case r if (r == 1) => item = new Equipment(coord.getX, coord.getY, EquipmentType.ROBES, false)
+      case r if (r == 2) => item = new Equipment(coord.getX, coord.getY, EquipmentType.IRONARMOR, false)
+      case r if (r == 3) => item = new Equipment(coord.getX, coord.getY, EquipmentType.STEELSWORD, false)
+      case r if (r == 4) => item = new Equipment(coord.getX, coord.getY, EquipmentType.WOODENSHIELD, false)
+    }
+  }
+  
   /** getter for stairs */
   def getStairs() = stairs
   
@@ -408,7 +424,7 @@ class Grid() {
   
   /** Returns random nonblocking coordinates */
   def giveRandomNonBlockinCoordinates(): Coordinate = {
-    val tile = giveRandomNonBlockingTile 
+    val tile = giveRandomNonBlockingTile
     new Coordinate(tile.getX, tile.getY)
   }
   
