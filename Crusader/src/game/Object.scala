@@ -35,7 +35,7 @@ trait Object {
   /** dummy methods */
   def pickUp {}
   def dodge = 0
-  def takeDamage(a: Int, b: Double) {}
+  def takeDamage(a: Int, b: Double, c: Object) {}
   
   /** Add object to the tile it is on */
   def init() = if (getGrid.isWithinGrid(getX, getY)) getGrid.getTile(getX, getY).addObject(this)
@@ -142,9 +142,9 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   /** Method to deal damage to monsters */
   def attack(target: Object) {
     if (rnd.nextInt(100) <= accuracy - target.dodge) {
-      target.takeDamage(damage(rnd.nextInt(100) <= crit), armorPierce)
+      target.takeDamage(damage(rnd.nextInt(100) <= crit), armorPierce, this)
     }
-    else target.takeDamage(smallestDamage, armorPierce)
+    else target.takeDamage(smallestDamage, armorPierce, this)
   }
   
   /** Damage is based on player's weapon */
@@ -163,6 +163,16 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
     num
   }
   
+  override def takeDamage(damage: Int, armorPierce: Double, attacker: Object) = {
+    var effectiveArmor = armor
+    if (rnd.nextInt(100) <= blockChance) effectiveArmor += shieldArmor
+    if (effectiveArmor < 0) effectiveArmor = 0
+    var effectiveDamage = (damage - effectiveArmor)
+    if (effectiveDamage < 0) effectiveDamage = 0
+    health -= effectiveDamage
+    addLog(attacker.name + " deals " + effectiveDamage.toString + " damage to " + name)
+  }
+  
   def armor: Double = {
     val patienceBonus: Double = {
       if (patience > 7) 2
@@ -174,13 +184,16 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
     slotArmor.armor + patienceBonus
   }
   
-  def armorPierce: Double = slotWeapon.armorPiercing
+  def armorPierce: Double = if (slotWeapon != null) slotWeapon.armorPiercing else 0
   
   /** Critical chance of weapon used */
-  def crit: Int = slotWeapon.critChance
+  def crit: Int = if (slotWeapon != null) slotWeapon.critChance else 2
   
   /** Block chance of shield used */
-  def block: Int = slotShield.blockChance
+  def blockChance: Int = if (slotShield != null) slotShield.blockChance else 0
+  
+  /** Shield Armor */
+  def shieldArmor: Double = if (slotShield != null) slotShield.armor else 0
   
   /** Total weight of items after patience bonus */
   def totalWeight: Int = {
@@ -198,7 +211,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   override def dodge: Int = 100 - totalWeight + humility*2
   
   /** Return accuracy of player */
-  def accuracy: Int = slotWeapon.accuracy + temperance*2
+  def accuracy: Int = if (slotWeapon != null) slotWeapon.accuracy + temperance*2 else 100 + temperance*2
   
   /** Return needed amount of experience to level up */
   def xpNeededForLevel(level: Int): Int = {
@@ -296,21 +309,30 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   var ap: Double = MonsterType.armorPierce(mType)
   var blockChance = 0
   var shieldArmor = 0
+  override def dodge = MonsterType.dodge(mType)
   
   init
   getMonsterList.append(this)
   
-  override def dodge = 10
+  /** When monster dies this method is called */
+  def kill() {
+    getMonsterList.filter(_ == this) foreach {getMonsterList -= _}
+    getGrid.getTile(getX, getY).removeObject(this)
+    x = -100
+    y = -100
+    addLog(name + " dies")
+  }
   
   /** Takes damage from attack */
-  override def takeDamage(damage: Int, armorPierce: Double) = {
+  override def takeDamage(damage: Int, armorPierce: Double, attacker: Object) = {
     var effectiveArmor = armor
     if (rnd.nextInt(100) <= blockChance) effectiveArmor += shieldArmor
     if (effectiveArmor < 0) effectiveArmor = 0
     var effectiveDamage = (damage - effectiveArmor)
     if (effectiveDamage < 0) effectiveDamage = 0
     health -= effectiveDamage
-    addLog(getPlayer.name + " deals " + effectiveDamage.toString + " damage to " + name)
+    addLog(attacker.name + " deals " + effectiveDamage.toString + " damage to " + name)
+    if (health < 0) kill
   }
   
   /** Temporary method until monster ai is working */
@@ -703,7 +725,6 @@ class Equipment(startX: Int, startY: Int, equipmentType: EquipmentType.Value, is
     equipped = true
     x = -100
     y = -100
-
   }
   
   /** Pick up */

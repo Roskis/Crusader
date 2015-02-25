@@ -2,8 +2,8 @@ package game
 
 import scala.io.Source
 import org.lwjgl.opengl.Display
-import Output.{startDisplay, drawMainMenu, drawGame}
-import GameState.{MAIN_MENU, GAME}
+import Output.{startDisplay, drawMainMenu, drawGame, drawCharacterCreation}
+import GameState.{MAIN_MENU, GAME, CHARACTER_CREATION}
 import org.lwjgl.input.{Mouse, Keyboard}
 import scala.util.Random
 import collection.mutable.Buffer
@@ -53,7 +53,7 @@ object Main {
     */
   def main(args:Array[String]) {
     startDisplay()
-    Keyboard.enableRepeatEvents(true)
+    player = new Player("Paladin", 0, 0)
     /** Gameloop */
     while (!Display.isCloseRequested) {
       gameState match {
@@ -64,6 +64,10 @@ object Main {
         case g if (g == GAME) => {
           gameKeys
           drawGame
+        }
+        case g if (g == CHARACTER_CREATION) => {
+          characterKeys
+          drawCharacterCreation
         }
       }
       Display.update()
@@ -81,7 +85,6 @@ object Main {
     episode = 1
     turn = 0
     while (Keyboard.next) {}
-    player = new Player("Paladin", 0, 0)
     nextMap()
   }
   
@@ -93,16 +96,46 @@ object Main {
     grid.init
   }
   
+  def characterKeys {
+    if ((Mouse.isButtonDown(0) && Mouse.getX > 1040 && Mouse.getX < 1263 && 
+        (height - Mouse.getY) > 604 && (height - Mouse.getY) < 660)) {
+          gameState = GAME
+          newGame
+    }
+    else if ((Mouse.isButtonDown(0) && Mouse.getX > 17 && Mouse.getX < 239 && 
+        (height - Mouse.getY) > 604 && (height - Mouse.getY) < 660)) {
+      gameState = MAIN_MENU
+    }
+    else while (Keyboard.next) {
+      Keyboard.getEventKey match {
+        case k if (k == Keyboard.KEY_ESCAPE) => gameState = MAIN_MENU
+        case k if (k == Keyboard.KEY_RETURN && Keyboard.getEventKeyState && player.name != "" && Output.font.getWidth(getPlayer.name) < 400) => {
+          gameState = GAME
+          newGame
+        }
+        case k if (k == Keyboard.KEY_BACK && Keyboard.getEventKeyState) => player.name = player.name.dropRight(1)
+        case k if (Keyboard.getEventKeyState) => {
+          if (k == 57 && Keyboard.getEventKeyState) player.name = player.name + " "
+          else if ((k == 0 || k == 12 || k == 13 || k == 15 || k == 26 || k == 27 || k == 28 || k == 29 || k == 39 || 
+              k == 40 || k == 41 || k == 42 || k == 43 || k > 50) && Keyboard.getEventKeyState) {}
+          else if (player.name == "" && Keyboard.getEventKeyState) player.name = Keyboard.getKeyName(k).toUpperCase
+          else player.name = player.name + Keyboard.getKeyName(k).toLowerCase
+          }
+        case _ => {}
+      }
+    }
+  }
+  
   /** Follow user input in menu */
   def menuKeys {
-    if ((Mouse.isButtonDown(0) && Mouse.getX >= 910 && Mouse.getX <= 1158 && 
-        (height - Mouse.getY) >= 324 && (height - Mouse.getY) <= 372) || 
+    if ((Mouse.isButtonDown(0) && Mouse.getX > 922 && Mouse.getX < 1145 && 
+        (height - Mouse.getY) > 320 && (height - Mouse.getY) < 376) || 
         Keyboard.isKeyDown(Keyboard.KEY_N)) {
-      gameState = GAME
-      newGame
+      gameState = CHARACTER_CREATION
+      player = new Player(player.name, 0, 0)
     }
-    else if ((Mouse.isButtonDown(0) && Mouse.getX >= 910 && Mouse.getX <= 1158 && 
-        (height - Mouse.getY) >= 424 && (height - Mouse.getY) <= 472) || 
+    else if ((Mouse.isButtonDown(0) && Mouse.getX > 922 && Mouse.getX < 1145 && 
+        (height - Mouse.getY) > 420 && (height - Mouse.getY) < 476) || 
         Keyboard.isKeyDown(Keyboard.KEY_Q)) {
       Display.destroy()
       System.exit(0)
@@ -114,54 +147,46 @@ object Main {
     while (Keyboard.next) {
       Keyboard.getEventKey match {
         case k if (k == Keyboard.KEY_ESCAPE) => gameState = MAIN_MENU
-        case k if ((k == Keyboard.KEY_D || k == Keyboard.KEY_RIGHT || k == Keyboard.KEY_NUMPAD6) && Keyboard.getEventKeyState) => {
-          if (getPlayer.health > 0) {
-            player.moveOrAttack(E)
-            playTurn
-          }
+        case k if ((k == Keyboard.KEY_D || k == Keyboard.KEY_RIGHT || k == Keyboard.KEY_NUMPAD6) && 
+            Keyboard.getEventKeyState && getPlayer.health > 0) => {
+          player.moveOrAttack(E)
+          playTurn
         }
-        case k if ((k == Keyboard.KEY_A || k == Keyboard.KEY_LEFT || k == Keyboard.KEY_NUMPAD4) && Keyboard.getEventKeyState) => {
-          if (getPlayer.health > 0) {
-            player.moveOrAttack(W)
-            playTurn
-          }
+        case k if ((k == Keyboard.KEY_A || k == Keyboard.KEY_LEFT || k == Keyboard.KEY_NUMPAD4) && 
+            Keyboard.getEventKeyState && getPlayer.health > 0) => {
+          player.moveOrAttack(W)
+          playTurn
         }
-        case k if ((k == Keyboard.KEY_W || k == Keyboard.KEY_UP || k == Keyboard.KEY_NUMPAD8) && Keyboard.getEventKeyState) => {
-          if (getPlayer.health > 0) {
-            player.moveOrAttack(N)
-            playTurn
-          }
+        case k if ((k == Keyboard.KEY_W || k == Keyboard.KEY_UP || k == Keyboard.KEY_NUMPAD8) && 
+            Keyboard.getEventKeyState && getPlayer.health > 0) => {
+          player.moveOrAttack(N)
+          playTurn
         }
-        case k if ((k == Keyboard.KEY_S || k == Keyboard.KEY_DOWN || k == Keyboard.KEY_NUMPAD2) && Keyboard.getEventKeyState) => {
-          if (getPlayer.health > 0) {
-            player.moveOrAttack(S)
-            playTurn
-          }
+        case k if ((k == Keyboard.KEY_S || k == Keyboard.KEY_DOWN || k == Keyboard.KEY_NUMPAD2) && 
+            Keyboard.getEventKeyState && getPlayer.health > 0) => {
+          player.moveOrAttack(S)
+          playTurn
         }
-        case k if ((k == Keyboard.KEY_Q || k == Keyboard.KEY_NUMPAD7) && Keyboard.getEventKeyState) => {
-          if (getPlayer.health > 0) {
-            player.moveOrAttack(NW)
-            playTurn
-          }
+        case k if ((k == Keyboard.KEY_Q || k == Keyboard.KEY_NUMPAD7) && 
+            Keyboard.getEventKeyState && getPlayer.health > 0) => {
+          player.moveOrAttack(NW)
+          playTurn
         }
-        case k if ((k == Keyboard.KEY_E || k == Keyboard.KEY_NUMPAD9) && Keyboard.getEventKeyState) => {
-          if (getPlayer.health > 0) {
-            player.moveOrAttack(NE)
-            playTurn
-          }
+        case k if ((k == Keyboard.KEY_E || k == Keyboard.KEY_NUMPAD9) && 
+            Keyboard.getEventKeyState && getPlayer.health > 0) => {
+          player.moveOrAttack(NE)
+          playTurn
         }
-        case k if ((k == Keyboard.KEY_C || k == Keyboard.KEY_NUMPAD3) && Keyboard.getEventKeyState) => {
-          if (getPlayer.health > 0) {
-            player.moveOrAttack(SE)
-            playTurn
-          }
+        case k if ((k == Keyboard.KEY_C || k == Keyboard.KEY_NUMPAD3) && 
+            Keyboard.getEventKeyState && getPlayer.health > 0) => {
+          player.moveOrAttack(SE)
+          playTurn
         }
-        case k if ((k == Keyboard.KEY_Z || k == Keyboard.KEY_NUMPAD1) && Keyboard.getEventKeyState) => {
-          if (getPlayer.health > 0) {
-            player.moveOrAttack(SW)
-            playTurn
+        case k if ((k == Keyboard.KEY_Z || k == Keyboard.KEY_NUMPAD1) && 
+            Keyboard.getEventKeyState && getPlayer.health > 0) => {
+          player.moveOrAttack(SW)
+          playTurn
           }
-        }
         case _ => {}
       }
     }
@@ -173,6 +198,7 @@ object Main {
     for (monster <- monsterList)
       monster.turn
     turn += 1
+    if (player.health < 0) Output.addLog("You died! Score: " + getPlayer.gold)
   }
   
   def clearLists() {

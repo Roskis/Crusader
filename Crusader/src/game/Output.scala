@@ -31,10 +31,13 @@ object Output {
   private var fontMenu: TrueTypeFont = null  
   private var awtFont: Font = null
   private var background:Texture = null
+  private var characterBackground: Texture = null
   private var continue:Texture = null
   private var continue2:Texture = null
   private var newgame:Texture = null
-  private var quit:Texture = null
+  private var newgame2:Texture = null
+  private var exit:Texture = null
+  private var back:Texture = null
   private var unseen: Texture = null
   private var tempHeart: Texture = null
   private var tempXp: Texture = null
@@ -96,15 +99,22 @@ object Output {
       case e: Throwable => e.printStackTrace()
     }
     
+    org.lwjgl.input.Keyboard.enableRepeatEvents(true)
+    
     background = loadTexture("tempBackground")
+    characterBackground = loadTexture("tempCharacterBackground")
     continue = loadTexture("UI/Continue")
     continue2 = loadTexture("UI/Continue2")
     newgame = loadTexture("UI/Newgame")
-    quit = loadTexture("UI/Quit")
+    newgame2 = loadTexture("UI/Newgame2")
+    exit = loadTexture("UI/Exit")
+    back = loadTexture("UI/Back")
     unseen = loadTexture("Tiles/unseen")
     tempHeart = loadTexture("tempHeart")
     tempXp = loadTexture("tempXp")
     tempUIBackground = loadTexture("tempUIBackground")
+    
+    addLog("Insert epic story here. (TODO)")
     
   }
   
@@ -152,6 +162,23 @@ object Output {
     glLoadIdentity
   }
   
+  /** Draw the character creation */
+  def drawCharacterCreation() {
+    glClear(GL_COLOR_BUFFER_BIT)
+    drawQuadTex(characterBackground, (width-characterBackground.getImageWidth)/2, 
+        (height-characterBackground.getImageHeight)/2, characterBackground.getImageWidth, characterBackground.getImageHeight)
+    if (font.getWidth(getPlayer.name) >= 400) {
+      font.drawString(width/2-font.getWidth("Name is too long")/2, height*5/9, "Name is too long", Color.red)
+      drawQuadTex(newgame2, width*23/24-newgame2.getImageWidth+54, height*7/10, newgame2.getImageWidth, newgame2.getImageHeight)
+    }
+    else drawQuadTex(newgame, width*23/24-newgame.getImageWidth+54, height*7/10, newgame.getImageWidth, newgame.getImageHeight)
+    drawQuadTex(back, 1/24, height*7/10, back.getImageWidth, back.getImageHeight)
+    fontMenu.drawString(width/2-fontMenu.getWidth("Enter name:")/2, height*3/9, "Enter name:", Color.black)
+    font.drawString(width/2-font.getWidth(getPlayer.name)/2, height*4/9, getPlayer.name, Color.black)
+    font.drawString(2, height - 24, "Mouse X: " + Mouse.getX.toString, Color.red)
+    font.drawString(130, height - 24, "Y: " + (height - Mouse.getY).toString, Color.red)
+  }
+  
   /** Draw the main menu */
   def drawMainMenu() {
     glClear(GL_COLOR_BUFFER_BIT)
@@ -159,8 +186,8 @@ object Output {
         (height-background.getImageHeight)/2, background.getImageWidth, background.getImageHeight)
     drawQuadTex(continue2, width*17/24, height*1/6, continue.getImageWidth, continue.getImageHeight)
     drawQuadTex(newgame, width*17/24, height*1/6+100, newgame.getImageWidth, newgame.getImageHeight)
-    drawQuadTex(quit, width*17/24, height*1/6+200, quit.getImageWidth, quit.getImageHeight)
-    fontMenu.drawString(width*17/24, height/10, "Crusader", Color.black)        
+    drawQuadTex(exit, width*17/24, height*1/6+200, exit.getImageWidth, exit.getImageHeight)
+    fontMenu.drawString(920, height/10, "Crusader", Color.black)        
     font.drawString(2, height - 24, "Mouse X: " + Mouse.getX.toString, Color.red)
     font.drawString(130, height - 24, "Y: " + (height - Mouse.getY).toString, Color.red)
   }
@@ -186,7 +213,6 @@ object Output {
     font.drawString(2, height - 205, "Version: " + version, Color.white)
     font.drawString(900, height - 205, "Episode: " + getEpisode, Color.white)
     font.drawString(990, height - 205, "Level: " + getLevel, Color.white)
-    if (getPlayer.health <= 0) fontMenu.drawString(width/4, height/4, "You died! Score: " + getPlayer.gold, Color.white)
     if (Mouse.getX < 1057 && (height - Mouse.getY) < 545) drawInfoBox
   }
   
@@ -241,7 +267,7 @@ object Output {
   /** Draw sidebar to right of the screen */
   def drawSideBar() {
     drawQuadTex(tempHeart, width-239, -25, tempHeart.getImageWidth, tempHeart.getImageHeight)
-    font.drawString(width-153, 80, "HP: " + getPlayer.health + "/" + getPlayer.maxHealth, Color.black)
+    font.drawString(width-153, 80, "HP: " + getPlayer.health.toInt + "/" + getPlayer.maxHealth, Color.black)
     drawQuadTex(tempXp, width-239, 100, tempXp.getImageWidth, tempXp.getImageHeight)
     font.drawString(width-153, 210, "XP: " + getPlayer.experience + "/10", Color.black)
     font.drawString(width-200, 410, "Items and stuff here", Color.black)
