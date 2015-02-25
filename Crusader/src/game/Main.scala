@@ -97,12 +97,12 @@ object Main {
   }
   
   def characterKeys {
-    if ((Mouse.isButtonDown(0) && Mouse.getX > 1040 && Mouse.getX < 1263 && 
+    if ((Mouse.isButtonDown(0) && Mouse.getX > 816 && Mouse.getX < 1040 && 
         (height - Mouse.getY) > 604 && (height - Mouse.getY) < 660)) {
           gameState = GAME
           newGame
     }
-    else if ((Mouse.isButtonDown(0) && Mouse.getX > 17 && Mouse.getX < 239 && 
+    else if ((Mouse.isButtonDown(0) && Mouse.getX > 274 && Mouse.getX < 496 && 
         (height - Mouse.getY) > 604 && (height - Mouse.getY) < 660)) {
       gameState = MAIN_MENU
     }

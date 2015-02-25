@@ -39,8 +39,13 @@ object Output {
   private var exit:Texture = null
   private var back:Texture = null
   private var unseen: Texture = null
-  private var tempHeart: Texture = null
-  private var tempXp: Texture = null
+  private var heart: Texture = null
+  private var XP: Texture = null
+  private var XPButton: Texture = null
+  private var XPButton2: Texture = null
+  private var saveQuit: Texture = null
+  private var HPBar: Texture = null
+  private var XPBar: Texture = null
   private var tempUIBackground: Texture = null
   
   /** Prepares, launches and initializes the display.
@@ -110,8 +115,13 @@ object Output {
     exit = loadTexture("UI/Exit")
     back = loadTexture("UI/Back")
     unseen = loadTexture("Tiles/unseen")
-    tempHeart = loadTexture("tempHeart")
-    tempXp = loadTexture("tempXp")
+    heart = loadTexture("UI/Heart")
+    XP = loadTexture("UI/XP")
+    XPButton = loadTexture("UI/XPButton")
+    XPButton2 = loadTexture("UI/XPButton2")
+    saveQuit = loadTexture("UI/Save&Quit")
+    HPBar = loadTexture("UI/HPBar")
+    XPBar = loadTexture("UI/XPBar")
     tempUIBackground = loadTexture("tempUIBackground")
     
     addLog("Insert epic story here. (TODO)")
@@ -171,8 +181,8 @@ object Output {
       font.drawString(width/2-font.getWidth("Name is too long")/2, height*5/9, "Name is too long", Color.red)
       drawQuadTex(newgame2, width*23/24-newgame2.getImageWidth+54, height*7/10, newgame2.getImageWidth, newgame2.getImageHeight)
     }
-    else drawQuadTex(newgame, width*23/24-newgame.getImageWidth+54, height*7/10, newgame.getImageWidth, newgame.getImageHeight)
-    drawQuadTex(back, 1/24, height*7/10, back.getImageWidth, back.getImageHeight)
+    else drawQuadTex(newgame, width*5/8, height*7/10, newgame.getImageWidth, newgame.getImageHeight)
+    drawQuadTex(back, width*3/8-back.getImageWidth+34, height*7/10, back.getImageWidth, back.getImageHeight)
     fontMenu.drawString(width/2-fontMenu.getWidth("Enter name:")/2, height*3/9, "Enter name:", Color.black)
     font.drawString(width/2-font.getWidth(getPlayer.name)/2, height*4/9, getPlayer.name, Color.black)
     font.drawString(2, height - 24, "Mouse X: " + Mouse.getX.toString, Color.red)
@@ -197,15 +207,14 @@ object Output {
     mouseXCoord = (Mouse.getX * 1.0 / 32 + getPlayer.getX - 16).toInt
     mouseYCoord = ((height - Mouse.getY) * 1.0 / 32 + getPlayer.getY - 8).toInt
     glClear(GL_COLOR_BUFFER_BIT)
-    drawQuadTex(tempUIBackground, 0, 0, tempUIBackground.getImageWidth, tempUIBackground.getImageHeight)
-    drawlog
+    drawQuadTex(tempUIBackground, (width-tempUIBackground.getImageWidth)/2, 
+        (height-tempUIBackground.getImageHeight)/2, tempUIBackground.getImageWidth, tempUIBackground.getImageHeight)
     drawSideBar
+    drawlog
     drawFloor
     drawObjects
     drawPlayer
     drawFog
-    font.drawString(2, 0, getPlayer.name + " the Holy", Color.white)
-    font.drawString(width - 155, height - 27, "Esc to quit", Color.black)
     font.drawString(2, height - 245, "Mouse X: " + mouseXCoord.toString, Color.red)
     font.drawString(130, height - 245, "Y: " + mouseYCoord.toString, Color.red)
     font.drawString(2, height - 225, "Mouse X: " + Mouse.getX.toString, Color.red)
@@ -266,15 +275,84 @@ object Output {
   
   /** Draw sidebar to right of the screen */
   def drawSideBar() {
-    drawQuadTex(tempHeart, width-239, -25, tempHeart.getImageWidth, tempHeart.getImageHeight)
-    font.drawString(width-153, 80, "HP: " + getPlayer.health.toInt + "/" + getPlayer.maxHealth, Color.black)
-    drawQuadTex(tempXp, width-239, 100, tempXp.getImageWidth, tempXp.getImageHeight)
-    font.drawString(width-153, 210, "XP: " + getPlayer.experience + "/10", Color.black)
-    font.drawString(width-200, 410, "Items and stuff here", Color.black)
-    font.drawString(width-200, 410, "Items and stuff here", Color.black)
-    if (getPlayer.slotWeapon != null) drawQuadTex(getPlayer.slotWeapon.image, width-200, 500, getPlayer.slotWeapon.image.getImageWidth, getPlayer.slotWeapon.image.getImageHeight)
-    if (getPlayer.slotArmor != null) drawQuadTex(getPlayer.slotArmor.image, width-150, 500, getPlayer.slotArmor.image.getImageWidth, getPlayer.slotArmor.image.getImageHeight)
-    if (getPlayer.slotShield != null) drawQuadTex(getPlayer.slotShield.image, width-100, 500, getPlayer.slotShield.image.getImageWidth, getPlayer.slotShield.image.getImageHeight)
+    val middle = 33*32 + (width - 33*32)/2
+    var height = 0
+    
+    var HPHeight = getPlayer.health / getPlayer.maxHealth
+    if (HPHeight > 1) HPHeight = 1
+    if (HPHeight < 0) HPHeight = 0
+    drawQuadTex(HPBar, middle-heart.getImageWidth/2+52, (height+46) + ((heart.getImageHeight-140) * (1-HPHeight)).toInt, 
+        heart.getImageWidth-104, ((heart.getImageHeight-140) * HPHeight).toInt)
+    
+    height -= 25
+    drawQuadTex(heart, middle-heart.getImageWidth/2, height, heart.getImageWidth, heart.getImageHeight)
+    
+    height += 115
+    val hptext = "HP: " + getPlayer.health.toInt + "/" + getPlayer.maxHealth
+    font.drawString(middle-font.getWidth(hptext)/2, height, hptext, Color.black)
+    
+    var XPWidth = getPlayer.experience*1.0 / getPlayer.smallestLevel
+    if (XPWidth > 1) XPWidth = 1
+    if (XPWidth < 0) XPWidth = 0
+    drawQuadTex(XPBar, middle-XP.getImageWidth/2+40, height+96, 
+        ((XP.getImageWidth-80)*XPWidth).toInt, XP.getImageHeight-224)
+    
+    height -= 16
+    drawQuadTex(XP, middle-XP.getImageWidth/2, height, XP.getImageWidth, XP.getImageHeight)
+    
+    height += 112
+    val xptext = "XP: " + getPlayer.experience + "/" + getPlayer.smallestLevel
+    font.drawString(middle-font.getWidth(xptext)/2, height, xptext, Color.black)
+    if (getPlayer.experience > getPlayer.smallestLevel) 
+      drawQuadTex(XPButton, middle-XPButton.getImageWidth/2, 194-48, XPButton.getImageWidth, 
+          XPButton.getImageHeight)
+    else drawQuadTex(XPButton2, middle-XPButton2.getImageWidth/2, 194-48, XPButton2.getImageWidth, 
+        XPButton2.getImageHeight)
+        
+    height += 150
+    if (getPlayer.slotWeapon != null) drawQuadTex(getPlayer.slotWeapon.image, 
+        middle-getPlayer.slotWeapon.image.getImageWidth*5/2, height, 
+        getPlayer.slotWeapon.image.getImageWidth, getPlayer.slotWeapon.image.getImageHeight)
+    if (getPlayer.slotArmor != null) drawQuadTex(getPlayer.slotArmor.image, 
+        middle-getPlayer.slotArmor.image.getImageWidth/2, height, 
+        getPlayer.slotArmor.image.getImageWidth, getPlayer.slotArmor.image.getImageHeight)
+    if (getPlayer.slotShield != null) drawQuadTex(getPlayer.slotShield.image, 
+        middle+getPlayer.slotShield.image.getImageWidth*3/2, height, 
+        getPlayer.slotShield.image.getImageWidth, getPlayer.slotShield.image.getImageHeight)
+    
+    height += 64
+    if (getPlayer.slotRing != null) drawQuadTex(getPlayer.slotRing.image, 
+        middle-getPlayer.slotRing.image.getImageWidth*5/2, height, 
+        getPlayer.slotRing.image.getImageWidth, getPlayer.slotRing.image.getImageHeight)
+    if (getPlayer.slotAmulet != null) drawQuadTex(getPlayer.slotAmulet.image, 
+        middle-getPlayer.slotAmulet.image.getImageWidth/2, height, 
+        getPlayer.slotAmulet.image.getImageWidth, getPlayer.slotAmulet.image.getImageHeight)
+    if (getPlayer.slotItem != null) drawQuadTex(getPlayer.slotItem.image, 
+        middle+getPlayer.slotItem.image.getImageWidth*3/2, height, 
+        getPlayer.slotItem.image.getImageWidth, getPlayer.slotItem.image.getImageHeight)
+    
+    height += 64
+    val name = "Name: " + getPlayer.name
+    font.drawString(middle-96, height, name, Color.black)
+    
+    height += 20
+    val title = "Title: " + getPlayer.title
+    font.drawString(middle-96, height, title, Color.black)
+    
+    height += 20
+    val heroLevel = "Hero level: " + getPlayer.totalLevel
+    font.drawString(middle-96, height, heroLevel, Color.black)
+    
+    height += 20
+    val gold = "Gold: " + getPlayer.gold
+    font.drawString(middle-96, height, gold, Color.black)
+    
+    height += 20
+    val piety = "Piety: " + getPlayer.piety
+    font.drawString(middle-96, height, piety, Color.black)
+    
+    height -= 64
+    drawQuadTex(saveQuit, middle-saveQuit.getImageWidth/2, height, saveQuit.getImageWidth, saveQuit.getImageHeight)
   }
   
   /** Draw player to the middle of screen */

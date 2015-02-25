@@ -121,6 +121,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   var maxHealth: Int = 20
   var experience: Int = 0
   var gold: Int = 0
+  var piety: Int = 0
   
   var zeal: Int = 0
   var humility: Int = 0
@@ -134,10 +135,23 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   var slotArmor: Equipment = new Equipment(-100, -100, EquipmentType.ROBES, true)
   var slotShield: Equipment = null
   var slotRing: Equipment = null
-  var slotAmulet: Equipment = null
+  var slotAmulet: Equipment = new Equipment(-100, -100, EquipmentType.ROBES, true)
   var slotItem: Equipment = null
   
   val grave = loadTexture("Environment/grave")
+  
+  /** Title of player */
+  def title: String = "the Holy"
+  
+  /** Total level of player */
+  def totalLevel(): Int = zeal + humility + temperance + kindness + patience + charity + diligence
+  
+  /** Return smallest level xp requirement */
+  def smallestLevel(): Int = {
+    var skills = List(zeal, humility, temperance, kindness, patience, charity, diligence)
+    skills = skills.sortWith(_ < _)
+    xpNeededForLevel(skills(0) + 1)
+  }
   
   /** Method to deal damage to monsters */
   def attack(target: Object) {
@@ -226,7 +240,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
       case l if (l == 8) => 5000
       case l if (l == 9) => 8000
       case l if (l == 10) => 15000
-      case _ => 1000000
+      case _ => 10
     }
   }
   
@@ -307,9 +321,12 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   var damage = MonsterType.damage(mType)
   var accuracy = MonsterType.accuracy(mType)
   var ap: Double = MonsterType.armorPierce(mType)
+  var experience = MonsterType.experience(mType)
+  var gold = MonsterType.gold(mType)
+  var piety = MonsterType.piety(mType)
+  override def dodge = MonsterType.dodge(mType)
   var blockChance = 0
   var shieldArmor = 0
-  override def dodge = MonsterType.dodge(mType)
   
   init
   getMonsterList.append(this)
@@ -321,6 +338,9 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     x = -100
     y = -100
     addLog(name + " dies")
+    getPlayer.experience += experience
+    getPlayer.gold += gold
+    getPlayer.piety += piety
   }
   
   /** Takes damage from attack */
