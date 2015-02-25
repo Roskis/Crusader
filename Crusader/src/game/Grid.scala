@@ -93,9 +93,10 @@ class Grid() {
       altar.setY(-100)
     }
     addStairs
-    addtrees(16)
-    addrocks(4)
+    addTrees(16)
+    addRocks(4)
     addItem
+    addMonsters(20)
     
     var playerPosition = giveRandomNonBlockinCoordinates
     do {
@@ -162,9 +163,9 @@ class Grid() {
   
   /** Adds shop to the map */
   def addShop() {
-    var coord = new Coordinate(randomX, randomY)
-    var door = new Tile(-100, -100, TileType.DJINNDOORH)
-    var direction: Direction = Direction.N
+    var coord: Coordinate = null
+    var door: Tile = new Tile(-100, -100, TileType.DJINNDOORH)
+    var direction: Direction = null
     
     do {
       direction = randomDirection(4)
@@ -230,39 +231,41 @@ class Grid() {
   }
   
   /** Add a number of trees */
-  def addtrees(num: Int) = {
+  def addTrees(num: Int) = {
     var tree: PassiveObject = null
-    var i = 0
-    var coord: Coordinate = new Coordinate(-100, -100)
-    do {
-      do {
-        coord = giveRandomNonBlockinCoordinates
-      }
+    var coord: Coordinate = null
+    for (n <- Range(0, num)) {
+      do coord = giveRandomNonBlockinCoordinates
       while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR))
       tree = new PassiveObject("Tree", "Large generic tree.", coord.getX, coord.getY, "Items/tempTree")
       tree.blockVision = true
       getTile(tree.getX, tree.getY).blockVision = true
-      i += 1
     }
-    while (i < num)
   }
   
   /** Add a number of rocks */
-  def addrocks(num: Int) = {
+  def addRocks(num: Int) = {
     var rock: PassiveObject = null
-    var i = 0
-    var coord: Coordinate = new Coordinate(-100, -100)
-    do {
-      do {
-        coord = giveRandomNonBlockinCoordinates
-      }
+    var coord: Coordinate = null
+    for (n <- Range(0, num)) {
+      do coord = giveRandomNonBlockinCoordinates
       while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR))
       rock = new PassiveObject("Rock", "Huge boulder.", coord.getX, coord.getY, "Items/tempRock")
       rock.blockVision = true
       getTile(rock.getX, rock.getY).blockVision = true
-      i += 1
     }
-    while (i < num)
+  }
+  
+  /** Add monsters */
+  def addMonsters(num: Int) = {
+    var coord: Coordinate = null
+    for (n <- Range(0, num)) {
+      do coord = giveRandomNonBlockinCoordinates
+      while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR))
+      new Monster(coord.getX, coord.getY, MonsterType.monstersForLevel(getLevel)(rnd.nextInt(MonsterType.monstersForLevel(getLevel).size)))
+    }
+    
+    
   }
   
   /** getter for altar */
@@ -270,10 +273,8 @@ class Grid() {
   
   /** Add altar */
   def addAltar() = {
-    var coord: Coordinate = new Coordinate(-100, -100)
-    do {
-      coord = giveRandomNonBlockinCoordinates
-    }
+    var coord: Coordinate = null
+    do coord = giveRandomNonBlockinCoordinates
     while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR))
     altar.setX(coord.getX)
     altar.setY(coord.getY)
@@ -281,10 +282,8 @@ class Grid() {
   
   /** Add random item */
   def addItem() = {
-    var coord: Coordinate = new Coordinate(-100, -100)
-    do {
-      coord = giveRandomNonBlockinCoordinates
-    }
+    var coord: Coordinate = null
+    do coord = giveRandomNonBlockinCoordinates
     while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR))
     var item: Equipment = null
     rnd.nextInt(5) match {

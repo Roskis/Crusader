@@ -1,15 +1,17 @@
 package game
 
 import org.newdawn.slick.opengl.Texture
-import Output.{loadTexture, drawQuadTex}
+import Output.{loadTexture, drawQuadTex, addLog}
 import Math.sqrt
 import Math.abs
 import Direction._
 import Main._
+import collection.mutable.Buffer
 
 /** All of the game's objects will be under this trait */
 trait Object {
   
+  val rnd: scala.util.Random
   var name: String
   var description: String
   var x: Int
@@ -18,8 +20,22 @@ trait Object {
   var blockMovement: Boolean
   var blockVision: Boolean
   
-  /** dummy method for all non item objects */
-  def pickUp() {}
+  /** Simple way to roll multiple dice */
+  def roll(amount: Int, number: Int): Int = {
+    var num: Int = 0
+    for (dice <- (0 until amount)) num += roll(number)
+    num
+  }
+  
+  /** Simple way to roll one dice */
+  def roll(number: Int): Int = {
+    getRnd.nextInt(number) + 1
+  }
+  
+  /** dummy methods */
+  def pickUp {}
+  def dodge = 0
+  def takeDamage(a: Int, b: Double) {}
   
   /** Add object to the tile it is on */
   def init() = if (getGrid.isWithinGrid(getX, getY)) getGrid.getTile(getX, getY).addObject(this)
@@ -91,8 +107,9 @@ trait Object {
 /** User's controllable player character */
 class Player(playerName: String, startX: Int, startY: Int) extends Object {
   
+  val rnd = getRnd
   var name = playerName
-  var description = "the player"
+  var description = "TODO"
   var x = startX * 32
   var y = startY * 32
   var image = loadTexture("Player/humanBase")
@@ -100,10 +117,18 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   var blockVision = false
   
   var viewRadius = 10
-  var health: Int = 20
+  var health: Double = 20
   var maxHealth: Int = 20
   var experience: Int = 0
   var gold: Int = 0
+  
+  var zeal: Int = 0
+  var humility: Int = 0
+  var temperance: Int = 0
+  var kindness: Int = 0
+  var patience: Int = 0
+  var charity: Int = 0
+  var diligence: Int = 0
   
   var slotWeapon: Equipment = new Equipment(-100, -100, EquipmentType.KNIFE, true)
   var slotArmor: Equipment = new Equipment(-100, -100, EquipmentType.ROBES, true)
@@ -112,9 +137,85 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   var slotAmulet: Equipment = null
   var slotItem: Equipment = null
   
-  val slots = List(slotWeapon, slotArmor, slotShield, slotRing, slotAmulet, slotItem)
-  
   val grave = loadTexture("Environment/grave")
+  
+  /** Method to deal damage to monsters */
+  def attack(target: Object) {
+    if (rnd.nextInt(100) <= accuracy - target.dodge) {
+      target.takeDamage(damage(rnd.nextInt(100) <= crit), armorPierce)
+    }
+    else target.takeDamage(smallestDamage, armorPierce)
+  }
+  
+  /** Damage is based on player's weapon */
+  def damage(crit: Boolean): Int = {
+    val weapondmg = roll(slotWeapon.damage._1, slotWeapon.damage._2) + slotWeapon.damage._3
+    if (crit) weapondmg + roll(zeal+2) + roll(zeal+2)
+    else weapondmg + roll(zeal+2)
+  }
+  
+  /** Return small damage */
+  def smallestDamage: Int = {
+    var num = 0
+    val zealroll = roll(zeal+2)
+    val weaponroll = roll(slotWeapon.damage._1, slotWeapon.damage._2) + slotWeapon.damage._3
+    if (rnd.nextInt(4) != 0) if (zealroll < weaponroll) num = zealroll else num = weaponroll
+    num
+  }
+  
+  def armor: Double = {
+    val patienceBonus: Double = {
+      if (patience > 7) 2
+      else if (patience > 5) 1.5
+      else if (patience > 3) 1
+      else if (patience > 1) 0.5
+      else 0
+    }
+    slotArmor.armor + patienceBonus
+  }
+  
+  def armorPierce: Double = slotWeapon.armorPiercing
+  
+  /** Critical chance of weapon used */
+  def crit: Int = slotWeapon.critChance
+  
+  /** Block chance of shield used */
+  def block: Int = slotShield.blockChance
+  
+  /** Total weight of items after patience bonus */
+  def totalWeight: Int = {
+    var num: Int = 0
+    if (slotWeapon != null) num += slotWeapon.weight
+    if (slotArmor != null) num += slotArmor.weight
+    if (slotShield != null) num += slotShield.weight
+    if (slotRing != null) num += slotRing.weight
+    if (slotAmulet != null) num += slotAmulet.weight
+    if (slotItem != null) num += slotItem.weight
+    ((1 - (0.05*patience)).toInt * num)
+  }
+  
+  /** Return dodge of player */
+  override def dodge: Int = 100 - totalWeight + humility*2
+  
+  /** Return accuracy of player */
+  def accuracy: Int = slotWeapon.accuracy + temperance*2
+  
+  /** Return needed amount of experience to level up */
+  def xpNeededForLevel(level: Int): Int = {
+    level match {
+      case l if (l == 1) => 10
+      case l if (l == 2) => 25
+      case l if (l == 3) => 85
+      case l if (l == 4) => 225
+      case l if (l == 5) => 750
+      case l if (l == 6) => 1800
+      case l if (l == 7) => 3000
+      case l if (l == 8) => 5000
+      case l if (l == 9) => 8000
+      case l if (l == 10) => 15000
+      case _ => 1000000
+    }
+  }
   
   /** Temporary move and attack command */
   def moveOrAttack(direction: Direction.Value) = {
@@ -130,7 +231,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
         }
       }
       
-      if (target != null) health -= 1
+      if (target != null) attack(target)
       else if (getGrid.getTile(newX, newY) == getGrid.getStairs) Main.nextMap
       else changePosition(newX, newY)
     }
@@ -176,20 +277,41 @@ class PassiveObject(objectName: String, objectDescription: String, startX: Int, 
 }
 
 /** All of monsters and npc will be under this class */
-class Monster(monsterName: String, monsterDescription: String, startX: Int, startY: Int, 
-    monsterImage: String) extends Object {
+class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends Object {
   
+  val mType = monsterType
   val rnd = getRnd
-  var name = monsterName
-  var description = monsterDescription
+  var name = MonsterType.name(mType)
+  var description = MonsterType.description(mType)
   var x = startX * 32
   var y = startY * 32
-  var image = loadTexture(monsterImage)
+  var image = MonsterType.image(mType)
   var blockMovement = true
   var blockVision = false
   
+  var health: Double = MonsterType.maxHP(mType)
+  var armor: Double = MonsterType.armor(mType)
+  var damage = MonsterType.damage(mType)
+  var accuracy = MonsterType.accuracy(mType)
+  var ap: Double = MonsterType.armorPierce(mType)
+  var blockChance = 0
+  var shieldArmor = 0
+  
   init
   getMonsterList.append(this)
+  
+  override def dodge = 10
+  
+  /** Takes damage from attack */
+  override def takeDamage(damage: Int, armorPierce: Double) = {
+    var effectiveArmor = armor
+    if (rnd.nextInt(100) <= blockChance) effectiveArmor += shieldArmor
+    if (effectiveArmor < 0) effectiveArmor = 0
+    var effectiveDamage = (damage - effectiveArmor)
+    if (effectiveDamage < 0) effectiveDamage = 0
+    health -= effectiveDamage
+    addLog(getPlayer.name + " deals " + effectiveDamage.toString + " damage to " + name)
+  }
   
   /** Temporary method until monster ai is working */
   def turn() {
@@ -219,6 +341,302 @@ class Monster(monsterName: String, monsterDescription: String, startX: Int, star
   
 }
 
+object MonsterType extends Enumeration {
+
+  type Type = Value
+  val BAT = Value
+  val SNAKE = Value
+  val SPIDER = Value
+  val GOBLINA = Value
+  val GOBLINB = Value
+  val HOUND = Value
+  val LIZARDA = Value
+  val LIZARDB = Value
+  val LIZARDC = Value
+  val CROCODILE = Value
+  
+  private val missing = loadTexture("UI/missing")
+  private val bat = loadTexture("Monsters/bat1")
+  private val snake = loadTexture("Monsters/snake1")
+  private val spider = loadTexture("Monsters/spider1")
+  private val goblina = loadTexture("Monsters/goblina1")
+  private val goblinb = loadTexture("Monsters/goblinb1")
+  private val hound = loadTexture("Monsters/hound1")
+  private val lizarda = loadTexture("Monsters/lizarda1")
+  private val lizardb = loadTexture("Monsters/lizardb1")
+  private val lizardc = loadTexture("Monsters/lizardc1")
+  private val crocodile = loadTexture("Monsters/crocodile1")
+  
+  //* Returns Buffer containing all of the spawnable monsters */
+  def monstersForLevel(level: Int): Buffer[Value] = {
+    var list = Buffer[Value]()
+    level match {
+      case l if (l == 1) => {
+        list += BAT
+        list += SNAKE
+        list += SPIDER
+      }
+      case l if (l == 2) => {
+        list += BAT
+        list += SNAKE
+        list += SPIDER
+        list += GOBLINA
+        list += GOBLINB
+        list += HOUND
+      }
+      case l if (l == 3) => {
+        list += BAT
+        list += SNAKE
+        list += SPIDER
+        list += GOBLINA
+        list += GOBLINB
+        list += HOUND
+        list += LIZARDA
+        list += LIZARDB
+        list += LIZARDC
+        list += CROCODILE
+      }
+      case l if (l == 4) => {
+        list += GOBLINA
+        list += GOBLINB
+        list += HOUND
+        list += LIZARDA
+        list += LIZARDB
+        list += LIZARDC
+        list += CROCODILE
+      }
+      case _ =>
+    }
+    list
+  }
+  
+  /** returns texture of the given monster */
+  def image(MonsterType: Type): Texture = {
+    MonsterType match {
+      case t if (t == BAT) => bat
+      case t if (t == SNAKE) => snake
+      case t if (t == SPIDER) => spider
+      case t if (t == GOBLINA) => goblina
+      case t if (t == GOBLINB) => goblinb
+      case t if (t == HOUND) => hound
+      case t if (t == LIZARDA) => lizarda
+      case t if (t == LIZARDB) => lizardb
+      case t if (t == LIZARDC) => lizardc
+      case t if (t == CROCODILE) => crocodile
+      case _ => missing
+    }
+  }
+  
+  /** returns max health of the given monster */
+  def maxHP(MonsterType: Type): Int = {
+    MonsterType match {
+      case t if (t == BAT) => 2
+      case t if (t == SNAKE) => 5
+      case t if (t == SPIDER) => 5
+      case t if (t == GOBLINA) => 15
+      case t if (t == GOBLINB) => 15
+      case t if (t == HOUND) => 10
+      case t if (t == LIZARDA) => 15
+      case t if (t == LIZARDB) => 15
+      case t if (t == LIZARDC) => 15
+      case t if (t == CROCODILE) => 20
+      case _ => 0
+    }
+  }
+  
+  /** returns damage of the given monster 
+   * 
+   * Tuple3 includes number of dices, their number of eyes and additional flat bonus 
+   * (num of dices, eyes, flat). Examples 2d3+5 = (2, 3, 5) and 1d4 = (1, 4, 0).
+   *  */
+  def damage(MonsterType: Type): Tuple3[Int, Int, Int] = {
+    MonsterType match {
+      case t if (t == BAT) => (1, 2, 0)
+      case t if (t == SNAKE) => (1, 2, 0)
+      case t if (t == SPIDER) => (1, 2, 0)
+      case t if (t == GOBLINA) => (1, 2, 0)
+      case t if (t == GOBLINB) => (1, 3, 0)
+      case t if (t == HOUND) => (1, 3, 0)
+      case t if (t == LIZARDA) => (1, 3, 0)
+      case t if (t == LIZARDB) => (1, 4, 0)
+      case t if (t == LIZARDC) => (1, 4, 0)
+      case t if (t == CROCODILE) => (1, 5, 0)
+      case _ => (0, 0, 0)
+    }
+  }
+  
+  /** returns armor of the given monster */
+  def armor(MonsterType: Type): Double = {
+    MonsterType match {
+      case t if (t == BAT) => 0
+      case t if (t == SNAKE) => 0
+      case t if (t == SPIDER) => 0
+      case t if (t == GOBLINA) => 1
+      case t if (t == GOBLINB) => 1.5
+      case t if (t == HOUND) => 0
+      case t if (t == LIZARDA) => 2
+      case t if (t == LIZARDB) => 1
+      case t if (t == LIZARDC) => 0
+      case t if (t == CROCODILE) => 2
+      case _ => 0
+    }
+  }
+  
+  /** returns accuracy of the given monster */
+  def accuracy(MonsterType: Type): Int = {
+    MonsterType match {
+      case t if (t == BAT) => 95
+      case t if (t == SNAKE) => 90
+      case t if (t == SPIDER) => 90
+      case t if (t == GOBLINA) => 85
+      case t if (t == GOBLINB) => 85
+      case t if (t == HOUND) => 90
+      case t if (t == LIZARDA) => 90
+      case t if (t == LIZARDB) => 85
+      case t if (t == LIZARDC) => 75
+      case t if (t == CROCODILE) => 80
+      case _ => 0
+    }
+  }
+  
+  /** returns critical chance of the given monster */
+  def criticalChance(MonsterType: Type): Int = {
+    MonsterType match {
+      case t if (t == BAT) => 2
+      case t if (t == SNAKE) => 4
+      case t if (t == SPIDER) => 2
+      case t if (t == GOBLINA) => 4
+      case t if (t == GOBLINB) => 5
+      case t if (t == HOUND) => 6
+      case t if (t == LIZARDA) => 5
+      case t if (t == LIZARDB) => 5
+      case t if (t == LIZARDC) => 10
+      case t if (t == CROCODILE) => 2
+      case _ => 0
+    }
+  }
+  
+  /** returns dodge chance of the given monster */
+  def dodge(MonsterType: Type): Int = {
+    MonsterType match {
+      case t if (t == BAT) => 30
+      case t if (t == SNAKE) => 10
+      case t if (t == SPIDER) => 15
+      case t if (t == GOBLINA) => 10
+      case t if (t == GOBLINB) => 12
+      case t if (t == HOUND) => 10
+      case t if (t == LIZARDA) => 8
+      case t if (t == LIZARDB) => 8
+      case t if (t == LIZARDC) => 10
+      case t if (t == CROCODILE) => 0
+      case _ => 0
+    }
+  }
+  
+  /** returns armor pierce of the given monster */
+  def armorPierce(MonsterType: Type): Int = {
+    MonsterType match {
+      case t if (t == BAT) => 0
+      case t if (t == SNAKE) => 0
+      case t if (t == SPIDER) => 0
+      case t if (t == GOBLINA) => 0
+      case t if (t == GOBLINB) => 1
+      case t if (t == HOUND) => 0
+      case t if (t == LIZARDA) => 2
+      case t if (t == LIZARDB) => 1
+      case t if (t == LIZARDC) => 0
+      case t if (t == CROCODILE) => 2
+      case _ => 0
+    }
+  }
+  
+  /** returns gold of the given monster */
+  def gold(MonsterType: Type): Int = {
+    MonsterType match {
+      case t if (t == BAT) => 1
+      case t if (t == SNAKE) => 3
+      case t if (t == SPIDER) => 2
+      case t if (t == GOBLINA) => 10
+      case t if (t == GOBLINB) => 15
+      case t if (t == HOUND) => 5
+      case t if (t == LIZARDA) => 10
+      case t if (t == LIZARDB) => 10
+      case t if (t == LIZARDC) => 10
+      case t if (t == CROCODILE) => 20
+      case _ => 0
+    }
+  }
+  
+  /** returns experience of the given monster */
+  def experience(MonsterType: Type): Int = {
+    MonsterType match {
+      case t if (t == BAT) => 1
+      case t if (t == SNAKE) => 3
+      case t if (t == SPIDER) => 2
+      case t if (t == GOBLINA) => 10
+      case t if (t == GOBLINB) => 15
+      case t if (t == HOUND) => 5
+      case t if (t == LIZARDA) => 15
+      case t if (t == LIZARDB) => 15
+      case t if (t == LIZARDC) => 15
+      case t if (t == CROCODILE) => 20
+      case _ => 0
+    }
+  }
+  
+  /** returns piety of the given monster */
+  def piety(MonsterType: Type): Int = {
+    MonsterType match {
+      case t if (t == BAT) => 1
+      case t if (t == SNAKE) => 2
+      case t if (t == SPIDER) => 4
+      case t if (t == GOBLINA) => 10
+      case t if (t == GOBLINB) => 15
+      case t if (t == HOUND) => 3
+      case t if (t == LIZARDA) => 15
+      case t if (t == LIZARDB) => 15
+      case t if (t == LIZARDC) => 15
+      case t if (t == CROCODILE) => 0
+      case _ => 0
+    }
+  }
+  
+  /** returns name of the given monster */
+  def name(MonsterType: Type): String = {
+    MonsterType match {
+      case t if (t == BAT) => "bat"
+      case t if (t == SNAKE) => "Snake"
+      case t if (t == SPIDER) => "Spider"
+      case t if (t == GOBLINA) => "Goblin"
+      case t if (t == GOBLINB) => "Goblin"
+      case t if (t == HOUND) => "Hound"
+      case t if (t == LIZARDA) => "Lizard"
+      case t if (t == LIZARDB) => "Lizard"
+      case t if (t == LIZARDC) => "Lizard"
+      case t if (t == CROCODILE) => "Crocodile"
+      case _ => "Unknown monster name"
+    }
+  }
+  
+  /** returns description of the given monster */
+  def description(MonsterType: Type): String = {
+    MonsterType match {
+      case t if (t == BAT) => "TODO"
+      case t if (t == SNAKE) => "TODO"
+      case t if (t == SPIDER) => "TODO"
+      case t if (t == GOBLINA) => "TODO"
+      case t if (t == GOBLINB) => "TODO"
+      case t if (t == HOUND) => "TODO"
+      case t if (t == LIZARDA) => "TODO"
+      case t if (t == LIZARDB) => "TODO"
+      case t if (t == LIZARDC) => "TODO"
+      case t if (t == CROCODILE) => "TODO"
+      case _ => "Unknown monster name"
+    }
+  }
+  
+}
+
 /** All of the game's items will be under this trait */
 trait Item extends Object {
   
@@ -231,6 +649,7 @@ trait Item extends Object {
 /** Player usable equipments */
 class Equipment(startX: Int, startY: Int, equipmentType: EquipmentType.Value, isEquipped: Boolean) extends Item {
   
+  val rnd = getRnd
   val eType = equipmentType
   var name = EquipmentType.name(eType)
   var description = EquipmentType.description(eType)
@@ -507,6 +926,7 @@ object EquipmentType extends Enumeration {
 class Consumable(consumableName: String, consumableDescription: String, startX: Int, startY: Int, 
     consumableImage: String, consumablePrice: Int, isEquipped: Boolean) extends Item {
   
+  val rnd = getRnd
   var name = consumableName
   var description = consumableDescription
   var x = startX * 32
@@ -527,6 +947,7 @@ class Consumable(consumableName: String, consumableDescription: String, startX: 
 class Scroll(scrollName: String, scrollDescription: String, startX: Int, startY: Int, 
     scrollImage: String, scrollPrice: Int, isEquipped: Boolean) extends Item {
   
+  val rnd = getRnd
   var name = scrollName
   var description = scrollDescription
   var x = startX * 32

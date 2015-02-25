@@ -91,11 +91,6 @@ object Main {
     level += 1
     grid = new Grid()
     grid.init
-    for (n <- Range(0,5)) {
-      var lizardPosition = grid.giveRandomNonBlockinCoordinates
-      var lizard = new Monster("Lizard", "Nasty looking reptile.", 
-          lizardPosition.getX, lizardPosition.getY, "Monsters/lizarda1")
-    }
   }
   
   /** Follow user input in menu */
