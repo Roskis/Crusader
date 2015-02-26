@@ -47,6 +47,7 @@ object Output {
   private var HPBar: Texture = null
   private var XPBar: Texture = null
   private var tempUIBackground: Texture = null
+  private var tempUIBackground2: Texture = null
   
   /** Prepares, launches and initializes the display.
    *
@@ -123,6 +124,7 @@ object Output {
     HPBar = loadTexture("UI/HPBar")
     XPBar = loadTexture("UI/XPBar")
     tempUIBackground = loadTexture("tempUIBackground")
+    tempUIBackground2 = loadTexture("tempUIBackground2")
     
     addLog("Insert epic story here. (TODO)")
     
@@ -207,8 +209,6 @@ object Output {
     mouseXCoord = (Mouse.getX * 1.0 / 32 + getPlayer.getX - 16).toInt
     mouseYCoord = ((height - Mouse.getY) * 1.0 / 32 + getPlayer.getY - 8).toInt
     glClear(GL_COLOR_BUFFER_BIT)
-    drawQuadTex(tempUIBackground, (width-tempUIBackground.getImageWidth)/2, 
-        (height-tempUIBackground.getImageHeight)/2, tempUIBackground.getImageWidth, tempUIBackground.getImageHeight)
     drawSideBar
     drawlog
     drawFloor
@@ -276,83 +276,89 @@ object Output {
   /** Draw sidebar to right of the screen */
   def drawSideBar() {
     val middle = 33*32 + (width - 33*32)/2
-    var height = 0
+    var heightForSidebar = 0
+    
+    drawQuadTex(tempUIBackground2, (width-tempUIBackground2.getImageWidth)/2, 
+        (height-tempUIBackground2.getImageHeight)/2, tempUIBackground2.getImageWidth, tempUIBackground2.getImageHeight)
     
     var HPHeight = getPlayer.health / getPlayer.maxHealth
     if (HPHeight > 1) HPHeight = 1
     if (HPHeight < 0) HPHeight = 0
-    drawQuadTex(HPBar, middle-heart.getImageWidth/2+52, (height+46) + ((heart.getImageHeight-140) * (1-HPHeight)).toInt, 
+    drawQuadTex(HPBar, middle-heart.getImageWidth/2+52, 46 + ((heart.getImageHeight-140) * (1-HPHeight)).toInt, 
         heart.getImageWidth-104, ((heart.getImageHeight-140) * HPHeight).toInt)
-    
-    height -= 25
-    drawQuadTex(heart, middle-heart.getImageWidth/2, height, heart.getImageWidth, heart.getImageHeight)
-    
-    height += 115
-    val hptext = "HP: " + getPlayer.health.toInt + "/" + getPlayer.maxHealth
-    font.drawString(middle-font.getWidth(hptext)/2, height, hptext, Color.black)
     
     var XPWidth = getPlayer.experience*1.0 / getPlayer.smallestLevel
     if (XPWidth > 1) XPWidth = 1
     if (XPWidth < 0) XPWidth = 0
-    drawQuadTex(XPBar, middle-XP.getImageWidth/2+40, height+96, 
-        ((XP.getImageWidth-80)*XPWidth).toInt, XP.getImageHeight-224)
+    drawQuadTex(XPBar, middle-XP.getImageWidth/2+40, 186, 
+        ((XP.getImageWidth-80)*XPWidth).toInt, XP.getImageHeight-134)
     
-    height -= 16
-    drawQuadTex(XP, middle-XP.getImageWidth/2, height, XP.getImageWidth, XP.getImageHeight)
+    drawQuadTex(tempUIBackground, (width-tempUIBackground.getImageWidth)/2, 
+        (height-tempUIBackground.getImageHeight)/2, tempUIBackground.getImageWidth, tempUIBackground.getImageHeight)
     
-    height += 112
+    heightForSidebar -= 25
+    drawQuadTex(heart, middle-heart.getImageWidth/2, heightForSidebar, heart.getImageWidth, heart.getImageHeight)
+    
+    heightForSidebar += 115
+    val hptext = "HP: " + getPlayer.health.toInt + "/" + getPlayer.maxHealth
+    font.drawString(middle-font.getWidth(hptext)/2, heightForSidebar, hptext, Color.black)
+    
+    heightForSidebar -= 16
+    drawQuadTex(XP, middle-XP.getImageWidth/2, heightForSidebar, XP.getImageWidth, XP.getImageHeight)
+    
+    heightForSidebar += 112
     val xptext = "XP: " + getPlayer.experience + "/" + getPlayer.smallestLevel
-    font.drawString(middle-font.getWidth(xptext)/2, height, xptext, Color.black)
+    font.drawString(middle-font.getWidth(xptext)/2, heightForSidebar, xptext, Color.black)
     if (getPlayer.experience > getPlayer.smallestLevel) 
       drawQuadTex(XPButton, middle-XPButton.getImageWidth/2, 194-48, XPButton.getImageWidth, 
           XPButton.getImageHeight)
     else drawQuadTex(XPButton2, middle-XPButton2.getImageWidth/2, 194-48, XPButton2.getImageWidth, 
         XPButton2.getImageHeight)
         
-    height += 150
+    heightForSidebar += 150
     if (getPlayer.slotWeapon != null) drawQuadTex(getPlayer.slotWeapon.image, 
-        middle-getPlayer.slotWeapon.image.getImageWidth*5/2, height, 
+        middle-getPlayer.slotWeapon.image.getImageWidth*5/2, heightForSidebar, 
         getPlayer.slotWeapon.image.getImageWidth, getPlayer.slotWeapon.image.getImageHeight)
     if (getPlayer.slotArmor != null) drawQuadTex(getPlayer.slotArmor.image, 
-        middle-getPlayer.slotArmor.image.getImageWidth/2, height, 
+        middle-getPlayer.slotArmor.image.getImageWidth/2, heightForSidebar, 
         getPlayer.slotArmor.image.getImageWidth, getPlayer.slotArmor.image.getImageHeight)
     if (getPlayer.slotShield != null) drawQuadTex(getPlayer.slotShield.image, 
-        middle+getPlayer.slotShield.image.getImageWidth*3/2, height, 
+        middle+getPlayer.slotShield.image.getImageWidth*3/2, heightForSidebar, 
         getPlayer.slotShield.image.getImageWidth, getPlayer.slotShield.image.getImageHeight)
     
-    height += 64
+    heightForSidebar += 64
     if (getPlayer.slotRing != null) drawQuadTex(getPlayer.slotRing.image, 
-        middle-getPlayer.slotRing.image.getImageWidth*5/2, height, 
+        middle-getPlayer.slotRing.image.getImageWidth*5/2, heightForSidebar, 
         getPlayer.slotRing.image.getImageWidth, getPlayer.slotRing.image.getImageHeight)
     if (getPlayer.slotAmulet != null) drawQuadTex(getPlayer.slotAmulet.image, 
-        middle-getPlayer.slotAmulet.image.getImageWidth/2, height, 
+        middle-getPlayer.slotAmulet.image.getImageWidth/2, heightForSidebar, 
         getPlayer.slotAmulet.image.getImageWidth, getPlayer.slotAmulet.image.getImageHeight)
     if (getPlayer.slotItem != null) drawQuadTex(getPlayer.slotItem.image, 
-        middle+getPlayer.slotItem.image.getImageWidth*3/2, height, 
+        middle+getPlayer.slotItem.image.getImageWidth*3/2, heightForSidebar, 
         getPlayer.slotItem.image.getImageWidth, getPlayer.slotItem.image.getImageHeight)
     
-    height += 64
+    heightForSidebar += 64
     val name = "Name: " + getPlayer.name
-    font.drawString(middle-96, height, name, Color.black)
+    font.drawString(middle-96, heightForSidebar, name, Color.black)
     
-    height += 20
+    heightForSidebar += 20
     val title = "Title: " + getPlayer.title
-    font.drawString(middle-96, height, title, Color.black)
+    font.drawString(middle-96, heightForSidebar, title, Color.black)
     
-    height += 20
+    heightForSidebar += 20
     val heroLevel = "Hero level: " + getPlayer.totalLevel
-    font.drawString(middle-96, height, heroLevel, Color.black)
+    font.drawString(middle-96, heightForSidebar, heroLevel, Color.black)
     
-    height += 20
+    heightForSidebar += 20
     val gold = "Gold: " + getPlayer.gold
-    font.drawString(middle-96, height, gold, Color.black)
+    font.drawString(middle-96, heightForSidebar, gold, Color.black)
     
-    height += 20
+    heightForSidebar += 20
     val piety = "Piety: " + getPlayer.piety
-    font.drawString(middle-96, height, piety, Color.black)
+    font.drawString(middle-96, heightForSidebar, piety, Color.black)
     
-    height -= 64
-    drawQuadTex(saveQuit, middle-saveQuit.getImageWidth/2, height, saveQuit.getImageWidth, saveQuit.getImageHeight)
+    heightForSidebar -= 64
+    drawQuadTex(saveQuit, middle-saveQuit.getImageWidth/2, heightForSidebar, saveQuit.getImageWidth, saveQuit.getImageHeight)
   }
   
   /** Draw player to the middle of screen */
