@@ -55,32 +55,15 @@ trait Object {
     else drawQuadTex(image, x - (getPlayer.getX - 16) * 32 - 16, y - (getPlayer.getY - 8) * 32 - 32, image.getImageWidth, image.getImageHeight)
   }
   
-  /** block current tile's vision */
-  def blockVisionForTile() = getGrid.getTile(getX, getY).blockVision = true
-    
-  /** unblock current tile's vision */
-  def unblockVisionForTile = getGrid.getTile(getX, getY).blockVision = false
-  
-  /** Check if this object is only visionblocker in this tile */
-  def onlyVisionBlocker(): Boolean = {
-    var boo: Boolean = true
-    if (getGrid.isWithinGrid(getX, getY)) {
-      for (obj <- getGrid.getTile(getX, getY).getObjectList) if (obj.blockVision && obj.getX == getX && obj.getY == getY) boo = false
-    }
-    boo
-  }
-  
   /** Changes the position of this object
    *
    * @param newX x-coordinate
    * @param newY y-coordinate
    */
   def changePosition(newX: Int, newY: Int) = {
-    if (blockVision && onlyVisionBlocker) unblockVisionForTile
     if (getGrid.isWithinGrid(getX, getY)) getGrid.getTile(getX, getY).removeObject(this)
     x = newX * 32
     y = newY * 32
-    if (blockVision) blockVisionForTile
     if (getGrid.isWithinGrid(getX, getY)) getGrid.getTile(getX, getY).addObject(this)
   }
 
@@ -276,7 +259,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   /** Move and attack command */
   def moveOrAttack(direction: Direction.Value) = {
     val coord = getCoordinates(direction, getX, getY)
-    if (getGrid.isWithinGrid(coord.getX, coord.getY) && !getGrid.getTile(coord.getX, coord.getY).blockMovement) {
+    if (getGrid.isWithinGrid(coord.getX, coord.getY)) {
       var canMove: Boolean = true
       for (obj <- getGrid.getTile(coord.getX, coord.getY).getObjectList) {
         obj match {
@@ -295,7 +278,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
           case _ => {}
         }
       }
-      if (canMove) move(coord)
+      if (canMove && !getGrid.getTile(coord.getX, coord.getY).blockMovement) move(coord)
     }
   }
   
@@ -325,7 +308,7 @@ class PassiveObject(objectName: String, objectDescription: String, startX: Int, 
   var x = startX * 32
   var y = startY * 32
   var image = loadTexture(objectImage)
-  var blockMovement = true
+  var blockMovement = false
   var blockVision = false
   var isMonster = false
   

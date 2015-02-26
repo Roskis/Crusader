@@ -25,9 +25,21 @@ class Tile(Xcoord: Int, Ycoord: Int, tileType: TileType.Value) {
   private val objectList = Buffer[Object]()
   var explored: Boolean = false
   var label: Int = 0
-  var blockMovement: Boolean = TileType.blockMovement(tileType)
-  var blockVision: Boolean = TileType.blockVision(tileType)
   var visible: Boolean = false
+  
+  /** check if this tile or anything on it blocks movement */
+  def blockMovement():Boolean = {
+    var boo: Boolean = TileType.blockMovement(tileType)
+    for (obj <- objectList) if (obj.blockMovement) boo = true
+    boo
+  }
+  
+  /** check if this tile or anything on it blocks vision */
+  def blockVision():Boolean = {
+    var boo: Boolean = TileType.blockVision(tileType)
+    for (obj <- objectList) if (obj.blockVision) boo = true
+    boo
+  }
   
   /** add object to this tile */
   def addObject(obj: Object) = objectList.append(obj)
@@ -38,14 +50,12 @@ class Tile(Xcoord: Int, Ycoord: Int, tileType: TileType.Value) {
   /** getter for object's in this tile */
   def getObjectList = objectList
   
+  /** Draw everything on this tile */
+  def drawObjects = if (explored) for (obj <- objectList) obj.draw
+  
   /** Draw Tile */
-  def draw = {
-    if (explored) {
-      drawQuadTex(image, x - (getPlayer.getX - 16) * 32, 
-          y - (getPlayer.getY - 8) * 32, image.getImageWidth, image.getImageHeight)
-      for (obj <- objectList) obj.draw
-    }
-  }
+  def draw = if (explored) drawQuadTex(image, x - (getPlayer.getX - 16) * 32, 
+      y - (getPlayer.getY - 8) * 32, image.getImageWidth, image.getImageHeight)
   
   /** Draw Fog */
   def drawFog = {

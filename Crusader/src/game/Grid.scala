@@ -261,9 +261,12 @@ class Grid() {
       do coord = giveRandomNonBlockinCoordinates
       while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || 
           !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
-      tree = new PassiveObject("Tree", "TODO", coord.getX, coord.getY, "Environment/tree1")
+      if (rnd.nextInt(2) == 0 ) {
+        tree = new PassiveObject("Tree", "TODO", coord.getX, coord.getY, "Environment/bigTree1")
+        tree.blockMovement = true
+      }
+      else tree = new PassiveObject("Tree", "TODO", coord.getX, coord.getY, "Environment/tree1")
       tree.blockVision = true
-      getTile(tree.getX, tree.getY).blockVision = true
     }
   }
   
@@ -277,7 +280,6 @@ class Grid() {
           !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
       rock = new PassiveObject("Rock", "TODO", coord.getX, coord.getY, if (rnd.nextInt(2) == 0) "Environment/rock1" else "Environment/rock2")
       rock.blockVision = true
-      getTile(rock.getX, rock.getY).blockVision = true
     }
   }
   
@@ -370,8 +372,12 @@ class Grid() {
   def draw() {
     for (i <- Range(0,size)) {
       for (j <- Range(0,size)) {
-        if (getTile(i, j).xDif(getPlayer) <= 16 && getTile(i, j).yDif(getPlayer) <= 8) 
-          map(i)(j).draw
+        if (getTile(i, j).xDif(getPlayer) <= 16 && getTile(i, j).yDif(getPlayer) <= 8) map(i)(j).draw
+      }
+    }
+    for (i <- Range(0,size)) {
+      for (j <- Range(0,size)) {
+        if (getTile(i, j).xDif(getPlayer) <= 16 && getTile(i, j).yDif(getPlayer) <= 8) map(i)(j).drawObjects
       }
     }
   }
