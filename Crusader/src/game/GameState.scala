@@ -4,6 +4,6 @@ package game
 object GameState extends Enumeration {
 
   type GameState = Value
-  val GAME, MAIN_MENU, CHARACTER_CREATION = Value
+  val GAME, MAIN_MENU, CHARACTER_CREATION, LEVEL = Value
 
 }

@@ -3,7 +3,7 @@ package game
 import scala.io.Source
 import org.lwjgl.opengl.Display
 import Output.{startDisplay, drawMainMenu, drawGame, drawCharacterCreation}
-import GameState.{MAIN_MENU, GAME, CHARACTER_CREATION}
+import GameState.{MAIN_MENU, GAME, CHARACTER_CREATION, LEVEL}
 import org.lwjgl.input.{Mouse, Keyboard}
 import scala.util.Random
 import collection.mutable.Buffer
@@ -23,6 +23,7 @@ object Main {
   private var scrollList = Buffer[Scroll]()
   private var gameLog = Buffer[String]()
   private var lastWheel: Int = 0
+  private var prevMouseState: Boolean = false
   
   private var frameRate: Int = 0
   private var height: Int = 0
@@ -65,6 +66,10 @@ object Main {
           gameKeys
           drawGame
         }
+        case g if (g == LEVEL) => {
+          levelKeys
+          drawGame
+        }
         case g if (g == CHARACTER_CREATION) => {
           characterKeys
           drawCharacterCreation
@@ -96,15 +101,63 @@ object Main {
     grid.init
   }
   
+  /** Follow user input when choosing new level */
+  def levelKeys {
+    if (Mouse.isButtonDown(0) && Mouse.getX > 149 && Mouse.getX < 406 && !prevMouseState && 
+        (height - Mouse.getY) > 606 && (height - Mouse.getY) < 671) {
+      gameState = GAME
+      while (Keyboard.next) {}
+    }
+    else if (player.health > 0) {
+      if (Mouse.isButtonDown(0) && player.experience >= player.xpNeededForLevel(player.zeal) && !prevMouseState && 
+          Mouse.getX > 149 && Mouse.getX < 406 && (height - Mouse.getY) > 117 && (height - Mouse.getY) < 181) {
+        player.experience -= player.xpNeededForLevel(player.zeal)
+        player.zeal += 1
+      }
+      else if (Mouse.isButtonDown(0) && player.experience >= player.xpNeededForLevel(player.humility) && !prevMouseState && 
+          Mouse.getX > 149 && Mouse.getX < 406 && (height - Mouse.getY) > 187 && (height - Mouse.getY) < 251) {
+        player.experience -= player.xpNeededForLevel(player.humility)
+        player.humility += 1
+      }
+      else if (Mouse.isButtonDown(0) && player.experience >= player.xpNeededForLevel(player.temperance) && !prevMouseState && 
+          Mouse.getX > 149 && Mouse.getX < 406 && (height - Mouse.getY) > 257 && (height - Mouse.getY) < 321) {
+        player.experience -= player.xpNeededForLevel(player.temperance)
+        player.temperance += 1
+      }
+      else if (Mouse.isButtonDown(0) && player.experience >= player.xpNeededForLevel(player.kindness) && !prevMouseState && 
+          Mouse.getX > 149 && Mouse.getX < 406 && (height - Mouse.getY) > 327 && (height - Mouse.getY) < 391) {
+        player.experience -= player.xpNeededForLevel(player.kindness)
+        player.kindness += 1
+      }
+      else if (Mouse.isButtonDown(0) && player.experience >= player.xpNeededForLevel(player.patience) && !prevMouseState && 
+          Mouse.getX > 149 && Mouse.getX < 406 && (height - Mouse.getY) > 397 && (height - Mouse.getY) < 461) {
+        player.experience -= player.xpNeededForLevel(player.patience)
+        player.patience += 1
+      }
+      else if (Mouse.isButtonDown(0) && player.experience >= player.xpNeededForLevel(player.charity) && !prevMouseState && 
+          Mouse.getX > 149 && Mouse.getX < 406 && (height - Mouse.getY) > 467 && (height - Mouse.getY) < 531) {
+        player.experience -= player.xpNeededForLevel(player.charity)
+        player.charity += 1
+      }
+      else if (Mouse.isButtonDown(0) && player.experience >= player.xpNeededForLevel(player.diligence) && !prevMouseState && 
+          Mouse.getX > 149 && Mouse.getX < 406 && (height - Mouse.getY) > 537 && (height - Mouse.getY) < 601) {
+        player.experience -= player.xpNeededForLevel(player.diligence)
+        player.diligence += 1
+      }
+    }
+    prevMouseState = Mouse.isButtonDown(0)
+  }
+  
+  /** Follow user input when creating new character */
   def characterKeys {
-    if ((Mouse.isButtonDown(0) && Mouse.getX > 816 && Mouse.getX < 1040 && 
-        (height - Mouse.getY) > 604 && (height - Mouse.getY) < 660)) {
+    if ((Mouse.isButtonDown(0) && Mouse.getX > 799 && Mouse.getX < 1056 && 
+        (height - Mouse.getY) > 600 && (height - Mouse.getY) < 665)) {
           gameState = GAME
           while (Keyboard.next) {}
           newGame
     }
-    else if ((Mouse.isButtonDown(0) && Mouse.getX > 274 && Mouse.getX < 496 && 
-        (height - Mouse.getY) > 604 && (height - Mouse.getY) < 660)) {
+    else if ((Mouse.isButtonDown(0) && Mouse.getX > 257 && Mouse.getX < 514 && 
+        (height - Mouse.getY) > 600 && (height - Mouse.getY) < 665)) {
       gameState = MAIN_MENU
       while (Keyboard.next) {}
     }
@@ -131,15 +184,15 @@ object Main {
   
   /** Follow user input in menu */
   def menuKeys {
-    if ((Mouse.isButtonDown(0) && Mouse.getX > 922 && Mouse.getX < 1145 && 
-        (height - Mouse.getY) > 320 && (height - Mouse.getY) < 376) || 
+    if ((Mouse.isButtonDown(0) && Mouse.getX > 905 && Mouse.getX < 1162 && 
+        (height - Mouse.getY) > 316 && (height - Mouse.getY) < 381) || 
         Keyboard.isKeyDown(Keyboard.KEY_N)) {
       gameState = CHARACTER_CREATION
       while (Keyboard.next) {}
       player = new Player(player.name, 0, 0)
     }
-    else if ((Mouse.isButtonDown(0) && Mouse.getX > 922 && Mouse.getX < 1145 && 
-        (height - Mouse.getY) > 420 && (height - Mouse.getY) < 476) || 
+    else if ((Mouse.isButtonDown(0) && Mouse.getX > 905 && Mouse.getX < 1162 && 
+        (height - Mouse.getY) > 416 && (height - Mouse.getY) < 481) || 
         Keyboard.isKeyDown(Keyboard.KEY_Q)) {
       Display.destroy()
       System.exit(0)
@@ -148,53 +201,68 @@ object Main {
   
   /** Follow user input in game */
   def gameKeys {
-    while (Keyboard.next) {
-      Keyboard.getEventKey match {
-        case k if (k == Keyboard.KEY_ESCAPE) => gameState = MAIN_MENU
-        case k if ((k == Keyboard.KEY_D || k == Keyboard.KEY_RIGHT || k == Keyboard.KEY_NUMPAD6) && 
-            Keyboard.getEventKeyState && getPlayer.health > 0) => {
-          player.moveOrAttack(E)
-          playTurn
-        }
-        case k if ((k == Keyboard.KEY_A || k == Keyboard.KEY_LEFT || k == Keyboard.KEY_NUMPAD4) && 
-            Keyboard.getEventKeyState && getPlayer.health > 0) => {
-          player.moveOrAttack(W)
-          playTurn
-        }
-        case k if ((k == Keyboard.KEY_W || k == Keyboard.KEY_UP || k == Keyboard.KEY_NUMPAD8) && 
-            Keyboard.getEventKeyState && getPlayer.health > 0) => {
-          player.moveOrAttack(N)
-          playTurn
-        }
-        case k if ((k == Keyboard.KEY_S || k == Keyboard.KEY_DOWN || k == Keyboard.KEY_NUMPAD2) && 
-            Keyboard.getEventKeyState && getPlayer.health > 0) => {
-          player.moveOrAttack(S)
-          playTurn
-        }
-        case k if ((k == Keyboard.KEY_Q || k == Keyboard.KEY_NUMPAD7) && 
-            Keyboard.getEventKeyState && getPlayer.health > 0) => {
-          player.moveOrAttack(NW)
-          playTurn
-        }
-        case k if ((k == Keyboard.KEY_E || k == Keyboard.KEY_NUMPAD9) && 
-            Keyboard.getEventKeyState && getPlayer.health > 0) => {
-          player.moveOrAttack(NE)
-          playTurn
-        }
-        case k if ((k == Keyboard.KEY_C || k == Keyboard.KEY_NUMPAD3) && 
-            Keyboard.getEventKeyState && getPlayer.health > 0) => {
-          player.moveOrAttack(SE)
-          playTurn
-        }
-        case k if ((k == Keyboard.KEY_Z || k == Keyboard.KEY_NUMPAD1) && 
-            Keyboard.getEventKeyState && getPlayer.health > 0) => {
-          player.moveOrAttack(SW)
-          playTurn
-          }
-        case _ => {}
-      }
+    if (Mouse.isButtonDown(0) && getPlayer.experience > getPlayer.smallestLevel && Mouse.getX > 1080 &&
+        Mouse.getX < 1255 && (height - Mouse.getY) > 242 && (height - Mouse.getY) < 307) {
+      gameState = LEVEL
+      while (Keyboard.next) {}
     }
-    lastWheel = Mouse.getDWheel
+    else if (Mouse.isButtonDown(0) && Mouse.getX > 1080 && Mouse.getX < 1255 && 
+        (height - Mouse.getY) > 640 && (height - Mouse.getY) < 705) {
+      gameState = MAIN_MENU
+      while (Keyboard.next) {}
+    }
+    else {
+      while (Keyboard.next) {
+        Keyboard.getEventKey match {
+          case k if (k == Keyboard.KEY_ESCAPE) => {
+            gameState = MAIN_MENU
+            while (Keyboard.next) {}
+          }
+          case k if ((k == Keyboard.KEY_D || k == Keyboard.KEY_RIGHT || k == Keyboard.KEY_NUMPAD6) && 
+              Keyboard.getEventKeyState && getPlayer.health > 0) => {
+            player.moveOrAttack(E)
+            playTurn
+          }
+          case k if ((k == Keyboard.KEY_A || k == Keyboard.KEY_LEFT || k == Keyboard.KEY_NUMPAD4) && 
+              Keyboard.getEventKeyState && getPlayer.health > 0) => {
+            player.moveOrAttack(W)
+            playTurn
+          }
+          case k if ((k == Keyboard.KEY_W || k == Keyboard.KEY_UP || k == Keyboard.KEY_NUMPAD8) && 
+              Keyboard.getEventKeyState && getPlayer.health > 0) => {
+            player.moveOrAttack(N)
+            playTurn
+          }
+          case k if ((k == Keyboard.KEY_S || k == Keyboard.KEY_DOWN || k == Keyboard.KEY_NUMPAD2) && 
+              Keyboard.getEventKeyState && getPlayer.health > 0) => {
+            player.moveOrAttack(S)
+            playTurn
+          }
+          case k if ((k == Keyboard.KEY_Q || k == Keyboard.KEY_NUMPAD7) && 
+              Keyboard.getEventKeyState && getPlayer.health > 0) => {
+            player.moveOrAttack(NW)
+            playTurn
+          }
+          case k if ((k == Keyboard.KEY_E || k == Keyboard.KEY_NUMPAD9) && 
+              Keyboard.getEventKeyState && getPlayer.health > 0) => {
+            player.moveOrAttack(NE)
+            playTurn
+          }
+          case k if ((k == Keyboard.KEY_C || k == Keyboard.KEY_NUMPAD3) && 
+              Keyboard.getEventKeyState && getPlayer.health > 0) => {
+            player.moveOrAttack(SE)
+            playTurn
+          }
+          case k if ((k == Keyboard.KEY_Z || k == Keyboard.KEY_NUMPAD1) && 
+              Keyboard.getEventKeyState && getPlayer.health > 0) => {
+            player.moveOrAttack(SW)
+            playTurn
+            }
+          case _ => {}
+        }
+      }
+      lastWheel = Mouse.getDWheel
+    }
   }
   
   /** Play one turn */
@@ -202,7 +270,7 @@ object Main {
     for (monster <- monsterList)
       monster.turn
     turn += 1
-    if (player.health < 0) Output.addLog("You died! Score: " + getPlayer.gold)
+    if (player.health <= 0) Output.addLog("You died! Score: " + getPlayer.gold.toInt)
   }
   
   def clearLists() {

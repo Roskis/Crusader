@@ -104,7 +104,9 @@ class Grid() {
       getPlayer.setX(playerPosition.getX)
       getPlayer.setY(playerPosition.getY)
     }
-    while (getPlayer.distance(getStairs) < 15 || getTile(playerPosition.getX, playerPosition.getY).getType != TileType.FLOOR)
+    while (getPlayer.distance(getStairs) < 15 || 
+        getTile(playerPosition.getX, playerPosition.getY).getType != TileType.FLOOR || 
+        !(getTile(playerPosition.getX, playerPosition.getY)).getObjectList.isEmpty)
     map(getPlayer.getX)(getPlayer.getY).explored = true
   }
   
@@ -236,7 +238,8 @@ class Grid() {
     var coord: Coordinate = null
     for (n <- Range(0, num)) {
       do coord = giveRandomNonBlockinCoordinates
-      while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR))
+      while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || 
+          !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
       tree = new PassiveObject("Tree", "Large generic tree.", coord.getX, coord.getY, "Items/tempTree")
       tree.blockVision = true
       getTile(tree.getX, tree.getY).blockVision = true
@@ -249,7 +252,8 @@ class Grid() {
     var coord: Coordinate = null
     for (n <- Range(0, num)) {
       do coord = giveRandomNonBlockinCoordinates
-      while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR))
+      while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || 
+          !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
       rock = new PassiveObject("Rock", "Huge boulder.", coord.getX, coord.getY, "Items/tempRock")
       rock.blockVision = true
       getTile(rock.getX, rock.getY).blockVision = true
@@ -261,8 +265,10 @@ class Grid() {
     var coord: Coordinate = null
     for (n <- Range(0, num)) {
       do coord = giveRandomNonBlockinCoordinates
-      while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR))
-      new Monster(coord.getX, coord.getY, MonsterType.monstersForLevel(getLevel)(rnd.nextInt(MonsterType.monstersForLevel(getLevel).size)))
+      while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || 
+          !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
+      new Monster(coord.getX, coord.getY, 
+          MonsterType.monstersForLevel(getLevel)(rnd.nextInt(MonsterType.monstersForLevel(getLevel).size)))
     }
     
     
@@ -275,7 +281,7 @@ class Grid() {
   def addAltar() = {
     var coord: Coordinate = null
     do coord = giveRandomNonBlockinCoordinates
-    while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR))
+    while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
     altar.setX(coord.getX)
     altar.setY(coord.getY)
   }
@@ -284,7 +290,7 @@ class Grid() {
   def addItem() = {
     var coord: Coordinate = null
     do coord = giveRandomNonBlockinCoordinates
-    while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR))
+    while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
     var item: Equipment = null
     rnd.nextInt(5) match {
       case r if (r == 0) => item = new Equipment(coord.getX, coord.getY, EquipmentType.KNIFE, false)
@@ -306,7 +312,9 @@ class Grid() {
       stairs.setX(coord.getX)
       stairs.setY(coord.getY)
     }
-    while ((stairs.getX > size/3 && stairs.getX < size*2/3) || (stairs.getY > size/3 && stairs.getY < size*2/3) || getTile(stairs.getX, stairs.getY).getType != TileType.FLOOR)
+    while ((stairs.getX > size/3 && stairs.getX < size*2/3) || (stairs.getY > size/3 && 
+        stairs.getY < size*2/3) || getTile(stairs.getX, stairs.getY).getType != TileType.FLOOR || 
+        !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
     setTile(stairs)
   }  
   

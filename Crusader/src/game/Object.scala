@@ -120,10 +120,9 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   
   var viewRadius = 10
   var health: Double = 20
-  var maxHealth: Int = 20
-  var experience: Int = 0
-  var gold: Int = 0
-  var piety: Int = 0
+  var experience: Double = 0
+  var gold: Double = 0
+  var piety: Double = 0
   
   var zeal: Int = 0
   var humility: Int = 0
@@ -137,10 +136,22 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   var slotArmor: Equipment = new Equipment(-100, -100, EquipmentType.ROBES, true)
   var slotShield: Equipment = null
   var slotRing: Equipment = null
-  var slotAmulet: Equipment = new Equipment(-100, -100, EquipmentType.ROBES, true)
+  var slotAmulet: Equipment = null
   var slotItem: Equipment = null
   
   val grave = loadTexture("Environment/grave")
+  
+  /** modifier applied to all experience gained */
+  def xpModifier: Double = 1+0.1*diligence
+  
+  /** modifier applied to all gold gained */
+  def goldModifier: Double = 1+0.1*diligence
+  
+  /** modifier applied to all piety gained */
+  def pietyModifier: Double = 1+0.1*charity
+  
+  /** Player's maximum health */
+  def maxHealth: Int = 20+8*kindness
   
   /** Title of player */
   def title: String = "the Holy"
