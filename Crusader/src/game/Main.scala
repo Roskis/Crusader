@@ -100,17 +100,20 @@ object Main {
     if ((Mouse.isButtonDown(0) && Mouse.getX > 816 && Mouse.getX < 1040 && 
         (height - Mouse.getY) > 604 && (height - Mouse.getY) < 660)) {
           gameState = GAME
+          while (Keyboard.next) {}
           newGame
     }
     else if ((Mouse.isButtonDown(0) && Mouse.getX > 274 && Mouse.getX < 496 && 
         (height - Mouse.getY) > 604 && (height - Mouse.getY) < 660)) {
       gameState = MAIN_MENU
+      while (Keyboard.next) {}
     }
     else while (Keyboard.next) {
       Keyboard.getEventKey match {
         case k if (k == Keyboard.KEY_ESCAPE) => gameState = MAIN_MENU
         case k if (k == Keyboard.KEY_RETURN && Keyboard.getEventKeyState && player.name != "" && Output.font.getWidth(getPlayer.name) < 400) => {
           gameState = GAME
+          while (Keyboard.next) {}
           newGame
         }
         case k if (k == Keyboard.KEY_BACK && Keyboard.getEventKeyState) => player.name = player.name.dropRight(1)
@@ -132,6 +135,7 @@ object Main {
         (height - Mouse.getY) > 320 && (height - Mouse.getY) < 376) || 
         Keyboard.isKeyDown(Keyboard.KEY_N)) {
       gameState = CHARACTER_CREATION
+      while (Keyboard.next) {}
       player = new Player(player.name, 0, 0)
     }
     else if ((Mouse.isButtonDown(0) && Mouse.getX > 922 && Mouse.getX < 1145 && 

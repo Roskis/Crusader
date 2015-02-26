@@ -19,6 +19,7 @@ trait Object {
   var image: Texture
   var blockMovement: Boolean
   var blockVision: Boolean
+  var isMonster: Boolean
   
   /** Simple way to roll multiple dice */
   def roll(amount: Int, number: Int): Int = {
@@ -115,6 +116,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   var image = loadTexture("Player/humanBase")
   var blockMovement = true
   var blockVision = false
+  var isMonster = false
   
   var viewRadius = 10
   var health: Double = 20
@@ -297,6 +299,7 @@ class PassiveObject(objectName: String, objectDescription: String, startX: Int, 
   var image = loadTexture(objectImage)
   var blockMovement = true
   var blockVision = false
+  var isMonster = false
   
   init
   getPassiveObjectList.append(this)
@@ -315,12 +318,14 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   var image = MonsterType.image(mType)
   var blockMovement = true
   var blockVision = false
+  var isMonster = true
   
   var health: Double = MonsterType.maxHP(mType)
   var armor: Double = MonsterType.armor(mType)
   var damage = MonsterType.damage(mType)
   var accuracy = MonsterType.accuracy(mType)
   var ap: Double = MonsterType.armorPierce(mType)
+  var crit = MonsterType.criticalChance(mType)
   var experience = MonsterType.experience(mType)
   var gold = MonsterType.gold(mType)
   var piety = MonsterType.piety(mType)
@@ -355,24 +360,48 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     if (health < 0) kill
   }
   
-  /** Temporary method until monster ai is working */
-  def turn() {
-    move(randomDirection(8))
+  /** Method to deal damage to player */
+  def attack(target: Object) {
+    if (rnd.nextInt(100) <= accuracy - target.dodge) {
+      target.takeDamage(damageroll(rnd.nextInt(100) <= crit), ap, this)
+    }
+    else target.takeDamage(smallDamage, ap, this)
   }
   
-  /** Move the object to given location
-   *
-   * @param newX x-coordinate
-   * @param newY y-coordinate
-   */
-  def move(direction: Direction.Value) =  {
-    val newX = getCoordinates(direction, getX, getY).getX
-    val newY = getCoordinates(direction, getX, getY).getY
-    if (getGrid.isWithinGrid(newX, newY) &&
-      !getGrid.getTile(newX, newY).blockMovement && 
-      !(newX == getPlayer.getX && newY == getPlayer.getY)) 
-    changePosition(newX, newY)
+  /** Damage is based on player's weapon */
+  def damageroll(crit: Boolean): Int = {
+    val dmg = roll(damage._1, damage._2) + damage._3
+    if (crit) dmg + dmg
+    else dmg
   }
+  
+  /** Return small damage */
+  def smallDamage: Int = {
+    val dmg = roll(damage._1, damage._2) + damage._3
+    if (rnd.nextInt(4) != 0) (dmg/2).toInt else 0
+  }
+  
+  /** Temporary method until monster ai is working */
+  def turn() {
+    if (distance(getPlayer) > 8) move(randomDirection(8))
+    else if (distance(getPlayer) < 2) attack(getPlayer)
+    else move(getGrid.line(getX, getY, getPlayer.getX, getPlayer.getY)(1))
+  }
+  
+  /** Move monster to given coordinate */
+  def move(coord: Coordinate): Unit = {
+    if (getGrid.isWithinGrid(coord.getX, coord.getY)) {
+      var boo = true
+      for (obj <- getGrid.getTile(coord.getX, coord.getY).getObjectList) if (obj.isMonster == true) boo = false
+      if (distance(coord) < 2 && !getGrid.getTile(coord.getX, coord.getY).blockMovement && boo) {
+        changePosition(coord.getX, coord.getY)
+      }
+    }
+  }
+  
+  /** Move the object to given direction */
+  def move(direction: Direction.Value): Unit =  move(new Coordinate(
+      getCoordinates(direction, getX, getY).getX, getCoordinates(direction, getX, getY).getY))
   
   /** Draw the object to the screen */
   override def draw = {
@@ -701,6 +730,7 @@ class Equipment(startX: Int, startY: Int, equipmentType: EquipmentType.Value, is
   var imageEquipped = EquipmentType.imageEquipped(eType)
   var blockMovement = false
   var blockVision = false
+  var isMonster = false
   var price = EquipmentType.price(eType)
   var inShop = false
   val armor = EquipmentType.armor(eType)
@@ -975,6 +1005,7 @@ class Consumable(consumableName: String, consumableDescription: String, startX: 
   var image = loadTexture(consumableImage)
   var blockMovement = false
   var blockVision = false
+  var isMonster = false
   var price = consumablePrice
   var inShop = false
   var equipped: Boolean = isEquipped
@@ -996,6 +1027,7 @@ class Scroll(scrollName: String, scrollDescription: String, startX: Int, startY:
   var image = loadTexture(scrollImage)
   var blockMovement = false
   var blockVision = false
+  var isMonster = false
   var price = scrollPrice
   var inShop = false
   var equipped: Boolean = isEquipped

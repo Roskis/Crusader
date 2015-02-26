@@ -388,6 +388,9 @@ class Grid() {
     }
   }
   
+  /** Alternative line algorthm */
+  def line(x1: Int, y1: Int, x2: Int, y2: Int): Buffer[Coordinate] = line(new Coordinate(x1, y1), new Coordinate(x2, y2))
+  
   /** Uses Bresenham's Line Algorithm to calculate straight line between two coordinates.
    *
    * @param coord1 is first given coordinate
