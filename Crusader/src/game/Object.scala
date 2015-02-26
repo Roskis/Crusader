@@ -141,6 +141,10 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   
   val grave = loadTexture("Environment/grave")
   
+  def giveXP(amount: Double) = experience += amount * (1+0.1*diligence)
+  def giveGold(amount: Double) = gold += amount * (1+0.1*diligence)
+  def givePiety(amount: Double) = piety += amount * (1+0.1*charity)
+  
   /** modifier applied to all experience gained */
   def xpModifier: Double = 1+0.1*diligence
   
@@ -163,7 +167,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   def smallestLevel(): Int = {
     var skills = List(zeal, humility, temperance, kindness, patience, charity, diligence)
     skills = skills.sortWith(_ < _)
-    xpNeededForLevel(skills(0) + 1)
+    xpNeededForLevel(skills(0))
   }
   
   /** Method to deal damage to monsters */
@@ -243,16 +247,17 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   /** Return needed amount of experience to level up */
   def xpNeededForLevel(level: Int): Int = {
     level match {
-      case l if (l == 1) => 10
-      case l if (l == 2) => 25
-      case l if (l == 3) => 85
-      case l if (l == 4) => 225
-      case l if (l == 5) => 750
-      case l if (l == 6) => 1800
-      case l if (l == 7) => 3000
-      case l if (l == 8) => 5000
-      case l if (l == 9) => 8000
-      case l if (l == 10) => 15000
+      case l if (l == 0) => 10
+      case l if (l == 1) => 25
+      case l if (l == 2) => 85
+      case l if (l == 3) => 225
+      case l if (l == 4) => 750
+      case l if (l == 5) => 1800
+      case l if (l == 6) => 3000
+      case l if (l == 7) => 5000
+      case l if (l == 8) => 8000
+      case l if (l == 9) => 15000
+      case l if (l == 10) => 45000
       case _ => 10
     }
   }
@@ -354,9 +359,9 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     x = -100
     y = -100
     addLog(name + " dies")
-    getPlayer.experience += experience
-    getPlayer.gold += gold
-    getPlayer.piety += piety
+    getPlayer.giveXP(experience)
+    getPlayer.giveGold(gold)
+    getPlayer.givePiety(piety)
   }
   
   /** Takes damage from attack */

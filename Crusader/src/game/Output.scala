@@ -345,7 +345,7 @@ object Output {
     val xptext = "XP: " + getPlayer.experience.toInt + "/" + getPlayer.smallestLevel
     font.drawString(middle-font.getWidth(xptext)/2, h, xptext, Color.black)
     
-    if (getPlayer.experience > getPlayer.smallestLevel) 
+    if (getPlayer.experience >= getPlayer.smallestLevel) 
       drawQuadTex(XPButton, middle-XPButton.getImageWidth/2, 194-48, XPButton.getImageWidth, 
           XPButton.getImageHeight)
     else drawQuadTex(XPButton2, middle-XPButton2.getImageWidth/2, 194-48, XPButton2.getImageWidth, 
