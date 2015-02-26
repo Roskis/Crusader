@@ -29,14 +29,7 @@ trait Object {
   }
   
   /** Simple way to roll one dice */
-  def roll(number: Int): Int = {
-    getRnd.nextInt(number) + 1
-  }
-  
-  /** dummy methods */
-  def pickUp {}
-  def dodge = 0
-  def takeDamage(a: Int, b: Double, c: Object) {}
+  def roll(number: Int): Int = getRnd.nextInt(number) + 1
   
   /** Add object to the tile it is on */
   def init() = if (getGrid.isWithinGrid(getX, getY)) getGrid.getTile(getX, getY).addObject(this)
@@ -46,14 +39,10 @@ trait Object {
     y - (getPlayer.getY - 8) * 32, image.getImageWidth, image.getImageHeight)
   
   /** block current tile's vision */
-  def blockVisionForTile() = {
-    getGrid.getTile(getX, getY).blockVision = true
-  }
+  def blockVisionForTile() = getGrid.getTile(getX, getY).blockVision = true
     
   /** unblock current tile's vision */
-  def unblockVisionForTile = {
-    getGrid.getTile(getX, getY).blockVision = false
-  }
+  def unblockVisionForTile = getGrid.getTile(getX, getY).blockVision = false
   
   /** Check if this object is only visionblocker in this tile */
   def onlyVisionBlocker(): Boolean = {
@@ -141,18 +130,17 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   
   val grave = loadTexture("Environment/grave")
   
-  def giveXP(amount: Double) = experience += amount * (1+0.1*diligence)
-  def giveGold(amount: Double) = gold += amount * (1+0.1*diligence)
-  def givePiety(amount: Double) = piety += amount * (1+0.1*charity)
+  /** modifier applied to prays */
+  def prayMissChance = 100-(charity*2.5)
   
-  /** modifier applied to all experience gained */
-  def xpModifier: Double = 1+0.1*diligence
+  /** modifier applied to all expirience gained */
+  def giveXP(amount: Double) = experience += amount * (1+0.1*diligence)
   
   /** modifier applied to all gold gained */
-  def goldModifier: Double = 1+0.1*diligence
+  def giveGold(amount: Double) = gold += amount * (1+0.1*diligence)
   
   /** modifier applied to all piety gained */
-  def pietyModifier: Double = 1+0.1*charity
+  def givePiety(amount: Double) = piety += amount * (1+0.1*charity)
   
   /** Player's maximum health */
   def maxHealth: Int = 20+8*kindness
@@ -171,7 +159,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   }
   
   /** Method to deal damage to monsters */
-  def attack(target: Object) {
+  def attack(target: Monster) {
     if (rnd.nextInt(100) <= accuracy - target.dodge) {
       target.takeDamage(damage(rnd.nextInt(100) <= crit), armorPierce, this)
     }
@@ -194,7 +182,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
     num
   }
   
-  override def takeDamage(damage: Int, armorPierce: Double, attacker: Object) = {
+  def takeDamage(damage: Int, armorPierce: Double, attacker: Object) = {
     var effectiveArmor = armor
     if (rnd.nextInt(100) <= blockChance) effectiveArmor += shieldArmor
     if (effectiveArmor < 0) effectiveArmor = 0
@@ -239,7 +227,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   }
   
   /** Return dodge of player */
-  override def dodge: Int = 100 - totalWeight + humility*2
+  def dodge: Int = 100 - totalWeight + humility*2
   
   /** Return accuracy of player */
   def accuracy: Int = if (slotWeapon != null) slotWeapon.accuracy + temperance*2 else 100 + temperance*2
@@ -262,23 +250,35 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
     }
   }
   
-  /** Temporary move and attack command */
+  /** Move to given coordinates or go to next map */
+  def move(coord: Coordinate) = {
+    if (getGrid.getTile(coord.getX, coord.getY) == getGrid.getStairs) Main.nextMap
+    else changePosition(coord.getX, coord.getY)
+  }
+  
+  /** Move and attack command */
   def moveOrAttack(direction: Direction.Value) = {
-    val newX = getCoordinates(direction, getX, getY).getX
-    val newY = getCoordinates(direction, getX, getY).getY
-    if (getGrid.isWithinGrid(newX, newY) && !getGrid.getTile(newX, newY).blockMovement) {
-      var target: Object = null
-      for (obj <- getGrid.getTile(newX, newY).getObjectList) {
+    val coord = getCoordinates(direction, getX, getY)
+    if (getGrid.isWithinGrid(coord.getX, coord.getY) && !getGrid.getTile(coord.getX, coord.getY).blockMovement) {
+      var canMove: Boolean = true
+      for (obj <- getGrid.getTile(coord.getX, coord.getY).getObjectList) {
         obj match {
-          case _: Monster => target = obj
-          case _: Item => obj.pickUp
-          case _ =>
+          case monster: Monster => {
+            canMove = false
+            attack(monster)
+          }
+          case item: Item => {
+            if(item.inShop && getPlayer.gold >= item.price) item.buy
+            else if (item.inShop) {
+              canMove = false
+              addLog(item.name + " is " + item.price + " gold.")
+            }
+            else item.pickUp
+            }
+          case _ => {}
         }
       }
-      
-      if (target != null) attack(target)
-      else if (getGrid.getTile(newX, newY) == getGrid.getStairs) Main.nextMap
-      else changePosition(newX, newY)
+      if (canMove) move(coord)
     }
   }
   
@@ -345,7 +345,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   var experience = MonsterType.experience(mType)
   var gold = MonsterType.gold(mType)
   var piety = MonsterType.piety(mType)
-  override def dodge = MonsterType.dodge(mType)
+  var dodge = MonsterType.dodge(mType)
   var blockChance = 0
   var shieldArmor = 0
   
@@ -365,7 +365,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   }
   
   /** Takes damage from attack */
-  override def takeDamage(damage: Int, armorPierce: Double, attacker: Object) = {
+  def takeDamage(damage: Int, armorPierce: Double, attacker: Object) = {
     var effectiveArmor = armor
     if (rnd.nextInt(100) <= blockChance) effectiveArmor += shieldArmor
     if (effectiveArmor < 0) effectiveArmor = 0
@@ -377,7 +377,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   }
   
   /** Method to deal damage to player */
-  def attack(target: Object) {
+  def attack(target: Player) {
     if (rnd.nextInt(100) <= accuracy - target.dodge) {
       target.takeDamage(damageroll(rnd.nextInt(100) <= crit), ap, this)
     }
@@ -425,7 +425,6 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
       drawQuadTex(image, x - (getPlayer.getX - 16) * 32, 
           y - (getPlayer.getY - 8) * 32, image.getImageWidth, image.getImageHeight)
   }
-  
 }
 
 object MonsterType extends Enumeration {
@@ -691,7 +690,7 @@ object MonsterType extends Enumeration {
   /** returns name of the given monster */
   def name(MonsterType: Type): String = {
     MonsterType match {
-      case t if (t == BAT) => "bat"
+      case t if (t == BAT) => "Bat"
       case t if (t == SNAKE) => "Snake"
       case t if (t == SPIDER) => "Spider"
       case t if (t == GOBLINA) => "Goblin"
@@ -721,7 +720,6 @@ object MonsterType extends Enumeration {
       case _ => "Unknown monster name"
     }
   }
-  
 }
 
 /** All of the game's items will be under this trait */
@@ -730,6 +728,9 @@ trait Item extends Object {
   var price: Int
   var inShop: Boolean
   var equipped: Boolean
+  
+  def buy: Unit
+  def pickUp: Unit
   
 }
 
@@ -761,6 +762,12 @@ class Equipment(startX: Int, startY: Int, equipmentType: EquipmentType.Value, is
   if (!equipped) {
     init
     getEquipmentList.append(this)
+  }
+  
+  def buy = {
+    getPlayer.gold -= price
+    inShop = false
+    pickUp
   }
   
   /** unequip item */
@@ -823,7 +830,6 @@ class Equipment(startX: Int, startY: Int, equipmentType: EquipmentType.Value, is
       case _ =>
     }
   }
-  
 }
 
 object EquipmentType extends Enumeration {
@@ -847,7 +853,36 @@ object EquipmentType extends Enumeration {
   private val woodenShieldG = loadTexture("Items/woodenShieldG")
   private val woodenShieldE = loadTexture("Player/woodenShieldE")
   
-  /** returns ground texture of the given equipment */
+  //* Returns Buffer containing all of the spawnable monsters */
+  def itemsForLevel(level: Int): Buffer[Value] = {
+    var list = Buffer[Value]()
+    level match {
+      case l if (l == 1) => {
+        list += KNIFE
+        list += ROBES
+        list += WOODENSHIELD
+      }
+      case l if (l == 2) => {
+        list += KNIFE
+        list += ROBES
+        list += WOODENSHIELD
+      }
+      case l if (l == 3) => {
+        list += STEELSWORD
+        list += IRONARMOR
+        list += WOODENSHIELD
+      }
+      case l if (l == 4) => {
+        list += STEELSWORD
+        list += IRONARMOR
+        list += WOODENSHIELD
+      }
+      case _ => list += KNIFE
+    }
+    list
+  }
+  
+  /** returns slot of the given equipment */
   def slot(EquipmentType: Type): String = {
     EquipmentType match {
       case t if (t == KNIFE) => "weapon"
@@ -1029,6 +1064,9 @@ class Consumable(consumableName: String, consumableDescription: String, startX: 
   init
   getConsumableList.append(this)
   
+  def buy: Unit = {}
+  def pickUp: Unit = {}
+  
 }
 
 /** Player usable scrolls */
@@ -1050,5 +1088,8 @@ class Scroll(scrollName: String, scrollDescription: String, startX: Int, startY:
   
   init
   getScrollList.append(this)
+  
+  def buy: Unit = {}
+  def pickUp: Unit = {}
   
 }

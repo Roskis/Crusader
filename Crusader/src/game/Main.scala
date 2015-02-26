@@ -201,7 +201,7 @@ object Main {
   
   /** Follow user input in game */
   def gameKeys {
-    if (Mouse.isButtonDown(0) && getPlayer.experience > getPlayer.smallestLevel && Mouse.getX > 1080 &&
+    if (Mouse.isButtonDown(0) && getPlayer.experience >= getPlayer.smallestLevel && Mouse.getX > 1080 &&
         Mouse.getX < 1255 && (height - Mouse.getY) > 242 && (height - Mouse.getY) < 307) {
       gameState = LEVEL
       while (Keyboard.next) {}

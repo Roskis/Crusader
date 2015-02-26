@@ -30,8 +30,8 @@ class Grid() {
       map = Array.ofDim[Tile](size, size)
       do {
         clearLists
-        altar = new PassiveObject("Altar", "Make your sacrifices here.", -100, -100, "tempAltar")
-        djinn = new PassiveObject("Djinn", "Merchant running business.", -100, -100, "tempDjinn")
+        altar = new PassiveObject("Altar", " TODO ", -100, -100, "tempAltar")
+        djinn = new PassiveObject("Djinn", " TODO ", -100, -100, "tempDjinn")
         makeMap1(45, 4, 4)
       }
       while (!mapIsContinuous)
@@ -46,6 +46,7 @@ class Grid() {
       map = Array.ofDim[Tile](size, size)
       testMap
     }
+    addItemsToShop
   }
 
   /** Temporary bossmap */
@@ -95,7 +96,11 @@ class Grid() {
     addStairs
     addTrees(16)
     addRocks(4)
-    addItem
+    var coord: Coordinate = null
+    do coord = giveRandomNonBlockinCoordinates
+    while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || 
+        !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
+    addItem(coord)
     addMonsters(20)
     
     var playerPosition = giveRandomNonBlockinCoordinates
@@ -270,8 +275,6 @@ class Grid() {
       new Monster(coord.getX, coord.getY, 
           MonsterType.monstersForLevel(getLevel)(rnd.nextInt(MonsterType.monstersForLevel(getLevel).size)))
     }
-    
-    
   }
   
   /** getter for altar */
@@ -286,20 +289,19 @@ class Grid() {
     altar.setY(coord.getY)
   }
   
-  /** Add random item */
-  def addItem() = {
-    var coord: Coordinate = null
-    do coord = giveRandomNonBlockinCoordinates
-    while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
-    var item: Equipment = null
-    rnd.nextInt(5) match {
-      case r if (r == 0) => item = new Equipment(coord.getX, coord.getY, EquipmentType.KNIFE, false)
-      case r if (r == 1) => item = new Equipment(coord.getX, coord.getY, EquipmentType.ROBES, false)
-      case r if (r == 2) => item = new Equipment(coord.getX, coord.getY, EquipmentType.IRONARMOR, false)
-      case r if (r == 3) => item = new Equipment(coord.getX, coord.getY, EquipmentType.STEELSWORD, false)
-      case r if (r == 4) => item = new Equipment(coord.getX, coord.getY, EquipmentType.WOODENSHIELD, false)
+  /** Method that adds item to each shopslot */
+  def addItemsToShop = {
+    for (i <- Range(0,size)) {
+      for (j <- Range(0,size)) {
+        if (getTile(i, j).getType == TileType.DJINNSLOT)
+          addItem(new Coordinate(i, j)).inShop=true
+      }
     }
   }
+  
+  /** Add random item */
+  def addItem(coord: Coordinate) = new Equipment(coord.getX, coord.getY, 
+      EquipmentType.itemsForLevel(getLevel)(rnd.nextInt(EquipmentType.itemsForLevel(getLevel).size)), false)
   
   /** getter for stairs */
   def getStairs() = stairs
