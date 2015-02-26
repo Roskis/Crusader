@@ -44,7 +44,7 @@ class Grid() {
       map = Array.ofDim[Tile](size, size)
       do {
         clearLists
-        altar = new PassiveObject("Altar", " TODO ", -100, -100, "tempAltar")
+        altar = new PassiveObject("Altar", " TODO ", -100, -100, "Environment/altar1")
         djinn = new PassiveObject("Djinn", " TODO ", -100, -100, "tempDjinn")
         makeMap1(45, 4, 4)
       }
@@ -259,7 +259,7 @@ class Grid() {
       do coord = giveRandomNonBlockinCoordinates
       while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || 
           !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
-      tree = new PassiveObject("Tree", "Large generic tree.", coord.getX, coord.getY, "Items/tempTree")
+      tree = new PassiveObject("Tree", "TODO", coord.getX, coord.getY, "Environment/tree1")
       tree.blockVision = true
       getTile(tree.getX, tree.getY).blockVision = true
     }
@@ -273,7 +273,7 @@ class Grid() {
       do coord = giveRandomNonBlockinCoordinates
       while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || 
           !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
-      rock = new PassiveObject("Rock", "Huge boulder.", coord.getX, coord.getY, "Items/tempRock")
+      rock = new PassiveObject("Rock", "TODO", coord.getX, coord.getY, if (rnd.nextInt(2) == 0) "Environment/rock1" else "Environment/rock2")
       rock.blockVision = true
       getTile(rock.getX, rock.getY).blockVision = true
     }

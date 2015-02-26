@@ -312,8 +312,8 @@ object Output {
     drawSideBar
     drawlog
     drawFloor
-    drawObjects
     drawPlayer
+    drawObjects
     drawFog
     font.drawString(2, height - 245, "Mouse X: " + mouseXCoord.toString, Color.red)
     font.drawString(130, height - 245, "Y: " + mouseYCoord.toString, Color.red)
@@ -477,7 +477,7 @@ object Output {
   
   /** Draw objects */
   def drawObjects() {
-    for (list <- List(getPassiveObjectList, getEquipmentList, getScrollList, getConsumableList, getMonsterList)) {
+    for (list <- List(getEquipmentList, getScrollList, getConsumableList, getMonsterList, getPassiveObjectList)) {
       for (obj <- list) {
         if (obj.xDif(getPlayer) <= 16 && obj.yDif(getPlayer) <= 8 && 
             getGrid.getTile(obj.getX, obj.getY).explored) obj.draw

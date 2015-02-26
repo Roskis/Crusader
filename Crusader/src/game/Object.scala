@@ -48,8 +48,12 @@ trait Object {
   def init() = if (getGrid.isWithinGrid(getX, getY)) getGrid.getTile(getX, getY).addObject(this)
   
   /** Draw the object to the screen */
-  def draw = drawQuadTex(image, x - (getPlayer.getX - 16) * 32, 
-    y - (getPlayer.getY - 8) * 32, image.getImageWidth, image.getImageHeight)
+  def draw = {
+    if (image.getImageWidth == 32 && image.getImageHeight == 32)
+      drawQuadTex(image, x - (getPlayer.getX - 16) * 32, 
+          y - (getPlayer.getY - 8) * 32, image.getImageWidth, image.getImageHeight)
+    else drawQuadTex(image, x - (getPlayer.getX - 16) * 32 - 16, y - (getPlayer.getY - 8) * 32 - 32, image.getImageWidth, image.getImageHeight)
+  }
   
   /** block current tile's vision */
   def blockVisionForTile() = getGrid.getTile(getX, getY).blockVision = true
@@ -305,11 +309,6 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
       if (slotRing != null) drawQuadTex(slotRing.imageEquipped, 16 * 32, 8 * 32, slotRing.imageEquipped.getImageWidth, slotRing.imageEquipped.getImageHeight)
       if (slotAmulet != null) drawQuadTex(slotAmulet.imageEquipped, 16 * 32, 8 * 32, slotAmulet.imageEquipped.getImageWidth, slotAmulet.imageEquipped.getImageHeight)
       if (slotItem != null) drawQuadTex(slotItem.imageEquipped, 16 * 32, 8 * 32, slotItem.imageEquipped.getImageWidth, slotItem.imageEquipped.getImageHeight)
-      /**
-      drawQuadTex(robesE, 16 * 32, 8 * 32, robesE.getImageWidth, robesE.getImageHeight)
-      drawQuadTex(steelSwordE, 16 * 32, 8 * 32, steelSwordE.getImageWidth, steelSwordE.getImageHeight)
-      drawQuadTex(woodenShieldE, 16 * 32, 8 * 32, woodenShieldE.getImageWidth, woodenShieldE.getImageHeight)
-      */
     }
     else drawQuadTex(grave, 16 * 32, 8 * 32, grave.getImageWidth, grave.getImageHeight)
   }
