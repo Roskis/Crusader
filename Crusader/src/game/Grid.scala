@@ -60,6 +60,8 @@ class Grid() {
       map = Array.ofDim[Tile](size, size)
       testMap
     }
+    getTile(altar.getX, altar.getY).addObject(altar)
+    getTile(djinn.getX, djinn.getY).addObject(djinn)
     addItemsToShop
   }
 

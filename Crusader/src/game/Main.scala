@@ -115,6 +115,7 @@ object Main {
     level += 1
     grid = new Grid()
     grid.init
+    grid.getTile(player.getX, player.getY).addObject(player)
   }
   
   /** Follow user input when choosing new level */

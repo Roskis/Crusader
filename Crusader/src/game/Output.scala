@@ -311,9 +311,7 @@ object Output {
     glClear(GL_COLOR_BUFFER_BIT)
     drawSideBar
     drawlog
-    drawFloor
-    drawPlayer
-    drawObjects
+    drawTiles
     drawFog
     font.drawString(2, height - 245, "Mouse X: " + mouseXCoord.toString, Color.red)
     font.drawString(130, height - 245, "Y: " + mouseYCoord.toString, Color.red)
@@ -462,11 +460,8 @@ object Output {
     drawQuadTex(quit, middle-quit.getImageWidth/2, h, quit.getImageWidth, quit.getImageHeight)
   }
   
-  /** Draw player to the middle of screen */
-  def drawPlayer() = getPlayer.draw
-  
   /** Draws Tiles */
-  def drawFloor() {
+  def drawTiles() {
     for (i <- Range(0,33)) {
       for (j <- Range(0,17)) {
         drawQuadTex(unseen, i * 32, j * 32, unseen.getImageWidth, unseen.getImageHeight)

@@ -40,9 +40,11 @@ class Tile(Xcoord: Int, Ycoord: Int, tileType: TileType.Value) {
   
   /** Draw Tile */
   def draw = {
-    if (explored)
+    if (explored) {
       drawQuadTex(image, x - (getPlayer.getX - 16) * 32, 
           y - (getPlayer.getY - 8) * 32, image.getImageWidth, image.getImageHeight)
+      for (obj <- objectList) obj.draw
+    }
   }
   
   /** Draw Fog */
