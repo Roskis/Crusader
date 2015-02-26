@@ -357,7 +357,6 @@ object Output {
     val piety = "Piety: " + getPlayer.piety
     font.drawString(middle-96, heightForSidebar, piety, Color.black)
     
-    heightForSidebar -= 64
     drawQuadTex(saveQuit, middle-saveQuit.getImageWidth/2, heightForSidebar, saveQuit.getImageWidth, saveQuit.getImageHeight)
   }
   
