@@ -1,18 +1,67 @@
 package game
 
-import org.lwjgl._
-import org.lwjgl.LWJGLException
-import org.lwjgl.opengl.{Display, DisplayMode, GL11}
-import org.lwjgl.opengl.GL11._
-import org.lwjgl.input.Mouse
-import org.newdawn.slick.opengl.{Texture, TextureLoader}
-import org.newdawn.slick.{Color, TrueTypeFont}
-import org.newdawn.slick.util.ResourceLoader
-import scala.io.Source
-import collection.mutable.Buffer
-import java.io.{IOException, InputStream, File}
 import java.awt.Font
-import Main._
+import java.io.IOException
+import java.io.InputStream
+
+import scala.Range
+import scala.collection.mutable.Buffer
+
+import org.lwjgl.LWJGLException
+import org.lwjgl.input.Mouse
+import org.lwjgl.opengl.Display
+import org.lwjgl.opengl.DisplayMode
+import org.lwjgl.opengl.GL11.GL_BLEND
+import org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT
+import org.lwjgl.opengl.GL11.GL_DEPTH_TEST
+import org.lwjgl.opengl.GL11.GL_LIGHTING
+import org.lwjgl.opengl.GL11.GL_MODELVIEW
+import org.lwjgl.opengl.GL11.GL_NEAREST
+import org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA
+import org.lwjgl.opengl.GL11.GL_PROJECTION
+import org.lwjgl.opengl.GL11.GL_QUADS
+import org.lwjgl.opengl.GL11.GL_SMOOTH
+import org.lwjgl.opengl.GL11.GL_SRC_ALPHA
+import org.lwjgl.opengl.GL11.GL_TEXTURE_2D
+import org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER
+import org.lwjgl.opengl.GL11.glBegin
+import org.lwjgl.opengl.GL11.glBlendFunc
+import org.lwjgl.opengl.GL11.glClear
+import org.lwjgl.opengl.GL11.glClearColor
+import org.lwjgl.opengl.GL11.glClearDepth
+import org.lwjgl.opengl.GL11.glDisable
+import org.lwjgl.opengl.GL11.glEnable
+import org.lwjgl.opengl.GL11.glEnd
+import org.lwjgl.opengl.GL11.glLoadIdentity
+import org.lwjgl.opengl.GL11.glMatrixMode
+import org.lwjgl.opengl.GL11.glOrtho
+import org.lwjgl.opengl.GL11.glShadeModel
+import org.lwjgl.opengl.GL11.glTexCoord2f
+import org.lwjgl.opengl.GL11.glTexParameteri
+import org.lwjgl.opengl.GL11.glTranslatef
+import org.lwjgl.opengl.GL11.glVertex2f
+import org.lwjgl.opengl.GL11.glViewport
+import org.newdawn.slick.Color
+import org.newdawn.slick.TrueTypeFont
+import org.newdawn.slick.opengl.Texture
+import org.newdawn.slick.opengl.TextureLoader
+import org.newdawn.slick.util.ResourceLoader
+
+import Main.getConsumableList
+import Main.getEpisode
+import Main.getEquipmentList
+import Main.getGameLog
+import Main.getGameState
+import Main.getGrid
+import Main.getHeight
+import Main.getLastWheel
+import Main.getLevel
+import Main.getMonsterList
+import Main.getPassiveObjectList
+import Main.getPlayer
+import Main.getScrollList
+import Main.getVersion
+import Main.getWidth
 
 /** Output is responsible for everything that is drawn on the screen.
  */
@@ -81,8 +130,25 @@ object Output {
       //Display.setFullscreen(true)
       Display.setDisplayMode(new DisplayMode(width, height))
       Display.setTitle("Crusader" + " " + version)
-      // Window's game icon is not loaded right. TODO
+      /** TODO
+      // Window's game icon is not loaded right.
       //Display.setIcon(Array(ByteBuffer.allocate(0x4000).put(new ImageIOImageData().imageToByteBuffer(ImageIO.read(new File("data/icon.png")), false, false, null))))
+
+      var bitit = Files.readAllBytes((new File("data/UI/icon.png")).toPath)
+      var buffis = ByteBuffer.allocate(bitit.length).put(bitit)
+      var buffis2 = new ImageIOImageData.imageToByteBuffer()
+      var arr = (Array(buffis))
+      Display.setIcon(arr)
+      
+      //var test = ByteBuffer.wrap(getBytesFromFile())
+      //var test = new ImageIOImageData.imageToByteBuffer(ImageIO.read(new File("data/UI/icon.png")), false, false, null)
+
+      Display.setIcon(new ByteBuffer {
+        new Array(2)
+        new ImageIOImageData
+        new ImageIOImageData
+      })
+      */
       Display.create()
       Display.setVSyncEnabled(vSync)
     } catch {

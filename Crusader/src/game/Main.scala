@@ -1,13 +1,29 @@
 package game
 
+import scala.collection.mutable.Buffer
 import scala.io.Source
-import org.lwjgl.opengl.Display
-import Output.{startDisplay, drawMainMenu, drawGame, drawCharacterCreation}
-import GameState.{MAIN_MENU, GAME, CHARACTER_CREATION, LEVEL}
-import org.lwjgl.input.{Mouse, Keyboard}
 import scala.util.Random
-import collection.mutable.Buffer
-import Direction._
+
+import org.lwjgl.input.Keyboard
+import org.lwjgl.input.Mouse
+import org.lwjgl.opengl.Display
+
+import Direction.E
+import Direction.N
+import Direction.NE
+import Direction.NW
+import Direction.S
+import Direction.SE
+import Direction.SW
+import Direction.W
+import GameState.CHARACTER_CREATION
+import GameState.GAME
+import GameState.LEVEL
+import GameState.MAIN_MENU
+import Output.drawCharacterCreation
+import Output.drawGame
+import Output.drawMainMenu
+import Output.startDisplay
 
 /** Main object is responsible for the allocation of tasks to other parts of the program and 
  *  running the mainloop.

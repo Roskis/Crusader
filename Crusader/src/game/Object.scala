@@ -1,12 +1,25 @@
 package game
 
+import java.lang.Math.abs
+import java.lang.Math.sqrt
+
+import scala.collection.mutable.Buffer
+
 import org.newdawn.slick.opengl.Texture
-import Output.{loadTexture, drawQuadTex, addLog}
-import Math.sqrt
-import Math.abs
-import Direction._
-import Main._
-import collection.mutable.Buffer
+
+import Direction.getCoordinates
+import Direction.randomDirection
+import Main.getConsumableList
+import Main.getEquipmentList
+import Main.getGrid
+import Main.getMonsterList
+import Main.getPassiveObjectList
+import Main.getPlayer
+import Main.getRnd
+import Main.getScrollList
+import Output.addLog
+import Output.drawQuadTex
+import Output.loadTexture
 
 /** All of the game's objects will be under this trait */
 trait Object {

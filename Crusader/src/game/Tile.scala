@@ -1,12 +1,15 @@
 package game
 
-import Output.loadTexture
-import Output.drawQuadTex
+import java.lang.Math.abs
+import java.lang.Math.sqrt
+
+import scala.collection.mutable.Buffer
+
 import org.newdawn.slick.opengl.Texture
-import Math.sqrt
-import Math.abs
-import Main._
-import collection.mutable.Buffer
+
+import Main.getPlayer
+import Output.drawQuadTex
+import Output.loadTexture
 
   /** Tile represents single tile in the game. The whole map is made of them.
    *

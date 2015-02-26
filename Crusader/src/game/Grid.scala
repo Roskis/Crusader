@@ -1,9 +1,23 @@
 package game
 
-import collection.mutable.Buffer
-import Math.{sqrt, abs, cos, sin}
-import Main._
-import Direction._
+import java.lang.Math.abs
+import java.lang.Math.cos
+import java.lang.Math.sin
+
+import scala.Range
+import scala.collection.mutable.Buffer
+
+import Direction.Direction
+import Direction.E
+import Direction.N
+import Direction.S
+import Direction.W
+import Direction.getCoordinates
+import Direction.randomDirection
+import Main.clearLists
+import Main.getLevel
+import Main.getPlayer
+import Main.getRnd
 
 /** Simple coordinate system */
 class Coordinate(var x: Int, var y: Int) {
