@@ -104,19 +104,28 @@ object TileType extends Enumeration {
   val DJINNDOORH = Value
   val DJINNDOORV = Value
   val DJINNFLOOR = Value
-  val DJINNSLOT = Value
   val DJINNWALL = Value
+  private val rnd = Main.getRnd
   
   private val missing = loadTexture("UI/missing")
   private val fog: Texture = loadTexture("Tiles/fog")
   private val grass1 = loadTexture("Tiles/grass1")
   private val wall1 = loadTexture("Tiles/wall1")
   private val tempStairs = loadTexture("tempStairs")
-  private val tempDjinnDoorH = loadTexture("tempDjinnDoorH")
-  private val tempDjinnDoorV = loadTexture("tempDjinnDoorV")
-  private val tempDjinnFloor = loadTexture("tempDjinnFloor")
-  private val tempDjinnSlot = loadTexture("tempDjinnSlot")
-  private val tempDjinnWall = loadTexture("tempDjinnWall")
+  private val tempDjinnDoorH = loadTexture("Tiles/djinnDoorH")
+  private val tempDjinnDoorV = loadTexture("Tiles/djinnDoorV")
+  private val tempDjinnFloor = {
+    val ran = rnd.nextInt(3)
+    if (ran == 0) loadTexture("Tiles/djinnFloor1")
+    else if (ran == 1 ) loadTexture("Tiles/djinnFloor2")
+    else loadTexture("Tiles/djinnFloor3")
+  }
+  private val tempDjinnWall = {
+    val ran = rnd.nextInt(3)
+    if (ran == 0) loadTexture("Tiles/djinnWall1")
+    else if (ran == 1 ) loadTexture("Tiles/djinnWall2")
+    else loadTexture("Tiles/djinnWall3")
+  }
   
   /** returns texture of the given tile type */
   def image(tileType: Type): Texture = {
@@ -127,7 +136,6 @@ object TileType extends Enumeration {
       case t if (t == DJINNDOORH) => tempDjinnDoorH
       case t if (t == DJINNDOORV) => tempDjinnDoorV
       case t if (t == DJINNFLOOR) => tempDjinnFloor
-      case t if (t == DJINNSLOT) => tempDjinnSlot
       case t if (t == DJINNWALL) => tempDjinnWall
       case _ => missing
     }
@@ -142,7 +150,6 @@ object TileType extends Enumeration {
       case t if (t == DJINNDOORH) => false
       case t if (t == DJINNDOORV) => false
       case t if (t == DJINNFLOOR) => false
-      case t if (t == DJINNSLOT) => false
       case t if (t == DJINNWALL) => true
       case _ => true
     }
@@ -157,7 +164,6 @@ object TileType extends Enumeration {
       case t if (t == DJINNDOORH) => true
       case t if (t == DJINNDOORV) => true
       case t if (t == DJINNFLOOR) => false
-      case t if (t == DJINNSLOT) => false
       case t if (t == DJINNWALL) => true
       case _ => true
     }

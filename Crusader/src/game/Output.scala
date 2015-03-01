@@ -439,23 +439,23 @@ object Output {
     
     h += 64
     val name = "Name: " + getPlayer.name
-    font.drawString(middle-96, h, name, Color.black)
+    font.drawString(middle-80, h, name, Color.black)
     
     h += 20
     val title = "Title: " + getPlayer.title
-    font.drawString(middle-96, h, title, Color.black)
+    font.drawString(middle-80, h, title, Color.black)
     
     h += 20
     val heroLevel = "Hero level: " + getPlayer.totalLevel
-    font.drawString(middle-96, h, heroLevel, Color.black)
+    font.drawString(middle-80, h, heroLevel, Color.black)
     
     h += 20
     val gold = "Gold: " + getPlayer.gold.toInt
-    font.drawString(middle-96, h, gold, Color.black)
+    font.drawString(middle-80, h, gold, Color.black)
     
     h += 20
     val piety = "Piety: " + getPlayer.piety.toInt
-    font.drawString(middle-96, h, piety, Color.black)
+    font.drawString(middle-80, h, piety, Color.black)
     
     drawQuadTex(quit, middle-quit.getImageWidth/2, h, quit.getImageWidth, quit.getImageHeight)
   }

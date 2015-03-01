@@ -62,7 +62,6 @@ class Grid() {
     }
     getTile(altar.getX, altar.getY).addObject(altar)
     getTile(djinn.getX, djinn.getY).addObject(djinn)
-    addItemsToShop
   }
 
   /** Temporary bossmap */
@@ -247,7 +246,8 @@ class Grid() {
       }
     }
     for (tile <- slotList) {
-      setTile(new Tile(tile.getX, tile.getY, TileType.DJINNSLOT))
+      //setTile(new Tile(tile.getX, tile.getY, TileType.DJINNSLOT))
+      addItem(new Coordinate(tile.getX, tile.getY)).inShop=true
     }
     setTile(new Tile(door.getX, door.getY, 
         if(direction == E || direction == W) TileType.DJINNDOORH else TileType.DJINNDOORV))
@@ -279,7 +279,6 @@ class Grid() {
       while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || 
           !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
       rock = new PassiveObject("Rock", "TODO", coord.getX, coord.getY, if (rnd.nextInt(2) == 0) "Environment/rock1" else "Environment/rock2")
-      rock.blockVision = true
     }
   }
   
@@ -305,16 +304,6 @@ class Grid() {
     while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
     altar.setX(coord.getX)
     altar.setY(coord.getY)
-  }
-  
-  /** Method that adds item to each shopslot */
-  def addItemsToShop = {
-    for (i <- Range(0,size)) {
-      for (j <- Range(0,size)) {
-        if (getTile(i, j).getType == TileType.DJINNSLOT)
-          addItem(new Coordinate(i, j)).inShop=true
-      }
-    }
   }
   
   /** Add random item */
@@ -370,13 +359,13 @@ class Grid() {
   
   /** Draw the whole map */
   def draw() {
-    for (i <- Range(0,size)) {
-      for (j <- Range(0,size)) {
+    for (j <- Range(0,size)) {
+      for (i <- Range(0,size)) {
         if (getTile(i, j).xDif(getPlayer) <= 16 && getTile(i, j).yDif(getPlayer) <= 8) map(i)(j).draw
       }
     }
-    for (i <- Range(0,size)) {
-      for (j <- Range(0,size)) {
+    for (j <- Range(0,size)) {
+      for (i <- Range(0,size)) {
         if (getTile(i, j).xDif(getPlayer) <= 16 && getTile(i, j).yDif(getPlayer) <= 8) map(i)(j).drawObjects
       }
     }
