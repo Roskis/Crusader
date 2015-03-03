@@ -25,6 +25,8 @@ import Output.drawGame
 import Output.drawMainMenu
 import Output.startDisplay
 
+import Helpers._
+
 /** Main object is responsible for the allocation of tasks to other parts of the program and 
  *  running the mainloop.
  */
@@ -126,39 +128,39 @@ object Main {
       while (Keyboard.next) {}
     }
     else if (player.health > 0) {
-      if (Mouse.isButtonDown(0) && player.experience >= player.xpNeededForLevel(player.zeal) && !prevMouseState && 
+      if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.zeal) && !prevMouseState && 
           Mouse.getX > 149 && Mouse.getX < 406 && (height - Mouse.getY) > 117 && (height - Mouse.getY) < 181) {
-        player.experience -= player.xpNeededForLevel(player.zeal)
+        player.experience -= xpNeededForLevel(player.zeal)
         player.zeal += 1
       }
-      else if (Mouse.isButtonDown(0) && player.experience >= player.xpNeededForLevel(player.humility) && !prevMouseState && 
+      else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.humility) && !prevMouseState && 
           Mouse.getX > 149 && Mouse.getX < 406 && (height - Mouse.getY) > 187 && (height - Mouse.getY) < 251) {
-        player.experience -= player.xpNeededForLevel(player.humility)
+        player.experience -= xpNeededForLevel(player.humility)
         player.humility += 1
       }
-      else if (Mouse.isButtonDown(0) && player.experience >= player.xpNeededForLevel(player.temperance) && !prevMouseState && 
+      else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.temperance) && !prevMouseState && 
           Mouse.getX > 149 && Mouse.getX < 406 && (height - Mouse.getY) > 257 && (height - Mouse.getY) < 321) {
-        player.experience -= player.xpNeededForLevel(player.temperance)
+        player.experience -= xpNeededForLevel(player.temperance)
         player.temperance += 1
       }
-      else if (Mouse.isButtonDown(0) && player.experience >= player.xpNeededForLevel(player.kindness) && !prevMouseState && 
+      else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.kindness) && !prevMouseState && 
           Mouse.getX > 149 && Mouse.getX < 406 && (height - Mouse.getY) > 327 && (height - Mouse.getY) < 391) {
-        player.experience -= player.xpNeededForLevel(player.kindness)
+        player.experience -= xpNeededForLevel(player.kindness)
         player.kindness += 1
       }
-      else if (Mouse.isButtonDown(0) && player.experience >= player.xpNeededForLevel(player.patience) && !prevMouseState && 
+      else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.patience) && !prevMouseState && 
           Mouse.getX > 149 && Mouse.getX < 406 && (height - Mouse.getY) > 397 && (height - Mouse.getY) < 461) {
-        player.experience -= player.xpNeededForLevel(player.patience)
+        player.experience -= xpNeededForLevel(player.patience)
         player.patience += 1
       }
-      else if (Mouse.isButtonDown(0) && player.experience >= player.xpNeededForLevel(player.charity) && !prevMouseState && 
+      else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.charity) && !prevMouseState && 
           Mouse.getX > 149 && Mouse.getX < 406 && (height - Mouse.getY) > 467 && (height - Mouse.getY) < 531) {
-        player.experience -= player.xpNeededForLevel(player.charity)
+        player.experience -= xpNeededForLevel(player.charity)
         player.charity += 1
       }
-      else if (Mouse.isButtonDown(0) && player.experience >= player.xpNeededForLevel(player.diligence) && !prevMouseState && 
+      else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.diligence) && !prevMouseState && 
           Mouse.getX > 149 && Mouse.getX < 406 && (height - Mouse.getY) > 537 && (height - Mouse.getY) < 601) {
-        player.experience -= player.xpNeededForLevel(player.diligence)
+        player.experience -= xpNeededForLevel(player.diligence)
         player.diligence += 1
       }
     }
@@ -275,6 +277,10 @@ object Main {
             player.moveOrAttack(SW)
             playTurn
             }
+          case k if (k == Keyboard.KEY_SPACE && Keyboard.getEventKeyState && getPlayer.health > 0) => {
+            player.pray
+            playTurn
+          }
           case _ => {}
         }
       }
@@ -287,7 +293,7 @@ object Main {
     for (monster <- monsterList)
       monster.turn
     turn += 1
-    if (player.health <= 0) Output.addLog("You died! Score: " + getPlayer.gold.toInt)
+    if (player.health <= 0) addLog("You died! Score: " + getPlayer.gold.toInt)
   }
   
   def clearLists() {

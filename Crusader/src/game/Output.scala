@@ -63,6 +63,8 @@ import Main.getScrollList
 import Main.getVersion
 import Main.getWidth
 
+import Helpers._
+
 /** Output is responsible for everything that is drawn on the screen.
  */
 object Output {
@@ -72,10 +74,10 @@ object Output {
   private val height: Int = getHeight
   private val width: Int = getWidth
   private val version: String = getVersion
-  private var mouseScrollBonus: Int = 0
   private var mouseXCoord: Int = 0
   private var mouseYCoord: Int = 0
   
+  var mouseScrollBonus: Int = 0
   var font: TrueTypeFont = null
   private var fontMenu: TrueTypeFont = null  
   private var awtFont: Font = null
@@ -230,25 +232,6 @@ object Output {
     
   }
   
-  /** Method to load textures from given location.
-   *  
-   *  Since all images are in png format and in the data folder, it is set already.
-   *
-   * @param path is location of the texture
-   * @return a Texture build from image at the given location
-   */
-  def loadTexture(path: String): Texture = {
-    var tex:Texture = null
-    val in:InputStream = ResourceLoader.getResourceAsStream("data/" + path + ".png")
-    try {
-      tex = TextureLoader.getTexture("PNG", in)
-    } catch {
-      case e:IOException => e.printStackTrace()
-      tex = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("data/UI/missing.png"))
-    }
-    tex
-  }
-  
   /** Method to draw textures on the display.
    *
    * @param tex is the texture used
@@ -322,34 +305,6 @@ object Output {
     font.drawString(990, height - 205, "Level: " + getLevel, Color.white)
     if (Mouse.getX < 1057 && (height - Mouse.getY) < 545) drawInfoBox
     if (getGameState == GameState.LEVEL) drawLevel
-  }
-  
-  /** Method to wrap long strings into smaller lines.
-   *
-   * @param text is the long text block needed to split
-   * @param maxLenght is the maximum lenght (in pixels) for one line
-   * @return Buffer containing smaller strings
-   */
-  def wordWrap(text: String, maxLength: Int): Buffer[String] = {
-    val lines = Buffer[String]()
-    var line = ""
-    for (word <- text.split(" ")) {
-      if (Output.font.getWidth(line + " " + word) > maxLength) {
-        lines += line
-        line = word + " "
-      }
-      else line += word + " "
-    }
-    lines += line
-    lines
-  }
-  
-  /** Add message to gamelogs */
-  def addLog(text: String) = {
-    for (line <- wordWrap(text, 1030)) {
-      getGameLog.append(line)
-      mouseScrollBonus += 1
-    }
   }
   
   /** Draw gamelog to bottom of the screen */
@@ -505,31 +460,31 @@ object Output {
     var h = 20
     var v = 150
     fontMenu.drawString(v, 35, title, Color.black)
-    if (getPlayer.experience >= getPlayer.xpNeededForLevel(getPlayer.zeal)) 
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.zeal)) 
       drawQuadTex(zeal, v, h, zeal.getImageWidth, zeal.getImageHeight)
     else drawQuadTex(zeal2, v, h, zeal2.getImageWidth, zeal2.getImageHeight)
     h += 70
-    if (getPlayer.experience >= getPlayer.xpNeededForLevel(getPlayer.humility)) 
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.humility)) 
       drawQuadTex(humility, v, h, humility.getImageWidth, humility.getImageHeight)
     else drawQuadTex(humility2, v, h, humility2.getImageWidth, humility2.getImageHeight)
     h += 70
-    if (getPlayer.experience >= getPlayer.xpNeededForLevel(getPlayer.temperance)) 
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.temperance)) 
       drawQuadTex(temperance, v, h, temperance.getImageWidth, temperance.getImageHeight)
     else drawQuadTex(temperance2, v, h, temperance2.getImageWidth, temperance2.getImageHeight)
     h += 70
-    if (getPlayer.experience >= getPlayer.xpNeededForLevel(getPlayer.kindness)) 
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.kindness)) 
       drawQuadTex(kindness, v, h, kindness.getImageWidth, kindness.getImageHeight)
     else drawQuadTex(kindness2, v, h, kindness2.getImageWidth, kindness2.getImageHeight)
     h += 70
-    if (getPlayer.experience >= getPlayer.xpNeededForLevel(getPlayer.patience)) 
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.patience)) 
       drawQuadTex(patience, v, h, patience.getImageWidth, patience.getImageHeight)
     else drawQuadTex(patience2, v, h, patience2.getImageWidth, patience2.getImageHeight)
     h += 70
-    if (getPlayer.experience >= getPlayer.xpNeededForLevel(getPlayer.charity)) 
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.charity)) 
       drawQuadTex(charity, v, h, charity.getImageWidth, charity.getImageHeight)
     else drawQuadTex(charity2, v, h, charity2.getImageWidth, charity2.getImageHeight)
     h += 70
-    if (getPlayer.experience >= getPlayer.xpNeededForLevel(getPlayer.diligence)) 
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.diligence)) 
       drawQuadTex(diligence, v, h, diligence.getImageWidth, diligence.getImageHeight)
     else drawQuadTex(diligence2, v, h, diligence2.getImageWidth, diligence2.getImageHeight)
     h += 70
@@ -544,7 +499,7 @@ object Output {
       else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
     }
     v += 32
-    font.drawString(v, h, "Costs: " + getPlayer.xpNeededForLevel(getPlayer.zeal), Color.black)
+    font.drawString(v, h, "Costs: " + xpNeededForLevel(getPlayer.zeal), Color.black)
     v += 128
     font.drawString(v, h, "Short description of skill (TODO)", Color.black)
     h += 70
@@ -555,7 +510,7 @@ object Output {
       else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
     }
     v += 32
-    font.drawString(v, h, "Costs: " + getPlayer.xpNeededForLevel(getPlayer.humility), Color.black)
+    font.drawString(v, h, "Costs: " + xpNeededForLevel(getPlayer.humility), Color.black)
     v += 128
     font.drawString(v, h, "Short description of skill (TODO)", Color.black)
     h += 70
@@ -566,7 +521,7 @@ object Output {
       else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
     }
     v += 32
-    font.drawString(v, h, "Costs: " + getPlayer.xpNeededForLevel(getPlayer.temperance), Color.black)
+    font.drawString(v, h, "Costs: " + xpNeededForLevel(getPlayer.temperance), Color.black)
     v += 128
     font.drawString(v, h, "Short description of skill (TODO)", Color.black)
     h += 70
@@ -577,7 +532,7 @@ object Output {
       else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
     }
     v += 32
-    font.drawString(v, h, "Costs: " + getPlayer.xpNeededForLevel(getPlayer.kindness), Color.black)
+    font.drawString(v, h, "Costs: " + xpNeededForLevel(getPlayer.kindness), Color.black)
     v += 128
     font.drawString(v, h, "Short description of skill (TODO)", Color.black)
     h += 70
@@ -588,7 +543,7 @@ object Output {
       else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
     }
     v += 32
-    font.drawString(v, h, "Costs: " + getPlayer.xpNeededForLevel(getPlayer.patience), Color.black)
+    font.drawString(v, h, "Costs: " + xpNeededForLevel(getPlayer.patience), Color.black)
     v += 128
     font.drawString(v, h, "Short description of skill (TODO)", Color.black)
     h += 70
@@ -599,7 +554,7 @@ object Output {
       else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
     }
     v += 32
-    font.drawString(v, h, "Costs: " + getPlayer.xpNeededForLevel(getPlayer.charity), Color.black)
+    font.drawString(v, h, "Costs: " + xpNeededForLevel(getPlayer.charity), Color.black)
     v += 128
     font.drawString(v, h, "Short description of skill (TODO)", Color.black)
     h += 70
@@ -610,7 +565,7 @@ object Output {
       else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
     }
     v += 32
-    font.drawString(v, h, "Costs: " + getPlayer.xpNeededForLevel(getPlayer.diligence), Color.black)
+    font.drawString(v, h, "Costs: " + xpNeededForLevel(getPlayer.diligence), Color.black)
     v += 128
     font.drawString(v, h, "Short description of skill (TODO)", Color.black)
     

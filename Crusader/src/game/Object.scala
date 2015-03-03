@@ -17,9 +17,9 @@ import Main.getPassiveObjectList
 import Main.getPlayer
 import Main.getRnd
 import Main.getScrollList
-import Output.addLog
 import Output.drawQuadTex
-import Output.loadTexture
+
+import Helpers._
 
 /** All of the game's objects will be under this trait */
 trait Object {
@@ -33,16 +33,6 @@ trait Object {
   var blockMovement: Boolean
   var blockVision: Boolean
   var isMonster: Boolean
-  
-  /** Simple way to roll multiple dice */
-  def roll(amount: Int, number: Int): Int = {
-    var num: Int = 0
-    for (dice <- (0 until amount)) num += roll(number)
-    num
-  }
-  
-  /** Simple way to roll one dice */
-  def roll(number: Int): Int = getRnd.nextInt(number) + 1
   
   /** Add object to the tile it is on */
   def init() = if (getGrid.isWithinGrid(getX, getY)) getGrid.getTile(getX, getY).addObject(this)
@@ -130,8 +120,16 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   
   val grave = loadTexture("Environment/grave")
   
+  def pray = {
+    if (getPlayer.piety > 0)getPlayer.piety -= (getPlayer.piety*0.05 + 5)
+    else getPlayer.piety -= rnd.nextInt(5)+6
+    if (rnd.nextInt(100) <= prayChance) Effect.prayer
+    else addLog("You pray.")
+  }
+  
   /** modifier applied to prays */
-  def prayMissChance = 100-(charity*2.5)
+  def prayChance = 10 + (charity*2.5) + 
+  (if (getX == getGrid.getAltar.getX && getY == getGrid.getAltar.getY) 20 else 0)
   
   /** modifier applied to all expirience gained */
   def giveXP(amount: Double) = experience += amount * (1+0.1*diligence)
@@ -231,24 +229,6 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   
   /** Return accuracy of player */
   def accuracy: Int = if (slotWeapon != null) slotWeapon.accuracy + temperance*2 else 100 + temperance*2
-  
-  /** Return needed amount of experience to level up */
-  def xpNeededForLevel(level: Int): Int = {
-    level match {
-      case l if (l == 0) => 10
-      case l if (l == 1) => 25
-      case l if (l == 2) => 85
-      case l if (l == 3) => 225
-      case l if (l == 4) => 750
-      case l if (l == 5) => 1800
-      case l if (l == 6) => 3000
-      case l if (l == 7) => 5000
-      case l if (l == 8) => 8000
-      case l if (l == 9) => 15000
-      case l if (l == 10) => 45000
-      case _ => 10
-    }
-  }
   
   /** Move to given coordinates or go to next map */
   def move(coord: Coordinate) = {

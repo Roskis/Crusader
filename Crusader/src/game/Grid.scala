@@ -49,6 +49,8 @@ class Grid() {
         makeMap1(45, 4, 4)
       }
       while (!mapIsContinuous)
+      getTile(altar.getX, altar.getY).addObject(altar)
+      getTile(djinn.getX, djinn.getY).addObject(djinn)
     }
     else if (getLevel == 5) {
       size = 21
@@ -60,8 +62,6 @@ class Grid() {
       map = Array.ofDim[Tile](size, size)
       testMap
     }
-    getTile(altar.getX, altar.getY).addObject(altar)
-    getTile(djinn.getX, djinn.getY).addObject(djinn)
   }
 
   /** Temporary bossmap */

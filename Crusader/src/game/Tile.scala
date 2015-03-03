@@ -9,7 +9,8 @@ import org.newdawn.slick.opengl.Texture
 
 import Main.getPlayer
 import Output.drawQuadTex
-import Output.loadTexture
+
+import Helpers._
 
   /** Tile represents single tile in the game. The whole map is made of them.
    *
