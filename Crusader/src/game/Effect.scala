@@ -4,19 +4,11 @@ import Main._
 import Helpers._
 
 /** Effects like prayers */
-object Effect {
+object Effect extends Enumeration {
   
-  val prayerChances = Map("partialRestoration" -> 80, "fullRestoration" -> 20)
+  type Prayer = Value
+  val PARTIALRESTORATION, FULLRESTORATION = Value
   
-  /** When player succeeds praying one random prayer is selected */
-  def prayer = {
-    chooseRandomFromMap(prayerChances) match {
-      case p if (p == "partialRestoration") => partialRestoration
-      case p if (p == "fullRestoration") => fullRestoration
-      case _ => {}
-    }
-  }
-
   /** Player regains part of maximum health */
   def partialRestoration = {
     var toAdd = getPlayer.maxHealth * 0.2

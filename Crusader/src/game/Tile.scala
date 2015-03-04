@@ -1,7 +1,6 @@
 package game
 
-import java.lang.Math.abs
-import java.lang.Math.sqrt
+import java.lang.Math.{abs, sqrt}
 
 import scala.collection.mutable.Buffer
 

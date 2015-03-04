@@ -1,25 +1,16 @@
 package game
 
-import java.lang.Math.abs
-import java.lang.Math.sqrt
+import java.lang.Math.{abs, sqrt}
 
 import scala.collection.mutable.Buffer
 
 import org.newdawn.slick.opengl.Texture
 
-import Direction.getCoordinates
-import Direction.randomDirection
-import Main.getConsumableList
-import Main.getEquipmentList
-import Main.getGrid
-import Main.getMonsterList
-import Main.getPassiveObjectList
-import Main.getPlayer
-import Main.getRnd
-import Main.getScrollList
+import Direction._
+import Main._
 import Output.drawQuadTex
-
 import Helpers._
+import Effect._
 
 /** All of the game's objects will be under this trait */
 trait Object {
@@ -120,10 +111,17 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   
   val grave = loadTexture("Environment/grave")
   
+  /** When player succeeds praying one random prayer is selected */
   def pray = {
     if (getPlayer.piety > 0)getPlayer.piety -= (getPlayer.piety*0.05 + 5)
     else getPlayer.piety -= rnd.nextInt(5)+6
-    if (rnd.nextInt(100) <= prayChance) Effect.prayer
+    if (rnd.nextInt(100) <= prayChance) {
+      chooseRandomPrayer(getPrayerChances) match {
+        case p if (p == PARTIALRESTORATION) => partialRestoration
+        case p if (p == FULLRESTORATION) => fullRestoration
+        case _ => {}
+      }
+    }
     else addLog("You pray.")
   }
   
@@ -404,7 +402,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
 
 object MonsterType extends Enumeration {
 
-  type Type = Value
+  type Monster = Value
   val BAT = Value
   val SNAKE = Value
   val SPIDER = Value
@@ -428,51 +426,27 @@ object MonsterType extends Enumeration {
   private val lizardc = loadTexture("Monsters/lizardc1")
   private val crocodile = loadTexture("Monsters/crocodile1")
   
-  //* Returns Buffer containing all of the spawnable monsters */
-  def monstersForLevel(level: Int): Buffer[Value] = {
-    var list = Buffer[Value]()
+  /** return chances how monsters occur in game */
+  def levelChance(level: Int): Map[Monster, Int] = {
+    var chances = Map[Monster, Int]()
     level match {
-      case l if (l == 1) => {
-        list += BAT
-        list += SNAKE
-        list += SPIDER
-      }
-      case l if (l == 2) => {
-        list += BAT
-        list += SNAKE
-        list += SPIDER
-        list += GOBLINA
-        list += GOBLINB
-        list += HOUND
-      }
-      case l if (l == 3) => {
-        list += BAT
-        list += SNAKE
-        list += SPIDER
-        list += GOBLINA
-        list += GOBLINB
-        list += HOUND
-        list += LIZARDA
-        list += LIZARDB
-        list += LIZARDC
-        list += CROCODILE
-      }
-      case l if (l == 4) => {
-        list += GOBLINA
-        list += GOBLINB
-        list += HOUND
-        list += LIZARDA
-        list += LIZARDB
-        list += LIZARDC
-        list += CROCODILE
-      }
-      case _ =>
+      case l if (l == 1) => chances = 
+        Map(BAT -> 50, SNAKE -> 25, SPIDER -> 25, GOBLINA -> 5, GOBLINB -> 1, HOUND -> 2)
+      case l if (l == 2) => chances = 
+        Map(BAT -> 25, SNAKE -> 25, SPIDER -> 25, GOBLINA -> 16, GOBLINB -> 4, HOUND -> 10)
+      case l if (l == 3) => chances = 
+        Map(BAT -> 15, SNAKE -> 10, SPIDER -> 10, GOBLINA -> 20, GOBLINB -> 5, HOUND -> 15, 
+            LIZARDA -> 10, LIZARDB -> 4, LIZARDC -> 2, CROCODILE -> 1)
+      case l if (l == 4) => chances = 
+        Map(GOBLINA -> 8, GOBLINB -> 2, HOUND -> 5, LIZARDA -> 20, LIZARDB -> 8, LIZARDC -> 2, 
+            CROCODILE -> 5)
+      case _ => {chances = Map(BAT -> 100)}
     }
-    list
+    chances
   }
   
   /** returns texture of the given monster */
-  def image(MonsterType: Type): Texture = {
+  def image(MonsterType: Monster): Texture = {
     MonsterType match {
       case t if (t == BAT) => bat
       case t if (t == SNAKE) => snake
@@ -489,7 +463,7 @@ object MonsterType extends Enumeration {
   }
   
   /** returns max health of the given monster */
-  def maxHP(MonsterType: Type): Int = {
+  def maxHP(MonsterType: Monster): Int = {
     MonsterType match {
       case t if (t == BAT) => 2
       case t if (t == SNAKE) => 5
@@ -510,7 +484,7 @@ object MonsterType extends Enumeration {
    * Tuple3 includes number of dices, their number of eyes and additional flat bonus 
    * (num of dices, eyes, flat). Examples 2d3+5 = (2, 3, 5) and 1d4 = (1, 4, 0).
    *  */
-  def damage(MonsterType: Type): Tuple3[Int, Int, Int] = {
+  def damage(MonsterType: Monster): Tuple3[Int, Int, Int] = {
     MonsterType match {
       case t if (t == BAT) => (1, 2, 0)
       case t if (t == SNAKE) => (1, 2, 0)
@@ -527,7 +501,7 @@ object MonsterType extends Enumeration {
   }
   
   /** returns armor of the given monster */
-  def armor(MonsterType: Type): Double = {
+  def armor(MonsterType: Monster): Double = {
     MonsterType match {
       case t if (t == BAT) => 0
       case t if (t == SNAKE) => 0
@@ -544,7 +518,7 @@ object MonsterType extends Enumeration {
   }
   
   /** returns accuracy of the given monster */
-  def accuracy(MonsterType: Type): Int = {
+  def accuracy(MonsterType: Monster): Int = {
     MonsterType match {
       case t if (t == BAT) => 95
       case t if (t == SNAKE) => 90
@@ -561,7 +535,7 @@ object MonsterType extends Enumeration {
   }
   
   /** returns critical chance of the given monster */
-  def criticalChance(MonsterType: Type): Int = {
+  def criticalChance(MonsterType: Monster): Int = {
     MonsterType match {
       case t if (t == BAT) => 2
       case t if (t == SNAKE) => 4
@@ -578,7 +552,7 @@ object MonsterType extends Enumeration {
   }
   
   /** returns dodge chance of the given monster */
-  def dodge(MonsterType: Type): Int = {
+  def dodge(MonsterType: Monster): Int = {
     MonsterType match {
       case t if (t == BAT) => 30
       case t if (t == SNAKE) => 10
@@ -595,7 +569,7 @@ object MonsterType extends Enumeration {
   }
   
   /** returns armor pierce of the given monster */
-  def armorPierce(MonsterType: Type): Int = {
+  def armorPierce(MonsterType: Monster): Int = {
     MonsterType match {
       case t if (t == BAT) => 0
       case t if (t == SNAKE) => 0
@@ -612,7 +586,7 @@ object MonsterType extends Enumeration {
   }
   
   /** returns gold of the given monster */
-  def gold(MonsterType: Type): Int = {
+  def gold(MonsterType: Monster): Int = {
     MonsterType match {
       case t if (t == BAT) => 1
       case t if (t == SNAKE) => 3
@@ -629,7 +603,7 @@ object MonsterType extends Enumeration {
   }
   
   /** returns experience of the given monster */
-  def experience(MonsterType: Type): Int = {
+  def experience(MonsterType: Monster): Int = {
     MonsterType match {
       case t if (t == BAT) => 1
       case t if (t == SNAKE) => 3
@@ -646,7 +620,7 @@ object MonsterType extends Enumeration {
   }
   
   /** returns piety of the given monster */
-  def piety(MonsterType: Type): Int = {
+  def piety(MonsterType: Monster): Int = {
     MonsterType match {
       case t if (t == BAT) => 1
       case t if (t == SNAKE) => 2
@@ -663,7 +637,7 @@ object MonsterType extends Enumeration {
   }
   
   /** returns name of the given monster */
-  def name(MonsterType: Type): String = {
+  def name(MonsterType: Monster): String = {
     MonsterType match {
       case t if (t == BAT) => "Bat"
       case t if (t == SNAKE) => "Snake"
@@ -680,7 +654,7 @@ object MonsterType extends Enumeration {
   }
   
   /** returns description of the given monster */
-  def description(MonsterType: Type): String = {
+  def description(MonsterType: Monster): String = {
     MonsterType match {
       case t if (t == BAT) => "TODO"
       case t if (t == SNAKE) => "TODO"
@@ -809,7 +783,7 @@ class Equipment(startX: Int, startY: Int, equipmentType: EquipmentType.Value, is
 
 object EquipmentType extends Enumeration {
 
-  type Type = Value
+  type Item = Value
   val KNIFE = Value
   val ROBES = Value
   val IRONARMOR = Value
@@ -828,37 +802,25 @@ object EquipmentType extends Enumeration {
   private val woodenShieldG = loadTexture("Items/woodenShieldG")
   private val woodenShieldE = loadTexture("Player/woodenShieldE")
   
-  //* Returns Buffer containing all of the spawnable monsters */
-  def itemsForLevel(level: Int): Buffer[Value] = {
-    var list = Buffer[Value]()
+  /** return chances how items occur in game */
+  def levelChance(level: Int): Map[Item, Int] = {
+    var chances = Map[Item, Int]()
     level match {
-      case l if (l == 1) => {
-        list += KNIFE
-        list += ROBES
-        list += WOODENSHIELD
-      }
-      case l if (l == 2) => {
-        list += KNIFE
-        list += ROBES
-        list += WOODENSHIELD
-      }
-      case l if (l == 3) => {
-        list += STEELSWORD
-        list += IRONARMOR
-        list += WOODENSHIELD
-      }
-      case l if (l == 4) => {
-        list += STEELSWORD
-        list += IRONARMOR
-        list += WOODENSHIELD
-      }
-      case _ => list += KNIFE
+      case l if (l == 1) => chances = 
+        Map(KNIFE -> 25, ROBES -> 25, WOODENSHIELD -> 20, STEELSWORD -> 5, IRONARMOR -> 5)
+      case l if (l == 2) => chances = 
+        Map(KNIFE -> 20, ROBES -> 20, WOODENSHIELD -> 15, STEELSWORD -> 10, IRONARMOR -> 10)
+      case l if (l == 3) => chances = 
+        Map(KNIFE -> 15, ROBES -> 15, WOODENSHIELD -> 10, STEELSWORD -> 15, IRONARMOR -> 15)
+      case l if (l == 4) => chances = 
+        Map(KNIFE -> 10, ROBES -> 10, WOODENSHIELD -> 5, STEELSWORD -> 20, IRONARMOR -> 20)
+      case _ => {chances = Map(KNIFE -> 100)}
     }
-    list
+    chances
   }
   
   /** returns slot of the given equipment */
-  def slot(EquipmentType: Type): String = {
+  def slot(EquipmentType: Item): String = {
     EquipmentType match {
       case t if (t == KNIFE) => "weapon"
       case t if (t == ROBES) => "armor"
@@ -870,7 +832,7 @@ object EquipmentType extends Enumeration {
   }
   
   /** returns ground texture of the given equipment */
-  def imageGround(EquipmentType: Type): Texture = {
+  def imageGround(EquipmentType: Item): Texture = {
     EquipmentType match {
       case t if (t == KNIFE) => knifeG
       case t if (t == ROBES) => robesG
@@ -882,7 +844,7 @@ object EquipmentType extends Enumeration {
   }
   
   /** returns equip texture of the given equipment */
-  def imageEquipped(EquipmentType: Type): Texture = {
+  def imageEquipped(EquipmentType: Item): Texture = {
     EquipmentType match {
       case t if (t == KNIFE) => knifeE
       case t if (t == ROBES) => robesE
@@ -894,7 +856,7 @@ object EquipmentType extends Enumeration {
   }
 
   /** returns armor of the given equipment */
-  def armor(EquipmentType: Type): Double = {
+  def armor(EquipmentType: Item): Double = {
     EquipmentType match {
       case t if (t == KNIFE) => 0
       case t if (t == ROBES) => 0
@@ -906,7 +868,7 @@ object EquipmentType extends Enumeration {
   }
   
   /** returns weight of the given equipment */
-  def weight(EquipmentType: Type): Int = {
+  def weight(EquipmentType: Item): Int = {
     EquipmentType match {
       case t if (t == KNIFE) => 2
       case t if (t == ROBES) => 0
@@ -918,7 +880,7 @@ object EquipmentType extends Enumeration {
   }
   
   /** returns block chance of the given equipment */
-  def blockChance(EquipmentType: Type): Int = {
+  def blockChance(EquipmentType: Item): Int = {
     EquipmentType match {
       case t if (t == KNIFE) => 0
       case t if (t == ROBES) => 0
@@ -934,7 +896,7 @@ object EquipmentType extends Enumeration {
    * Tuple3 includes number of dices, their number of eyes and additional flat bonus 
    * (num of dices, eyes, flat). Examples 2d3+5 = (2, 3, 5) and 1d4 = (1, 4, 0).
    */
-  def damage(EquipmentType: Type): Tuple3[Int, Int, Int] = {
+  def damage(EquipmentType: Item): Tuple3[Int, Int, Int] = {
     EquipmentType match {
       case t if (t == KNIFE) => (1, 2, 0)
       case t if (t == ROBES) => (0, 0, 0)
@@ -946,7 +908,7 @@ object EquipmentType extends Enumeration {
   }
   
   /** returns armor piercing of the given equipment */
-  def armorPiercing(EquipmentType: Type): Int = {
+  def armorPiercing(EquipmentType: Item): Int = {
     EquipmentType match {
       case t if (t == KNIFE) => 0
       case t if (t == ROBES) => 0
@@ -958,7 +920,7 @@ object EquipmentType extends Enumeration {
   }
   
   /** returns accuracy of the given equipment */
-  def accuracy(EquipmentType: Type): Int = {
+  def accuracy(EquipmentType: Item): Int = {
     EquipmentType match {
       case t if (t == KNIFE) => 100
       case t if (t == ROBES) => 0
@@ -970,7 +932,7 @@ object EquipmentType extends Enumeration {
   }
   
   /** returns critical chance of the given equipment */
-  def critChance(EquipmentType: Type): Int = {
+  def critChance(EquipmentType: Item): Int = {
     EquipmentType match {
       case t if (t == KNIFE) => 4
       case t if (t == ROBES) => 0
@@ -982,7 +944,7 @@ object EquipmentType extends Enumeration {
   }
   
   /** returns price of the given equipment */
-  def price(EquipmentType: Type): Int = {
+  def price(EquipmentType: Item): Int = {
     EquipmentType match {
       case t if (t == KNIFE) => 20
       case t if (t == ROBES) => 10
@@ -994,7 +956,7 @@ object EquipmentType extends Enumeration {
   }
   
   /** returns name of the given equipment */
-  def name(EquipmentType: Type): String = {
+  def name(EquipmentType: Item): String = {
     EquipmentType match {
       case t if (t == KNIFE) => "Knife"
       case t if (t == ROBES) => "Robes"
@@ -1006,7 +968,7 @@ object EquipmentType extends Enumeration {
   }
   
   /** returns description of the given equipment */
-  def description(EquipmentType: Type): String = {
+  def description(EquipmentType: Item): String = {
     EquipmentType match {
       case t if (t == KNIFE) => "TODO"
       case t if (t == ROBES) => "TODO"

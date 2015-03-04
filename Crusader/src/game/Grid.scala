@@ -1,23 +1,13 @@
 package game
 
-import java.lang.Math.abs
-import java.lang.Math.cos
-import java.lang.Math.sin
+import java.lang.Math.{abs, cos, sin}
 
 import scala.Range
 import scala.collection.mutable.Buffer
 
-import Direction.Direction
-import Direction.E
-import Direction.N
-import Direction.S
-import Direction.W
-import Direction.getCoordinates
-import Direction.randomDirection
-import Main.clearLists
-import Main.getLevel
-import Main.getPlayer
-import Main.getRnd
+import Direction._
+import Main._
+import Helpers._
 
 /** Simple coordinate system */
 class Coordinate(var x: Int, var y: Int) {
@@ -289,8 +279,7 @@ class Grid() {
       do coord = giveRandomNonBlockinCoordinates
       while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || 
           !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
-      new Monster(coord.getX, coord.getY, 
-          MonsterType.monstersForLevel(getLevel)(rnd.nextInt(MonsterType.monstersForLevel(getLevel).size)))
+      new Monster(coord.getX, coord.getY, chooseRandomMonster(getMonsterChances))
     }
   }
   
@@ -307,8 +296,7 @@ class Grid() {
   }
   
   /** Add random item */
-  def addItem(coord: Coordinate) = new Equipment(coord.getX, coord.getY, 
-      EquipmentType.itemsForLevel(getLevel)(rnd.nextInt(EquipmentType.itemsForLevel(getLevel).size)), false)
+  def addItem(coord: Coordinate) = new Equipment(coord.getX, coord.getY, chooseRandomItem(getItemChances), false)
   
   /** getter for stairs */
   def getStairs() = stairs

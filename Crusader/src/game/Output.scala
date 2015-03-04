@@ -2,67 +2,19 @@ package game
 
 import java.awt.Font
 import java.io.IOException
-import java.io.InputStream
 
 import scala.Range
 import scala.collection.mutable.Buffer
 
 import org.lwjgl.LWJGLException
 import org.lwjgl.input.Mouse
-import org.lwjgl.opengl.Display
-import org.lwjgl.opengl.DisplayMode
-import org.lwjgl.opengl.GL11.GL_BLEND
-import org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT
-import org.lwjgl.opengl.GL11.GL_DEPTH_TEST
-import org.lwjgl.opengl.GL11.GL_LIGHTING
-import org.lwjgl.opengl.GL11.GL_MODELVIEW
-import org.lwjgl.opengl.GL11.GL_NEAREST
-import org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA
-import org.lwjgl.opengl.GL11.GL_PROJECTION
-import org.lwjgl.opengl.GL11.GL_QUADS
-import org.lwjgl.opengl.GL11.GL_SMOOTH
-import org.lwjgl.opengl.GL11.GL_SRC_ALPHA
-import org.lwjgl.opengl.GL11.GL_TEXTURE_2D
-import org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER
-import org.lwjgl.opengl.GL11.glBegin
-import org.lwjgl.opengl.GL11.glBlendFunc
-import org.lwjgl.opengl.GL11.glClear
-import org.lwjgl.opengl.GL11.glClearColor
-import org.lwjgl.opengl.GL11.glClearDepth
-import org.lwjgl.opengl.GL11.glDisable
-import org.lwjgl.opengl.GL11.glEnable
-import org.lwjgl.opengl.GL11.glEnd
-import org.lwjgl.opengl.GL11.glLoadIdentity
-import org.lwjgl.opengl.GL11.glMatrixMode
-import org.lwjgl.opengl.GL11.glOrtho
-import org.lwjgl.opengl.GL11.glShadeModel
-import org.lwjgl.opengl.GL11.glTexCoord2f
-import org.lwjgl.opengl.GL11.glTexParameteri
-import org.lwjgl.opengl.GL11.glTranslatef
-import org.lwjgl.opengl.GL11.glVertex2f
-import org.lwjgl.opengl.GL11.glViewport
-import org.newdawn.slick.Color
-import org.newdawn.slick.TrueTypeFont
-import org.newdawn.slick.opengl.Texture
-import org.newdawn.slick.opengl.TextureLoader
+import org.lwjgl.opengl.{Display, DisplayMode}
+import org.lwjgl.opengl.GL11._
+import org.newdawn.slick.{Color, TrueTypeFont}
+import org.newdawn.slick.opengl.{Texture}
 import org.newdawn.slick.util.ResourceLoader
 
-import Main.getConsumableList
-import Main.getEpisode
-import Main.getEquipmentList
-import Main.getGameLog
-import Main.getGameState
-import Main.getGrid
-import Main.getHeight
-import Main.getLastWheel
-import Main.getLevel
-import Main.getMonsterList
-import Main.getPassiveObjectList
-import Main.getPlayer
-import Main.getScrollList
-import Main.getVersion
-import Main.getWidth
-
+import Main._
 import Helpers._
 
 /** Output is responsible for everything that is drawn on the screen.

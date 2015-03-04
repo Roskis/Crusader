@@ -4,28 +4,15 @@ import scala.collection.mutable.Buffer
 import scala.io.Source
 import scala.util.Random
 
-import org.lwjgl.input.Keyboard
-import org.lwjgl.input.Mouse
+import org.lwjgl.input.{Keyboard, Mouse}
 import org.lwjgl.opengl.Display
 
-import Direction.E
-import Direction.N
-import Direction.NE
-import Direction.NW
-import Direction.S
-import Direction.SE
-import Direction.SW
-import Direction.W
-import GameState.CHARACTER_CREATION
-import GameState.GAME
-import GameState.LEVEL
-import GameState.MAIN_MENU
-import Output.drawCharacterCreation
-import Output.drawGame
-import Output.drawMainMenu
-import Output.startDisplay
-
 import Helpers._
+import Direction._
+import GameState._
+import Effect._
+import Output.{drawCharacterCreation, drawGame, drawMainMenu, startDisplay}
+import MonsterType.levelChance
 
 /** Main object is responsible for the allocation of tasks to other parts of the program and 
  *  running the mainloop.
@@ -42,6 +29,9 @@ object Main {
   private var gameLog = Buffer[String]()
   private var lastWheel: Int = 0
   private var prevMouseState: Boolean = false
+  private var monsterChances = Map[MonsterType.Monster, Int]()
+  private var itemChances = Map[EquipmentType.Item, Int]()
+  private var prayerChances: Map[Effect.Prayer, Int] = Map(PARTIALRESTORATION -> 80, FULLRESTORATION -> 20)
   
   private var frameRate: Int = 0
   private var height: Int = 0
@@ -115,6 +105,8 @@ object Main {
   def nextMap() {
     clearLists
     level += 1
+    updateItemChances
+    updateMonsterChances
     grid = new Grid()
     grid.init
     grid.getTile(player.getX, player.getY).addObject(player)
@@ -304,6 +296,9 @@ object Main {
     scrollList.clear
   }
   
+  def updateMonsterChances = monsterChances = MonsterType.levelChance(level)
+  def updateItemChances = itemChances = EquipmentType.levelChance(level)
+  
   /** Some getters */
   def getRnd() = rnd
   def getGameState() = gameState
@@ -323,5 +318,8 @@ object Main {
   def getLevel() = level
   def getTurn() = turn
   def getLastWheel() = lastWheel
+  def getPrayerChances() = prayerChances
+  def getMonsterChances() = monsterChances
+  def getItemChances() = itemChances
   
 }

@@ -2,10 +2,8 @@ package game
 
 import Main._
 import org.newdawn.slick.util.ResourceLoader
-import org.newdawn.slick.opengl.Texture
-import java.io.IOException
-import org.newdawn.slick.opengl.TextureLoader
-import java.io.InputStream
+import org.newdawn.slick.opengl.{Texture, TextureLoader}
+import java.io.{IOException, InputStream}
 import scala.collection.mutable.Buffer
 
 /** Methods that don't anywhere but are needed everywhere */
@@ -13,8 +11,40 @@ object Helpers {
 
   private val rnd =  getRnd
   
-  /** Select random from map containing choices and their chances */
-  def chooseRandomFromMap(chances: Map[String, Int]) = {
+  /** Select random monster from map containing choices and their chances */
+  def chooseRandomItem(chances: Map[EquipmentType.Item, Int]) = {
+    var random = 0
+    for (choice <- chances) random += choice._2
+    random = rnd.nextInt(random) + 1
+    
+    var sum = 0
+    var choice = chances.head._1
+    
+    for (i <- chances ; if sum < random) {
+      choice = i._1
+      sum += i._2
+    }
+    choice
+  }
+  
+  /** Select random monster from map containing choices and their chances */
+  def chooseRandomMonster(chances: Map[MonsterType.Monster, Int]) = {
+    var random = 0
+    for (choice <- chances) random += choice._2
+    random = rnd.nextInt(random) + 1
+    
+    var sum = 0
+    var choice = chances.head._1
+    
+    for (i <- chances ; if sum < random) {
+      choice = i._1
+      sum += i._2
+    }
+    choice
+  }
+  
+  /** Select random prayer from map containing choices and their chances */
+  def chooseRandomPrayer(chances: Map[Effect.Prayer, Int]) = {
     var random = 0
     for (choice <- chances) random += choice._2
     random = rnd.nextInt(random) + 1
