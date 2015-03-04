@@ -308,6 +308,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   var blockMovement = true
   var blockVision = false
   var isMonster = true
+  var mode = "passive"
   
   var health: Double = MonsterType.maxHP(mType)
   var armor: Double = MonsterType.armor(mType)
@@ -346,6 +347,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     if (effectiveDamage < 0) effectiveDamage = 0
     health -= effectiveDamage
     addLog(attacker.name + " deals " + effectiveDamage.toString + " damage to " + name)
+    mode = "aggressive"
     if (health < 0) kill
   }
   
@@ -370,10 +372,32 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     if (rnd.nextInt(4) != 0) (dmg/2).toInt else 0
   }
   
-  /** Temporary method until monster ai is working */
+  /** Monster's turn depends on it's ai */
   def turn() {
-    if (distance(getPlayer) > 8) move(randomDirection(8))
-    else if (distance(getPlayer) < 2) attack(getPlayer)
+    monsterType match {
+      case m if (m == MonsterType.BAT) => batAI
+      case _ => basicAI
+    }
+  }
+  
+  /** AI for bat */
+  def batAI = {
+    if (mode == "passive") move(randomDirection(8))
+    else if (mode == "aggressive") tryAttack
+  }
+  
+  /** Simple ai for most of the monsters */
+  def basicAI = {
+    if (distance(getPlayer) > 7 && mode == "passive") move(randomDirection(8))
+    else {
+      mode = "aggressive"
+      tryAttack
+    }
+  }
+  
+  /** Either move towards player or attack player */
+  def tryAttack() = {
+    if (distance(getPlayer) < 2) attack(getPlayer)
     else move(getGrid.line(getX, getY, getPlayer.getX, getPlayer.getY)(1))
   }
   
