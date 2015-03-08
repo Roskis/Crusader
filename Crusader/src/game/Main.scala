@@ -158,6 +158,15 @@ object Main {
         player.experience -= xpNeededForLevel(player.diligence)
         player.diligence += 1
       }
+      else while (Keyboard.next) {
+        Keyboard.getEventKey match {
+          case k if (k == Keyboard.KEY_Q && Keyboard.getEventKeyState) => {
+            gameState = GAME
+            while (Keyboard.next) {}
+          }
+          case _ => {}
+        }
+      }
     }
     prevMouseState = Mouse.isButtonDown(0)
   }
@@ -232,42 +241,42 @@ object Main {
             gameState = MAIN_MENU
             while (Keyboard.next) {}
           }
-          case k if ((k == Keyboard.KEY_RIGHT || k == Keyboard.KEY_NUMPAD6) && 
+          case k if ((k == Keyboard.KEY_RIGHT || k == Keyboard.KEY_NUMPAD6 || k == Keyboard.KEY_L) && 
               Keyboard.getEventKeyState && getPlayer.health > 0) => {
             player.moveOrAttack(E)
             playTurn
           }
-          case k if ((k == Keyboard.KEY_LEFT || k == Keyboard.KEY_NUMPAD4) && 
+          case k if ((k == Keyboard.KEY_LEFT || k == Keyboard.KEY_NUMPAD4 || k == Keyboard.KEY_H) && 
               Keyboard.getEventKeyState && getPlayer.health > 0) => {
             player.moveOrAttack(W)
             playTurn
           }
-          case k if ((k == Keyboard.KEY_UP || k == Keyboard.KEY_NUMPAD8) && 
+          case k if ((k == Keyboard.KEY_UP || k == Keyboard.KEY_NUMPAD8 || k == Keyboard.KEY_K) && 
               Keyboard.getEventKeyState && getPlayer.health > 0) => {
             player.moveOrAttack(N)
             playTurn
           }
-          case k if ((k == Keyboard.KEY_DOWN || k == Keyboard.KEY_NUMPAD2) && 
+          case k if ((k == Keyboard.KEY_DOWN || k == Keyboard.KEY_NUMPAD2 || k == Keyboard.KEY_J) && 
               Keyboard.getEventKeyState && getPlayer.health > 0) => {
             player.moveOrAttack(S)
             playTurn
           }
-          case k if ((k == Keyboard.KEY_NUMPAD7) && 
+          case k if ((k == Keyboard.KEY_NUMPAD7 || k == Keyboard.KEY_Y) && 
               Keyboard.getEventKeyState && getPlayer.health > 0) => {
             player.moveOrAttack(NW)
             playTurn
           }
-          case k if ((k == Keyboard.KEY_NUMPAD9) && 
+          case k if ((k == Keyboard.KEY_NUMPAD9 || k == Keyboard.KEY_U) && 
               Keyboard.getEventKeyState && getPlayer.health > 0) => {
             player.moveOrAttack(NE)
             playTurn
           }
-          case k if ((k == Keyboard.KEY_NUMPAD3) && 
+          case k if ((k == Keyboard.KEY_NUMPAD3 || k == Keyboard.KEY_N) && 
               Keyboard.getEventKeyState && getPlayer.health > 0) => {
             player.moveOrAttack(SE)
             playTurn
           }
-          case k if ((k == Keyboard.KEY_NUMPAD1) && 
+          case k if ((k == Keyboard.KEY_NUMPAD1 || k == Keyboard.KEY_B) && 
               Keyboard.getEventKeyState && getPlayer.health > 0) => {
             player.moveOrAttack(SW)
             playTurn
@@ -285,6 +294,16 @@ object Main {
             player.slotItem.use
             playTurn
           }
+          case k if (k == Keyboard.KEY_Q && Keyboard.getEventKeyState && 
+              getPlayer.experience >= getPlayer.smallestLevel && getPlayer.health > 0) => {
+            gameState = LEVEL
+            while (Keyboard.next) {}
+          }
+          case k if (k == Keyboard.KEY_N && Keyboard.getEventKeyState && getPlayer.health <= 0) => {
+            while (Keyboard.next) {}
+            player = new Player(player.name, 0, 0)
+            newGame
+          }
           case _ => {}
         }
       }
@@ -297,7 +316,10 @@ object Main {
     for (monster <- monsterList)
       monster.turn
     turn += 1
-    if (player.health <= 0) addLog("You died! Score: " + getPlayer.gold.toInt + ".")
+    if (player.health <= 0) {
+      addLog("You died! Score: " + getPlayer.gold.toInt + ".")
+      addLog("Esc to quit and N to start new game.")
+    }
   }
   
   def clearLists() {

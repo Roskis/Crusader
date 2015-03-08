@@ -371,6 +371,7 @@ object Output {
     val piety = "Piety: " + getPlayer.piety.toInt
     font.drawString(middle-80, h, piety, Color.black)
     
+    h += 40
     drawQuadTex(quit, middle-quit.getImageWidth/2, h, quit.getImageWidth, quit.getImageHeight)
   }
   
