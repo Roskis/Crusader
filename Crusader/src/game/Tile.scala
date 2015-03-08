@@ -22,7 +22,7 @@ class Tile(Xcoord: Int, Ycoord: Int, tileType: TileType.Value) {
   private var x = Xcoord * 32
   private var y = Ycoord * 32
   private var image: Texture = TileType.image(tileType)
-  private val objectList = Buffer[Object]()
+  var objectList = Buffer[Object]()
   var explored: Boolean = false
   var label: Int = 0
   var visible: Boolean = false

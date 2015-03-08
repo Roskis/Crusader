@@ -113,20 +113,29 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   
   /** When player succeeds praying one random prayer is selected */
   def pray = {
-    if (getPlayer.piety > 0)getPlayer.piety -= (getPlayer.piety*0.05 + 5)
-    else getPlayer.piety -= rnd.nextInt(5)+6
     if (rnd.nextInt(100) <= prayChance) {
       chooseRandomPrayer(getPrayerChances) match {
         case p if (p == PARTIALRESTORATION) => partialRestoration
         case p if (p == FULLRESTORATION) => fullRestoration
-        case _ => {}
+        case p if (p == LIGHTNINGBOLT) => lightningBolt
+        case p if (p == GOLDLOSS) => goldLoss
+        case p if (p == EXPERIENCELOSS) => experienceLoss
+        case p if (p == DEMENTIA) => dementia
+        case p if (p == STAIRS) => stairs
+        case p if (p == SMITE) => smite
+        case p if (p == GOLDGAIN) => goldGain
+        case p if (p == EXPERIENCEGAIN) => experienceGain
+        case p if (p == CLAIRVOYANCE) => clairvoyance
+        case _ => {println("prayer not found")}
       }
     }
     else addLog("You pray.")
+    if (getPlayer.piety > 0) getPlayer.piety -= (getPlayer.piety*0.05 + 5)
+    else getPlayer.piety -= rnd.nextInt(5)+6
   }
   
   /** modifier applied to prays */
-  def prayChance = 10 + (charity*2.5) + 
+  def prayChance = 100 + (charity*2.5) + 
   (if (getX == getGrid.getAltar.getX && getY == getGrid.getAltar.getY) 20 else 0)
   
   /** modifier applied to all expirience gained */
@@ -145,7 +154,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   def title: String = "the Holy"
   
   /** Total level of player */
-  def totalLevel(): Int = zeal + humility + temperance + kindness + patience + charity + diligence
+  def totalLevel: Int = zeal + humility + temperance + kindness + patience + charity + diligence
   
   /** Return smallest level xp requirement */
   def smallestLevel(): Int = {
@@ -329,6 +338,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   /** When monster dies this method is called */
   def kill() {
     getMonsterList.filter(_ == this) foreach {getMonsterList -= _}
+    updateLastMonster(null)
     getGrid.getTile(getX, getY).removeObject(this)
     x = -100
     y = -100
@@ -340,6 +350,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   
   /** Takes damage from attack */
   def takeDamage(damage: Int, armorPierce: Double, attacker: Object) = {
+    updateLastMonster(this)
     var effectiveArmor = armor
     if (rnd.nextInt(100) <= blockChance) effectiveArmor += shieldArmor
     if (effectiveArmor < 0) effectiveArmor = 0
@@ -348,7 +359,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     health -= effectiveDamage
     addLog(attacker.name + " deals " + effectiveDamage.toString + " damage to " + name)
     mode = "aggressive"
-    if (health < 0) kill
+    if (health <= 0) kill
   }
   
   /** Method to deal damage to player */

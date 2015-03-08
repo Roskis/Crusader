@@ -302,7 +302,7 @@ class Grid() {
   def getStairs() = stairs
   
   /** Add stairs */
-  def addStairs() {
+  def addStairs() = {
     var coord: Coordinate = new Coordinate(-100, -100)
     do {
       coord = giveRandomNonBlockinCoordinates
@@ -313,15 +313,36 @@ class Grid() {
         stairs.getY < size*2/3) || getTile(stairs.getX, stairs.getY).getType != TileType.FLOOR || 
         !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
     setTile(stairs)
-  }  
+  }
+  
+  /** Move stairs to player's location */
+  def moveStairsToPlayer = {
+    val tempList = stairs.getObjectList
+    stairs.objectList = Buffer[Object]()
+    for (obj <- getTile(getPlayer.getX, getPlayer.getY).getObjectList) stairs.addObject(obj)
+    map(stairs.getX)(stairs.getY) = new Tile(stairs.getX, stairs.getY, TileType.FLOOR)
+    for (obj <- tempList) getTile(stairs.getX, stairs.getY).addObject(obj)
+    stairs.setX(getPlayer.getX)
+    stairs.setY(getPlayer.getY)
+    stairs.explored = true
+    map(getPlayer.getX)(getPlayer.getY) = stairs
+  }
   
   /** Returns the neighbors of given tile */
-  def neighbors(tile: Tile):Buffer[Tile] = {
+  def neighbors(tile: Tile, num: Int):Buffer[Tile] = {
     val list = Buffer[Tile]()
     var coord: Coordinate = new Coordinate(-100, -100)
-    for (dir <- List(N, E, S, W))  {
-      coord = getCoordinates(dir, tile.getX, tile.getY)
-      if (isWithinGrid(coord.getX, coord.getY)) list.append(getTile(coord.getX, coord.getY))
+    if (num == 4) {
+      for (dir <- List(N, E, S, W)) {
+        coord = getCoordinates(dir, tile.getX, tile.getY)
+        if (isWithinGrid(coord.getX, coord.getY)) list.append(getTile(coord.getX, coord.getY))
+      }
+    }
+    else if (num == 8) {
+      for (dir <- List(N, E, S, W, NE, NW, SE, SW)) {
+        coord = getCoordinates(dir, tile.getX, tile.getY)
+        if (isWithinGrid(coord.getX, coord.getY)) list.append(getTile(coord.getX, coord.getY))
+      }
     }
     list
   }
@@ -397,7 +418,29 @@ class Grid() {
     }
   }
   
-  /** Alternative line algorthm */
+  /** Hide whole map */
+  def unexploreAll = {
+    for (i <- Range(0,size)) {
+      for (j <- Range(0,size)) {
+        map(i)(j).explored = false
+      }
+    }
+    getTile(getPlayer.getX, getPlayer.getY).explored = true
+  }
+  
+  /** Reveal whole map */
+  def exploreAll = {
+    var boo = false
+    for (i <- Range(0,size)) {
+      for (j <- Range(0,size)) {
+        boo = false
+        for (n <- neighbors(map(i)(j), 8)) if (n.getType == TileType.FLOOR) boo = true
+        if (map(i)(j).getType == TileType.FLOOR || boo) map(i)(j).explored = true
+      }
+    }
+  }
+  
+  /** Alternative line */
   def line(x1: Int, y1: Int, x2: Int, y2: Int): Buffer[Coordinate] = line(new Coordinate(x1, y1), new Coordinate(x2, y2))
   
   /** Uses Bresenham's Line Algorithm to calculate straight line between two coordinates.
@@ -462,7 +505,7 @@ class Grid() {
       for (j <- Range(0,size)) {
         if (!map(i)(j).blockMovement) {
           map(i)(j).label = size*size+1
-          for (near <- neighbors(map(i)(j))) {
+          for (near <- neighbors(map(i)(j), 4)) {
             if (near.label != 0 && near.label < map(i)(j).label) map(i)(j).label = near.label
             else if (near.label != 0 && near.label > map(i)(j).label) changeLabels(near.label, map(i)(j).label)
           }
@@ -482,7 +525,7 @@ class Grid() {
     for (n <- Range(0,size)) {
       for (m <- Range(0,size)) {
         if (map(n)(m).label == num) {
-          for (near <- neighbors(map(n)(m))) 
+          for (near <- neighbors(map(n)(m), 4)) 
             if (near.label != 0 && near.label < map(n)(m).label) num2 = near.label
         }
       }

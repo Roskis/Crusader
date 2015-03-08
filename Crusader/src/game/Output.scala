@@ -49,6 +49,7 @@ object Output {
   private var quit: Texture = null
   private var HPBar: Texture = null
   private var XPBar: Texture = null
+  private var blackBorder: Texture = null
   private var zeal:Texture = null
   private var zeal2:Texture = null
   private var humility:Texture = null
@@ -160,6 +161,7 @@ object Output {
     quit = loadTexture("UI/Quit")
     HPBar = loadTexture("UI/HPBar")
     XPBar = loadTexture("UI/XPBar")
+    blackBorder = loadTexture("UI/BlackBorder")
     zeal = loadTexture("UI/Zeal")
     zeal2 = loadTexture("UI/Zeal2")
     humility = loadTexture("UI/Humility")
@@ -214,7 +216,7 @@ object Output {
     glClear(GL_COLOR_BUFFER_BIT)
     drawQuadTex(characterBackground, (width-characterBackground.getImageWidth)/2, 
         (height-characterBackground.getImageHeight)/2, characterBackground.getImageWidth, characterBackground.getImageHeight)
-    if (font.getWidth(getPlayer.name) >= 400) {
+    if (font.getWidth(getPlayer.name) >= 200) {
       font.drawString(width/2-font.getWidth("Name is too long")/2, height*5/9, "Name is too long", Color.red)
       drawQuadTex(newgame2, width*23/24-newgame2.getImageWidth+54, height*7/10, newgame2.getImageWidth, newgame2.getImageHeight)
     }
@@ -255,8 +257,22 @@ object Output {
     font.drawString(2, height - 205, "Version: " + version, Color.white)
     font.drawString(900, height - 205, "Episode: " + getEpisode, Color.white)
     font.drawString(990, height - 205, "Level: " + getLevel, Color.white)
+    val name = getPlayer.name + " " + getPlayer.title
+    font.drawString(2, 2, name, Color.white)
     if (Mouse.getX < 1057 && (height - Mouse.getY) < 545) drawInfoBox
     if (getGameState == GameState.LEVEL) drawLevel
+    if (getLastMonster != null) {
+      drawQuadTex(blackBorder, 33*32/2-204, 2, 408, 4)
+      drawQuadTex(blackBorder, 33*32/2-204, 31, 408, 4)
+      drawQuadTex(blackBorder, 33*32/2-204, 2, 4, 33)
+      drawQuadTex(blackBorder, 33*32/2+200, 2, 4, 33)
+      val monsterStatus = getLastMonster.name + " " + getLastMonster.health.toInt + "/" + MonsterType.maxHP(getLastMonster.mType)
+      var HPWidth = getLastMonster.health / MonsterType.maxHP(getLastMonster.mType)
+      if (HPWidth > 1) HPWidth = 1
+      if (HPWidth < 0) HPWidth = 0
+      drawQuadTex(HPBar, 33*32/2-200, 6, (400*HPWidth).toInt, 25)
+      font.drawString((33*32 - font.getWidth(monsterStatus))/2, 2, monsterStatus)
+    }
   }
   
   /** Draw gamelog to bottom of the screen */
@@ -345,14 +361,6 @@ object Output {
         getPlayer.slotItem.image.getImageWidth, getPlayer.slotItem.image.getImageHeight)
     
     h += 64
-    val name = "Name: " + getPlayer.name
-    font.drawString(middle-80, h, name, Color.black)
-    
-    h += 20
-    val title = "Title: " + getPlayer.title
-    font.drawString(middle-80, h, title, Color.black)
-    
-    h += 20
     val heroLevel = "Hero level: " + getPlayer.totalLevel
     font.drawString(middle-80, h, heroLevel, Color.black)
     
@@ -453,7 +461,7 @@ object Output {
     v += 32
     font.drawString(v, h, "Costs: " + xpNeededForLevel(getPlayer.zeal), Color.black)
     v += 128
-    font.drawString(v, h, "Short description of skill (TODO)", Color.black)
+    font.drawString(v, h, "Zeal increases damage.", Color.black)
     h += 70
     v = 400
     for (lev <- Range(0,10)) {
@@ -464,7 +472,7 @@ object Output {
     v += 32
     font.drawString(v, h, "Costs: " + xpNeededForLevel(getPlayer.humility), Color.black)
     v += 128
-    font.drawString(v, h, "Short description of skill (TODO)", Color.black)
+    font.drawString(v, h, "Humility increases dodge chance.", Color.black)
     h += 70
     v = 400
     for (lev <- Range(0,10)) {
@@ -475,7 +483,7 @@ object Output {
     v += 32
     font.drawString(v, h, "Costs: " + xpNeededForLevel(getPlayer.temperance), Color.black)
     v += 128
-    font.drawString(v, h, "Short description of skill (TODO)", Color.black)
+    font.drawString(v, h, "Temperance increases accuracy.", Color.black)
     h += 70
     v = 400
     for (lev <- Range(0,10)) {
@@ -486,7 +494,7 @@ object Output {
     v += 32
     font.drawString(v, h, "Costs: " + xpNeededForLevel(getPlayer.kindness), Color.black)
     v += 128
-    font.drawString(v, h, "Short description of skill (TODO)", Color.black)
+    font.drawString(v, h, "Kindness increases maximum health.", Color.black)
     h += 70
     v = 400
     for (lev <- Range(0,10)) {
@@ -497,7 +505,7 @@ object Output {
     v += 32
     font.drawString(v, h, "Costs: " + xpNeededForLevel(getPlayer.patience), Color.black)
     v += 128
-    font.drawString(v, h, "Short description of skill (TODO)", Color.black)
+    font.drawString(v, h, "Patience increases weight limit.", Color.black)
     h += 70
     v = 400
     for (lev <- Range(0,10)) {
@@ -508,7 +516,7 @@ object Output {
     v += 32
     font.drawString(v, h, "Costs: " + xpNeededForLevel(getPlayer.charity), Color.black)
     v += 128
-    font.drawString(v, h, "Short description of skill (TODO)", Color.black)
+    font.drawString(v, h, "Charity increases piety gain.", Color.black)
     h += 70
     v = 400
     for (lev <- Range(0,10)) {
@@ -519,7 +527,7 @@ object Output {
     v += 32
     font.drawString(v, h, "Costs: " + xpNeededForLevel(getPlayer.diligence), Color.black)
     v += 128
-    font.drawString(v, h, "Short description of skill (TODO)", Color.black)
+    font.drawString(v, h, "Diligence increases gold and xp gain.", Color.black)
     
   }
   

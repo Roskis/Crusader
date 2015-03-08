@@ -28,10 +28,10 @@ object Main {
   private var scrollList = Buffer[Scroll]()
   private var gameLog = Buffer[String]()
   private var lastWheel: Int = 0
+  private var lastMonster: Monster = null
   private var prevMouseState: Boolean = false
   private var monsterChances = Map[MonsterType.Monster, Int]()
   private var itemChances = Map[EquipmentType.Item, Int]()
-  private var prayerChances: Map[Effect.Prayer, Int] = Map(PARTIALRESTORATION -> 80, FULLRESTORATION -> 20)
   
   private var frameRate: Int = 0
   private var height: Int = 0
@@ -103,6 +103,7 @@ object Main {
   
   /** Advance one level */
   def nextMap() {
+    updateLastMonster(null)
     clearLists
     level += 1
     updateItemChances
@@ -175,7 +176,7 @@ object Main {
     else while (Keyboard.next) {
       Keyboard.getEventKey match {
         case k if (k == Keyboard.KEY_ESCAPE) => gameState = MAIN_MENU
-        case k if (k == Keyboard.KEY_RETURN && Keyboard.getEventKeyState && player.name != "" && Output.font.getWidth(getPlayer.name) < 400) => {
+        case k if (k == Keyboard.KEY_RETURN && Keyboard.getEventKeyState && player.name != "" && Output.font.getWidth(getPlayer.name) < 200) => {
           gameState = GAME
           while (Keyboard.next) {}
           newGame
@@ -296,8 +297,23 @@ object Main {
     scrollList.clear
   }
   
+  /** Updaters */
   def updateMonsterChances = monsterChances = MonsterType.levelChance(level)
   def updateItemChances = itemChances = EquipmentType.levelChance(level)
+  def updateLastMonster(monster: Monster) = lastMonster = monster
+  
+  /** Get more good effects when piety is higher and more bad ones with negative piety */
+  def getPrayerChances() = {
+    var chances = Map(PARTIALRESTORATION -> 80, FULLRESTORATION -> 20, STAIRS -> 10, SMITE -> 10, 
+        GOLDGAIN -> 10, EXPERIENCEGAIN -> 10, CLAIRVOYANCE -> 10)
+    if (player.piety < 0) {
+      chances += (DEMENTIA -> 100)
+      chances += (EXPERIENCELOSS -> 100)
+      chances += (GOLDLOSS -> 100)
+      chances += (LIGHTNINGBOLT -> 100)
+    }
+    chances
+  } 
   
   /** Some getters */
   def getRnd() = rnd
@@ -318,8 +334,8 @@ object Main {
   def getLevel() = level
   def getTurn() = turn
   def getLastWheel() = lastWheel
-  def getPrayerChances() = prayerChances
   def getMonsterChances() = monsterChances
   def getItemChances() = itemChances
+  def getLastMonster() = lastMonster
   
 }
