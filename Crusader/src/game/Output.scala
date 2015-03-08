@@ -182,8 +182,6 @@ object Output {
     tempUIBackground2 = loadTexture("tempUIBackground2")
     tempLevelBackground = loadTexture("tempLevelBackground")
     
-    addLog("Insert epic story here. (TODO)")
-    
   }
   
   /** Method to draw textures on the display.
@@ -246,9 +244,11 @@ object Output {
     mouseXCoord = (Mouse.getX * 1.0 / 32 + getPlayer.getX - 16).toInt
     mouseYCoord = ((height - Mouse.getY) * 1.0 / 32 + getPlayer.getY - 8).toInt
     glClear(GL_COLOR_BUFFER_BIT)
+    drawQuadTex(tempUIBackground2, (width-tempUIBackground2.getImageWidth)/2, 
+        (height-tempUIBackground2.getImageHeight)/2, tempUIBackground2.getImageWidth, tempUIBackground2.getImageHeight)
+    drawTiles
     drawSideBar
     drawlog
-    drawTiles
     drawFog
     font.drawString(2, height - 245, "Mouse X: " + mouseXCoord.toString, Color.red)
     font.drawString(130, height - 245, "Y: " + mouseYCoord.toString, Color.red)
@@ -299,9 +299,6 @@ object Output {
   def drawSideBar() {
     val middle = 33*32 + (width - 33*32)/2
     var h = 0
-    
-    drawQuadTex(tempUIBackground2, (width-tempUIBackground2.getImageWidth)/2, 
-        (height-tempUIBackground2.getImageHeight)/2, tempUIBackground2.getImageWidth, tempUIBackground2.getImageHeight)
     
     var HPHeight = getPlayer.health / getPlayer.maxHealth
     if (HPHeight > 1) HPHeight = 1
