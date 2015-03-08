@@ -182,6 +182,8 @@ object Output {
     tempUIBackground2 = loadTexture("tempUIBackground2")
     tempLevelBackground = loadTexture("tempLevelBackground")
     
+    addLog("Your holy mission is to purify the world from evil.")
+    
   }
   
   /** Method to draw textures on the display.

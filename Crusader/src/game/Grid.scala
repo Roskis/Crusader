@@ -35,7 +35,7 @@ class Grid() {
       do {
         clearLists
         altar = new PassiveObject("Altar", " TODO ", -100, -100, "Environment/altar1")
-        djinn = new PassiveObject("Djinn", " TODO ", -100, -100, "tempDjinn")
+        djinn = new PassiveObject(djinnName, " TODO ", -100, -100, "tempDjinn")
         makeMap1(45, 4, 4)
       }
       while (!mapIsContinuous)
@@ -177,8 +177,11 @@ class Grid() {
     getPlayer.setY(size/2)
   }
   
+  /** getter for djinn */
+  def getDjinn() = djinn
+  
   /** Adds shop to the map */
-  def addShop() {
+  def addShop() = {
     var coord: Coordinate = null
     var door: Tile = new Tile(-100, -100, TileType.DJINNDOORH)
     var direction: Direction = null

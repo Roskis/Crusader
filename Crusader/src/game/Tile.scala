@@ -6,7 +6,7 @@ import scala.collection.mutable.Buffer
 
 import org.newdawn.slick.opengl.Texture
 
-import Main.getPlayer
+import Main.{getPlayer, getShopVisited, nextMap}
 import Output.drawQuadTex
 
 import Helpers._
@@ -42,7 +42,12 @@ class Tile(Xcoord: Int, Ycoord: Int, tileType: TileType.Value) {
   }
   
   /** add object to this tile */
-  def addObject(obj: Object) = objectList.append(obj)
+  def addObject(obj: Object) = {
+    objectList.append(obj)
+    if (obj.isInstanceOf[Player] && 
+        (tileType == TileType.DJINNDOORH || tileType == TileType.DJINNDOORV)) shopGreet
+    else if (obj.isInstanceOf[Player] && tileType == TileType.STAIRS) nextMap
+  }
   
   /** remove object from this tile */
   def removeObject(obj: Object) = objectList.filter(_ == obj) foreach {objectList -= _}

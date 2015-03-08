@@ -23,7 +23,6 @@ trait Object {
   var image: Texture
   var blockMovement: Boolean
   var blockVision: Boolean
-  var isMonster: Boolean
   
   /** Add object to the tile it is on */
   def init() = if (getGrid.isWithinGrid(getX, getY)) getGrid.getTile(getX, getY).addObject(this)
@@ -89,7 +88,6 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   var image = loadTexture("Player/humanBase")
   var blockMovement = true
   var blockVision = false
-  var isMonster = false
   
   var viewRadius = 10
   var health: Double = 20
@@ -105,12 +103,12 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   var charity: Int = 0
   var diligence: Int = 0
   
-  var slotWeapon: Equipment = new Equipment(-100, -100, EquipmentType.KNIFE, true)
-  var slotArmor: Equipment = new Equipment(-100, -100, EquipmentType.ROBES, true)
+  var slotWeapon: Equipment = new Equipment(-100, -100, ItemType.KNIFE, true)
+  var slotArmor: Equipment = new Equipment(-100, -100, ItemType.ROBES, true)
   var slotShield: Equipment = null
   var slotRing: Equipment = null
   var slotAmulet: Equipment = null
-  var slotItem: Equipment = null
+  var slotItem: Item = null
   
   val grave = loadTexture("Environment/grave")
   
@@ -154,7 +152,23 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   def maxHealth: Int = 20+8*kindness
   
   /** Title of player */
-  def title: String = "the Holy"
+  def title: String = {
+    if (piety < -2000) "the Evil"
+    else if (piety < -1000) "the Baleful"
+    else if (piety < -500) "the Wicked"
+    else if (piety < -200) "the Malignant"
+    else if (piety < -100) "the Cursed"
+    else if (piety < 0) "the Defiled"
+    else if (piety > 25000) "the Avatar of God"
+    else if (piety > 10000) "the Godly"
+    else if (piety > 5000) "the Messiah"
+    else if (piety > 2000) "the Saint"
+    else if (piety > 1000) "the Sacred Crusader"
+    else if (piety > 500) "the Holy"
+    else if (piety > 200) "the Pure"
+    else if (piety > 100) "the Paladin"
+    else "the Knight"
+  }
   
   /** Total level of player */
   def totalLevel: Int = zeal + humility + temperance + kindness + patience + charity + diligence
@@ -197,7 +211,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
     var effectiveDamage = (damage - effectiveArmor)
     if (effectiveDamage < 0) effectiveDamage = 0
     health -= effectiveDamage
-    addLog(attacker.name + " deals " + effectiveDamage.toString + " damage to " + name)
+    addLog(attacker.name + " deals " + effectiveDamage.toInt.toString + " damage to " + name + ".")
   }
   
   def armor: Double = {
@@ -241,10 +255,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   def accuracy: Int = if (slotWeapon != null) slotWeapon.accuracy + temperance*2 else 100 + temperance*2
   
   /** Move to given coordinates or go to next map */
-  def move(coord: Coordinate) = {
-    if (getGrid.getTile(coord.getX, coord.getY) == getGrid.getStairs) Main.nextMap
-    else changePosition(coord.getX, coord.getY)
-  }
+  def move(coord: Coordinate) = changePosition(coord.getX, coord.getY)
   
   /** Move and attack command */
   def moveOrAttack(direction: Direction.Value) = {
@@ -281,7 +292,6 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
       if (slotShield != null) drawQuadTex(slotShield.imageEquipped, 16 * 32, 8 * 32, slotShield.imageEquipped.getImageWidth, slotShield.imageEquipped.getImageHeight)
       if (slotRing != null) drawQuadTex(slotRing.imageEquipped, 16 * 32, 8 * 32, slotRing.imageEquipped.getImageWidth, slotRing.imageEquipped.getImageHeight)
       if (slotAmulet != null) drawQuadTex(slotAmulet.imageEquipped, 16 * 32, 8 * 32, slotAmulet.imageEquipped.getImageWidth, slotAmulet.imageEquipped.getImageHeight)
-      if (slotItem != null) drawQuadTex(slotItem.imageEquipped, 16 * 32, 8 * 32, slotItem.imageEquipped.getImageWidth, slotItem.imageEquipped.getImageHeight)
     }
     else drawQuadTex(grave, 16 * 32, 8 * 32, grave.getImageWidth, grave.getImageHeight)
   }
@@ -300,7 +310,6 @@ class PassiveObject(objectName: String, objectDescription: String, startX: Int, 
   var image = loadTexture(objectImage)
   var blockMovement = false
   var blockVision = false
-  var isMonster = false
   
   init
   getPassiveObjectList.append(this)
@@ -319,7 +328,6 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   var image = MonsterType.image(mType)
   var blockMovement = true
   var blockVision = false
-  var isMonster = true
   var mode = "passive"
   
   var health: Double = MonsterType.maxHP(mType)
@@ -343,9 +351,10 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     getMonsterList.filter(_ == this) foreach {getMonsterList -= _}
     updateLastMonster(null)
     getGrid.getTile(getX, getY).removeObject(this)
+    if (this.monsterType == MonsterType.RAT) new Consumable(getX, getY, ItemType.RATMEAT, false)
     x = -100
     y = -100
-    addLog(name + " dies")
+    addLog(name + " dies.")
     getPlayer.giveXP(experience)
     getPlayer.giveGold(gold)
     getPlayer.givePiety(piety)
@@ -360,7 +369,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     var effectiveDamage = (damage - effectiveArmor)
     if (effectiveDamage < 0) effectiveDamage = 0
     health -= effectiveDamage
-    addLog(attacker.name + " deals " + effectiveDamage.toString + " damage to " + name)
+    addLog(attacker.name + " deals " + effectiveDamage.toInt.toString + " damage to " + name + ".")
     mode = "aggressive"
     if (health <= 0) kill
   }
@@ -427,7 +436,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   def move(coord: Coordinate): Unit = {
     if (getGrid.isWithinGrid(coord.getX, coord.getY)) {
       var boo = true
-      for (obj <- getGrid.getTile(coord.getX, coord.getY).getObjectList) if (obj.isMonster == true) boo = false
+      for (obj <- getGrid.getTile(coord.getX, coord.getY).getObjectList) if (obj.isInstanceOf[Monster]) boo = false
       if (distance(coord) < 2 && !getGrid.getTile(coord.getX, coord.getY).blockMovement && boo) {
         changePosition(coord.getX, coord.getY)
       }
@@ -730,41 +739,8 @@ trait Item extends Object {
   var price: Int
   var inShop: Boolean
   var equipped: Boolean
-  
-  def buy: Unit
-  def pickUp: Unit
-  
-}
-
-/** Player usable equipments */
-class Equipment(startX: Int, startY: Int, equipmentType: EquipmentType.Value, isEquipped: Boolean) extends Item {
-  
-  val rnd = getRnd
-  val eType = equipmentType
-  var name = EquipmentType.name(eType)
-  var description = EquipmentType.description(eType)
-  var x = startX * 32
-  var y = startY * 32
-  var image = EquipmentType.imageGround(eType)
-  var imageEquipped = EquipmentType.imageEquipped(eType)
-  var blockMovement = false
-  var blockVision = false
-  var isMonster = false
-  var price = EquipmentType.price(eType)
-  var inShop = false
-  val armor = EquipmentType.armor(eType)
-  val weight = EquipmentType.weight(eType)
-  val blockChance = EquipmentType.blockChance(eType)
-  val damage = EquipmentType.damage(eType)
-  val armorPiercing = EquipmentType.armorPiercing(eType)
-  val accuracy = EquipmentType.accuracy(eType)
-  val critChance = EquipmentType.critChance(eType)
-  var equipped: Boolean = isEquipped
-  
-  if (!equipped) {
-    init
-    getEquipmentList.append(this)
-  }
+  val itemType: ItemType.Value
+  val weight: Int
   
   def buy = {
     getPlayer.gold -= price
@@ -772,39 +748,13 @@ class Equipment(startX: Int, startY: Int, equipmentType: EquipmentType.Value, is
     pickUp
   }
   
-  /** unequip item */
-  def unequip {
-    if (getPlayer.slotWeapon != null && EquipmentType.slot(getPlayer.slotWeapon.eType) == EquipmentType.slot(equipmentType)) getPlayer.slotWeapon = null
-    else if (getPlayer.slotArmor != null && EquipmentType.slot(getPlayer.slotArmor.eType) == EquipmentType.slot(equipmentType)) getPlayer.slotArmor = null
-    else if (getPlayer.slotShield != null && EquipmentType.slot(getPlayer.slotShield.eType) == EquipmentType.slot(equipmentType)) getPlayer.slotShield = null
-    else if (getPlayer.slotRing != null && EquipmentType.slot(getPlayer.slotRing.eType) == EquipmentType.slot(equipmentType)) getPlayer.slotRing = null
-    else if (getPlayer.slotAmulet != null && EquipmentType.slot(getPlayer.slotAmulet.eType) == EquipmentType.slot(equipmentType)) getPlayer.slotAmulet = null
-    else if (getPlayer.slotItem != null && EquipmentType.slot(getPlayer.slotItem.eType) == EquipmentType.slot(equipmentType)) getPlayer.slotItem = null
-    equipped = false
-    x = getPlayer.getX * 32
-    y = getPlayer.getY * 32
-    init
-    getEquipmentList.append(this)
-  }
-  
-  /** equip item */
-  def equip {
-    if (EquipmentType.slot(equipmentType) == "weapon") getPlayer.slotWeapon = this
-    else if (EquipmentType.slot(equipmentType) == "armor") getPlayer.slotArmor = this
-    else if (EquipmentType.slot(equipmentType) == "shield") getPlayer.slotShield = this
-    else if (EquipmentType.slot(equipmentType) == "ring") getPlayer.slotRing = this
-    else if (EquipmentType.slot(equipmentType) == "amulet") getPlayer.slotAmulet = this
-    else if (EquipmentType.slot(equipmentType) == "item") getPlayer.slotItem = this
-    getEquipmentList.filter(_ == this) foreach {getEquipmentList -= _}
-    getGrid.getTile(getX, getY).removeObject(this)
-    equipped = true
-    x = -100
-    y = -100
-  }
+  def equip: Unit
+  def unequip: Unit
+  def use: Unit
   
   /** Pick up */
-  override def pickUp = {
-    EquipmentType.slot(equipmentType) match {
+  def pickUp = {
+    ItemType.slot(itemType) match {
       case s if (s == "weapon") => {
         if (getPlayer.slotWeapon != null) getPlayer.slotWeapon.unequip
         equip
@@ -832,16 +782,75 @@ class Equipment(startX: Int, startY: Int, equipmentType: EquipmentType.Value, is
       case _ =>
     }
   }
+  
 }
 
-object EquipmentType extends Enumeration {
+/** Player usable equipments */
+class Equipment(startX: Int, startY: Int, equipmentType: ItemType.Value, isEquipped: Boolean) extends Item {
+  
+  val rnd = getRnd
+  val itemType = equipmentType
+  var name = ItemType.name(itemType)
+  var description = ItemType.description(itemType)
+  var x = startX * 32
+  var y = startY * 32
+  var image = ItemType.imageGround(itemType)
+  val imageEquipped = ItemType.imageEquipped(itemType)
+  var blockMovement = false
+  var blockVision = false
+  var price = ItemType.price(itemType)
+  var inShop = false
+  val armor = ItemType.armor(itemType)
+  val weight = ItemType.weight(itemType)
+  val blockChance = ItemType.blockChance(itemType)
+  val damage = ItemType.damage(itemType)
+  val armorPiercing = ItemType.armorPiercing(itemType)
+  val accuracy = ItemType.accuracy(itemType)
+  val critChance = ItemType.critChance(itemType)
+  var equipped: Boolean = isEquipped
+  
+  if (!equipped) {
+    init
+    getEquipmentList.append(this)
+  }
+  
+  /** dummy method */
+  def use = {}
+  
+  /** unequip item */
+  def unequip {
+    if (getPlayer.slotWeapon != null && ItemType.slot(getPlayer.slotWeapon.itemType) == ItemType.slot(itemType)) getPlayer.slotWeapon = null
+    else if (getPlayer.slotArmor != null && ItemType.slot(getPlayer.slotArmor.itemType) == ItemType.slot(itemType)) getPlayer.slotArmor = null
+    else if (getPlayer.slotShield != null && ItemType.slot(getPlayer.slotShield.itemType) == ItemType.slot(itemType)) getPlayer.slotShield = null
+    else if (getPlayer.slotRing != null && ItemType.slot(getPlayer.slotRing.itemType) == ItemType.slot(itemType)) getPlayer.slotRing = null
+    else if (getPlayer.slotAmulet != null && ItemType.slot(getPlayer.slotAmulet.itemType) == ItemType.slot(itemType)) getPlayer.slotAmulet = null
+    equipped = false
+    x = getPlayer.getX * 32
+    y = getPlayer.getY * 32
+    init
+    getEquipmentList.append(this)
+  }
+  
+  /** equip item */
+  def equip {
+    if (ItemType.slot(itemType) == "weapon") getPlayer.slotWeapon = this
+    else if (ItemType.slot(itemType) == "armor") getPlayer.slotArmor = this
+    else if (ItemType.slot(itemType) == "shield") getPlayer.slotShield = this
+    else if (ItemType.slot(itemType) == "ring") getPlayer.slotRing = this
+    else if (ItemType.slot(itemType) == "amulet") getPlayer.slotAmulet = this
+    getEquipmentList.filter(_ == this) foreach {getEquipmentList -= _}
+    getGrid.getTile(getX, getY).removeObject(this)
+    equipped = true
+    x = -100
+    y = -100
+  }
+  
+}
+
+object ItemType extends Enumeration {
 
   type Item = Value
-  val KNIFE = Value
-  val ROBES = Value
-  val IRONARMOR = Value
-  val STEELSWORD = Value
-  val WOODENSHIELD = Value
+  val KNIFE, ROBES, IRONARMOR, STEELSWORD, WOODENSHIELD, RATMEAT = Value
   
   private val missing = loadTexture("UI/missing")
   private val knifeG = loadTexture("Items/knifeG")
@@ -854,6 +863,8 @@ object EquipmentType extends Enumeration {
   private val steelSwordE = loadTexture("Player/steelSwordE")
   private val woodenShieldG = loadTexture("Items/woodenShieldG")
   private val woodenShieldE = loadTexture("Player/woodenShieldE")
+  private val ratG = loadTexture("Items/ratG")
+  private val ratE = loadTexture("Player/ratE")
   
   /** return chances how items occur in game */
   def levelChance(level: Int): Map[Item, Int] = {
@@ -873,44 +884,47 @@ object EquipmentType extends Enumeration {
   }
   
   /** returns slot of the given equipment */
-  def slot(EquipmentType: Item): String = {
-    EquipmentType match {
+  def slot(ItemType: Item): String = {
+    ItemType match {
       case t if (t == KNIFE) => "weapon"
       case t if (t == ROBES) => "armor"
       case t if (t == IRONARMOR) => "armor"
       case t if (t == STEELSWORD) => "weapon"
       case t if (t == WOODENSHIELD) => "shield"
+      case t if (t == RATMEAT) => "item"
       case _ => ""
     }
   }
   
   /** returns ground texture of the given equipment */
-  def imageGround(EquipmentType: Item): Texture = {
-    EquipmentType match {
+  def imageGround(ItemType: Item): Texture = {
+    ItemType match {
       case t if (t == KNIFE) => knifeG
       case t if (t == ROBES) => robesG
       case t if (t == IRONARMOR) => ironArmorG
       case t if (t == STEELSWORD) => steelSwordG
       case t if (t == WOODENSHIELD) => woodenShieldG
+      case t if (t == RATMEAT) => ratG
       case _ => missing
     }
   }
   
   /** returns equip texture of the given equipment */
-  def imageEquipped(EquipmentType: Item): Texture = {
-    EquipmentType match {
+  def imageEquipped(ItemType: Item): Texture = {
+    ItemType match {
       case t if (t == KNIFE) => knifeE
       case t if (t == ROBES) => robesE
       case t if (t == IRONARMOR) => ironArmorE
       case t if (t == STEELSWORD) => steelSwordE
       case t if (t == WOODENSHIELD) => woodenShieldE
+      case t if (t == RATMEAT) => ratE
       case _ => missing
     }
   }
 
   /** returns armor of the given equipment */
-  def armor(EquipmentType: Item): Double = {
-    EquipmentType match {
+  def armor(ItemType: Item): Double = {
+    ItemType match {
       case t if (t == KNIFE) => 0
       case t if (t == ROBES) => 0
       case t if (t == IRONARMOR) => 1
@@ -921,20 +935,21 @@ object EquipmentType extends Enumeration {
   }
   
   /** returns weight of the given equipment */
-  def weight(EquipmentType: Item): Int = {
-    EquipmentType match {
+  def weight(ItemType: Item): Int = {
+    ItemType match {
       case t if (t == KNIFE) => 2
       case t if (t == ROBES) => 0
       case t if (t == IRONARMOR) => 25
       case t if (t == STEELSWORD) => 12
       case t if (t == WOODENSHIELD) => 5
+      case t if (t == RATMEAT) => 3
       case _ => 0
     }
   }
   
   /** returns block chance of the given equipment */
-  def blockChance(EquipmentType: Item): Int = {
-    EquipmentType match {
+  def blockChance(ItemType: Item): Int = {
+    ItemType match {
       case t if (t == KNIFE) => 0
       case t if (t == ROBES) => 0
       case t if (t == IRONARMOR) => 0
@@ -949,8 +964,8 @@ object EquipmentType extends Enumeration {
    * Tuple3 includes number of dices, their number of eyes and additional flat bonus 
    * (num of dices, eyes, flat). Examples 2d3+5 = (2, 3, 5) and 1d4 = (1, 4, 0).
    */
-  def damage(EquipmentType: Item): Tuple3[Int, Int, Int] = {
-    EquipmentType match {
+  def damage(ItemType: Item): Tuple3[Int, Int, Int] = {
+    ItemType match {
       case t if (t == KNIFE) => (1, 2, 0)
       case t if (t == ROBES) => (0, 0, 0)
       case t if (t == IRONARMOR) => (0, 0, 0)
@@ -961,8 +976,8 @@ object EquipmentType extends Enumeration {
   }
   
   /** returns armor piercing of the given equipment */
-  def armorPiercing(EquipmentType: Item): Int = {
-    EquipmentType match {
+  def armorPiercing(ItemType: Item): Int = {
+    ItemType match {
       case t if (t == KNIFE) => 0
       case t if (t == ROBES) => 0
       case t if (t == IRONARMOR) => 0
@@ -973,8 +988,8 @@ object EquipmentType extends Enumeration {
   }
   
   /** returns accuracy of the given equipment */
-  def accuracy(EquipmentType: Item): Int = {
-    EquipmentType match {
+  def accuracy(ItemType: Item): Int = {
+    ItemType match {
       case t if (t == KNIFE) => 100
       case t if (t == ROBES) => 0
       case t if (t == IRONARMOR) => 0
@@ -985,8 +1000,8 @@ object EquipmentType extends Enumeration {
   }
   
   /** returns critical chance of the given equipment */
-  def critChance(EquipmentType: Item): Int = {
-    EquipmentType match {
+  def critChance(ItemType: Item): Int = {
+    ItemType match {
       case t if (t == KNIFE) => 4
       case t if (t == ROBES) => 0
       case t if (t == IRONARMOR) => 0
@@ -997,8 +1012,8 @@ object EquipmentType extends Enumeration {
   }
   
   /** returns price of the given equipment */
-  def price(EquipmentType: Item): Int = {
-    EquipmentType match {
+  def price(ItemType: Item): Int = {
+    ItemType match {
       case t if (t == KNIFE) => 20
       case t if (t == ROBES) => 10
       case t if (t == IRONARMOR) => 250
@@ -1009,25 +1024,27 @@ object EquipmentType extends Enumeration {
   }
   
   /** returns name of the given equipment */
-  def name(EquipmentType: Item): String = {
-    EquipmentType match {
+  def name(ItemType: Item): String = {
+    ItemType match {
       case t if (t == KNIFE) => "Knife"
       case t if (t == ROBES) => "Robes"
       case t if (t == IRONARMOR) => "Iron armor"
       case t if (t == STEELSWORD) => "Steel sword"
       case t if (t == WOODENSHIELD) => "Wooden shield"
+      case t if (t == RATMEAT) => "Rat meat"
       case _ => "Unknown item name"
     }
   }
   
   /** returns description of the given equipment */
-  def description(EquipmentType: Item): String = {
-    EquipmentType match {
+  def description(ItemType: Item): String = {
+    ItemType match {
       case t if (t == KNIFE) => "TODO"
       case t if (t == ROBES) => "TODO"
       case t if (t == IRONARMOR) => "TODO"
       case t if (t == STEELSWORD) => "TODO"
       case t if (t == WOODENSHIELD) => "TODO"
+      case t if (t == RATMEAT) => "TODO"
       case _ => "Unknown item description"
     }
   }
@@ -1035,28 +1052,58 @@ object EquipmentType extends Enumeration {
 }
 
 /** Player usable consumables */
-class Consumable(consumableName: String, consumableDescription: String, startX: Int, startY: Int, 
-    consumableImage: String, consumablePrice: Int, isEquipped: Boolean) extends Item {
-  
+class Consumable(startX: Int, startY: Int, val itemType: ItemType.Value, isEquipped: Boolean) extends Item {
+
   val rnd = getRnd
-  var name = consumableName
-  var description = consumableDescription
+  val weight = ItemType.weight(itemType)
+  var name = ItemType.name(itemType)
+  var description = ItemType.description(itemType)
   var x = startX * 32
   var y = startY * 32
-  var image = loadTexture(consumableImage)
+  var image = ItemType.imageGround(itemType)
+  val imageEquipped = ItemType.imageEquipped(itemType)
   var blockMovement = false
   var blockVision = false
-  var isMonster = false
-  var price = consumablePrice
+  var price = ItemType.price(itemType)
   var inShop = false
-  var equipped: Boolean = isEquipped
+  var equipped = isEquipped
   
-  init
-  getConsumableList.append(this)
+  if (!equipped) {
+    init
+    getConsumableList.append(this)
+  }
+
   
-  def buy: Unit = {}
-  def pickUp: Unit = {}
+  /** Unequip item */
+  def unequip {
+    if (getPlayer.slotItem != null) getPlayer.slotItem = null
+    equipped = false
+    x = getPlayer.getX * 32
+    y = getPlayer.getY * 32
+    init
+    getConsumableList.append(this)
+  }
   
+  /** Equip item */
+  def equip {
+    if (ItemType.slot(itemType) == "item") getPlayer.slotItem = this
+    getConsumableList.filter(_ == this) foreach {getConsumableList -= _}
+    getGrid.getTile(getX, getY).removeObject(this)
+    equipped = true
+    x = -100
+    y = -100
+  }
+  
+  /** Use item */
+  def use = {
+    getPlayer.health += roll(6)
+    if (getPlayer.health > getPlayer.maxHealth) getPlayer.health = getPlayer.maxHealth
+    addLog("You eat " + name + ".")
+    getPlayer.slotItem = null
+    equipped = false
+    x = -100
+    y = -100
+  }
 }
 
 /** Player usable scrolls */
@@ -1064,6 +1111,8 @@ class Scroll(scrollName: String, scrollDescription: String, startX: Int, startY:
     scrollImage: String, scrollPrice: Int, isEquipped: Boolean) extends Item {
   
   val rnd = getRnd
+  val itemType = null
+  val weight = 0
   var name = scrollName
   var description = scrollDescription
   var x = startX * 32
@@ -1071,7 +1120,6 @@ class Scroll(scrollName: String, scrollDescription: String, startX: Int, startY:
   var image = loadTexture(scrollImage)
   var blockMovement = false
   var blockVision = false
-  var isMonster = false
   var price = scrollPrice
   var inShop = false
   var equipped: Boolean = isEquipped
@@ -1079,7 +1127,27 @@ class Scroll(scrollName: String, scrollDescription: String, startX: Int, startY:
   init
   getScrollList.append(this)
   
-  def buy: Unit = {}
-  def pickUp: Unit = {}
+  /** Unequip item */
+  def unequip {
+    if (getPlayer.slotItem != null) getPlayer.slotItem = null
+    equipped = false
+    x = getPlayer.getX * 32
+    y = getPlayer.getY * 32
+    init
+    getScrollList.append(this)
+  }
+  
+  /** Equip item */
+  def equip {
+    if (ItemType.slot(itemType) == "item") getPlayer.slotItem = this
+    getScrollList.filter(_ == this) foreach {getScrollList -= _}
+    getGrid.getTile(getX, getY).removeObject(this)
+    equipped = true
+    x = -100
+    y = -100
+  }
+  
+  /** Use the scroll */
+  def use = {}
   
 }

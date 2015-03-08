@@ -11,8 +11,38 @@ object Helpers {
 
   private val rnd =  getRnd
   
+  /** Few djinn names */
+  def djinnName: String = {
+    val list = List("Aku", "Erham", "Goham", "Halam", "Juzam", "Mahamoti", "Mijae", "Ruham", 
+        "Serendib", "Sulam", "Zanam")
+    list(rnd.nextInt(list.size))
+  }
+  
+  /** Few djinn greetings */
+  def shopWelcome: String = {
+    val list = List("Greetings stranger, may I interest you in my wares?", 
+        "Fine day isn't it, now have a look at my wares.", 
+        "Buy or sell my price is always fair.", 
+        "Welcome to my shop crusader.", 
+        "You'll need a lot more than just gods on your side you know.", 
+        "Welcome to my humble market, now let's talk about trade...", 
+        "Business is business even in the midst of oblivion.", 
+        "Oh hi there adventurer, may I aid you on your journey?", 
+        "What do you need, mortal?", 
+        "What is it you're looking for, mortal?")
+    list(rnd.nextInt(list.size))
+  }
+  
+  /** Greet player when entering the shop */
+  def shopGreet = {
+    if (!getShopVisited) {
+      visitShop
+      addLog(getGrid.getDjinn.name + ": \"" + shopWelcome + "\"")
+    }
+  }
+  
   /** Select random monster from map containing choices and their chances */
-  def chooseRandomItem(chances: Map[EquipmentType.Item, Int]) = {
+  def chooseRandomItem(chances: Map[ItemType.Item, Int]) = {
     var random = 0
     for (choice <- chances) random += choice._2
     random = rnd.nextInt(random) + 1

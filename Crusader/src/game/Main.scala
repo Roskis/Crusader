@@ -31,7 +31,8 @@ object Main {
   private var lastMonster: Monster = null
   private var prevMouseState: Boolean = false
   private var monsterChances = Map[MonsterType.Monster, Int]()
-  private var itemChances = Map[EquipmentType.Item, Int]()
+  private var itemChances = Map[ItemType.Item, Int]()
+  private var shopVisited = false
   
   private var frameRate: Int = 0
   private var height: Int = 0
@@ -62,7 +63,7 @@ object Main {
     */
   def main(args:Array[String]) {
     startDisplay()
-    player = new Player("Paladin", 0, 0)
+    player = new Player("Player", 0, 0)
     /** Gameloop */
     while (!Display.isCloseRequested) {
       gameState match {
@@ -104,6 +105,7 @@ object Main {
   /** Advance one level */
   def nextMap() {
     updateLastMonster(null)
+    shopVisited = false
     clearLists
     level += 1
     updateItemChances
@@ -230,48 +232,57 @@ object Main {
             gameState = MAIN_MENU
             while (Keyboard.next) {}
           }
-          case k if ((k == Keyboard.KEY_D || k == Keyboard.KEY_RIGHT || k == Keyboard.KEY_NUMPAD6) && 
+          case k if ((k == Keyboard.KEY_RIGHT || k == Keyboard.KEY_NUMPAD6) && 
               Keyboard.getEventKeyState && getPlayer.health > 0) => {
             player.moveOrAttack(E)
             playTurn
           }
-          case k if ((k == Keyboard.KEY_A || k == Keyboard.KEY_LEFT || k == Keyboard.KEY_NUMPAD4) && 
+          case k if ((k == Keyboard.KEY_LEFT || k == Keyboard.KEY_NUMPAD4) && 
               Keyboard.getEventKeyState && getPlayer.health > 0) => {
             player.moveOrAttack(W)
             playTurn
           }
-          case k if ((k == Keyboard.KEY_W || k == Keyboard.KEY_UP || k == Keyboard.KEY_NUMPAD8) && 
+          case k if ((k == Keyboard.KEY_UP || k == Keyboard.KEY_NUMPAD8) && 
               Keyboard.getEventKeyState && getPlayer.health > 0) => {
             player.moveOrAttack(N)
             playTurn
           }
-          case k if ((k == Keyboard.KEY_S || k == Keyboard.KEY_DOWN || k == Keyboard.KEY_NUMPAD2) && 
+          case k if ((k == Keyboard.KEY_DOWN || k == Keyboard.KEY_NUMPAD2) && 
               Keyboard.getEventKeyState && getPlayer.health > 0) => {
             player.moveOrAttack(S)
             playTurn
           }
-          case k if ((k == Keyboard.KEY_Q || k == Keyboard.KEY_NUMPAD7) && 
+          case k if ((k == Keyboard.KEY_NUMPAD7) && 
               Keyboard.getEventKeyState && getPlayer.health > 0) => {
             player.moveOrAttack(NW)
             playTurn
           }
-          case k if ((k == Keyboard.KEY_E || k == Keyboard.KEY_NUMPAD9) && 
+          case k if ((k == Keyboard.KEY_NUMPAD9) && 
               Keyboard.getEventKeyState && getPlayer.health > 0) => {
             player.moveOrAttack(NE)
             playTurn
           }
-          case k if ((k == Keyboard.KEY_C || k == Keyboard.KEY_NUMPAD3) && 
+          case k if ((k == Keyboard.KEY_NUMPAD3) && 
               Keyboard.getEventKeyState && getPlayer.health > 0) => {
             player.moveOrAttack(SE)
             playTurn
           }
-          case k if ((k == Keyboard.KEY_Z || k == Keyboard.KEY_NUMPAD1) && 
+          case k if ((k == Keyboard.KEY_NUMPAD1) && 
               Keyboard.getEventKeyState && getPlayer.health > 0) => {
             player.moveOrAttack(SW)
             playTurn
             }
-          case k if (k == Keyboard.KEY_SPACE && Keyboard.getEventKeyState && getPlayer.health > 0) => {
+          case k if ((k == Keyboard.KEY_SPACE || k == Keyboard.KEY_R) && Keyboard.getEventKeyState && 
+              getPlayer.health > 0) => {
             player.pray
+            playTurn
+          }
+          case k if (k == Keyboard.KEY_W && Keyboard.getEventKeyState && getPlayer.health > 0) => {
+            playTurn
+          }
+          case k if (k == Keyboard.KEY_E && Keyboard.getEventKeyState && getPlayer.health > 0 && 
+              player.slotItem != null) => {
+            player.slotItem.use
             playTurn
           }
           case _ => {}
@@ -286,7 +297,7 @@ object Main {
     for (monster <- monsterList)
       monster.turn
     turn += 1
-    if (player.health <= 0) addLog("You died! Score: " + getPlayer.gold.toInt)
+    if (player.health <= 0) addLog("You died! Score: " + getPlayer.gold.toInt + ".")
   }
   
   def clearLists() {
@@ -299,8 +310,9 @@ object Main {
   
   /** Updaters */
   def updateMonsterChances = monsterChances = MonsterType.levelChance(level)
-  def updateItemChances = itemChances = EquipmentType.levelChance(level)
+  def updateItemChances = itemChances = ItemType.levelChance(level)
   def updateLastMonster(monster: Monster) = lastMonster = monster
+  def visitShop = shopVisited = true 
   
   /** Get more good effects when piety is higher and more bad ones with negative piety */
   def getPrayerChances() = {
@@ -337,5 +349,6 @@ object Main {
   def getMonsterChances() = monsterChances
   def getItemChances() = itemChances
   def getLastMonster() = lastMonster
+  def getShopVisited() = shopVisited
   
 }
