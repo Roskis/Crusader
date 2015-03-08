@@ -1,6 +1,7 @@
 package game
 
 import Main.getRnd
+import Math.abs
 
 /** There are four main directions and four intermediate directions */
 object Direction extends Enumeration {
@@ -38,6 +39,30 @@ object Direction extends Enumeration {
   }
   def getCoordinates(dir: Direction, obj: Object): Coordinate = {
     getCoordinates(dir: Direction, obj.getX, obj.getY)
+  }
+  
+  /** Method to get the direction when looking from start coordinate to end coordinate */
+  def getDirection(startCoord: Coordinate, endCoord: Coordinate): Direction = {
+    var dx = endCoord.getX - startCoord.getX
+    var dy = endCoord.getY - startCoord.getY
+    var dir: Direction = null
+    if (abs(dx) >= abs(dy)) {
+      if (dx >= 0) {
+        dir = E
+      }
+      else {
+        dir = W
+      }
+    }
+    else {
+      if (dy >= 0) {
+        dir = S
+      }
+      else {
+        dir = N
+      }
+    }
+    dir
   }
   
   /** Return random direction. Insert 4 if you want to move only with main directions and 8 if you 

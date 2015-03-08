@@ -248,7 +248,7 @@ object Output {
         (height-tempUIBackground2.getImageHeight)/2, tempUIBackground2.getImageWidth, tempUIBackground2.getImageHeight)
     drawTiles
     drawSideBar
-    drawlog
+    drawLog
     drawFog
     font.drawString(2, height - 245, "Mouse X: " + mouseXCoord.toString, Color.red)
     font.drawString(130, height - 245, "Y: " + mouseYCoord.toString, Color.red)
@@ -276,7 +276,7 @@ object Output {
   }
   
   /** Draw gamelog to bottom of the screen */
-  def drawlog() {
+  def drawLog() {
     getLastWheel match {
       case w if (w > 0) => mouseScrollBonus -= 1
       case w if (w < 0) => mouseScrollBonus += 1

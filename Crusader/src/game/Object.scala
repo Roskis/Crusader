@@ -48,6 +48,9 @@ trait Object {
     if (getGrid.isWithinGrid(getX, getY)) getGrid.getTile(getX, getY).addObject(this)
   }
 
+  /** get object's coordinate */
+  def getCoordinate() = new Coordinate(getX, getY)
+  
   /** x and y getters */
   def getX(): Int = x/32
   def getY(): Int = y/32
@@ -135,7 +138,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   }
   
   /** modifier applied to prays */
-  def prayChance = 100 + (charity*2.5) + 
+  def prayChance = 10 + (charity*2.5) + 
   (if (getX == getGrid.getAltar.getX && getY == getGrid.getAltar.getY) 20 else 0)
   
   /** modifier applied to all expirience gained */
@@ -387,6 +390,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   def turn() {
     monsterType match {
       case m if (m == MonsterType.BAT) => batAI
+      case m if (m == MonsterType.RAT) => ratAI
       case _ => basicAI
     }
   }
@@ -394,6 +398,13 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   /** AI for bat */
   def batAI = {
     if (mode == "passive") move(randomDirection(8))
+    else if (mode == "aggressive") tryAttack
+  }
+  
+  /** AI for rat */
+  def ratAI = {
+    if (mode == "passive" && distance(getPlayer) <= 3) mode = "flee"
+    else if (mode == "flee") move(getCoordinates(getDirection(getPlayer.getCoordinate, getCoordinate), this))
     else if (mode == "aggressive") tryAttack
   }
   
@@ -438,18 +449,10 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
 object MonsterType extends Enumeration {
 
   type Monster = Value
-  val BAT = Value
-  val SNAKE = Value
-  val SPIDER = Value
-  val GOBLINA = Value
-  val GOBLINB = Value
-  val HOUND = Value
-  val LIZARDA = Value
-  val LIZARDB = Value
-  val LIZARDC = Value
-  val CROCODILE = Value
+  val RAT, BAT, SNAKE, SPIDER, GOBLINA, GOBLINB, HOUND, LIZARDA, LIZARDB, LIZARDC, CROCODILE = Value
   
   private val missing = loadTexture("UI/missing")
+  private val rat = loadTexture("Monsters/rat1")
   private val bat = loadTexture("Monsters/bat1")
   private val snake = loadTexture("Monsters/snake1")
   private val spider = loadTexture("Monsters/spider1")
@@ -466,15 +469,17 @@ object MonsterType extends Enumeration {
     var chances = Map[Monster, Int]()
     level match {
       case l if (l == 1) => chances = 
-        Map(BAT -> 50, SNAKE -> 25, SPIDER -> 25, GOBLINA -> 5, GOBLINB -> 1, HOUND -> 2)
+        Map(RAT -> 10, BAT -> 50, SNAKE -> 25, SPIDER -> 25, GOBLINA -> 5, GOBLINB -> 1, 
+            HOUND -> 2)
       case l if (l == 2) => chances = 
-        Map(BAT -> 25, SNAKE -> 25, SPIDER -> 25, GOBLINA -> 16, GOBLINB -> 4, HOUND -> 10)
+        Map(RAT -> 10, BAT -> 25, SNAKE -> 25, SPIDER -> 25, GOBLINA -> 16, GOBLINB -> 4, 
+            HOUND -> 10)
       case l if (l == 3) => chances = 
-        Map(BAT -> 15, SNAKE -> 10, SPIDER -> 10, GOBLINA -> 20, GOBLINB -> 5, HOUND -> 15, 
-            LIZARDA -> 10, LIZARDB -> 4, LIZARDC -> 2, CROCODILE -> 1)
+        Map(RAT -> 10, BAT -> 15, SNAKE -> 10, SPIDER -> 10, GOBLINA -> 20, GOBLINB -> 5, 
+            HOUND -> 15, LIZARDA -> 10, LIZARDB -> 4, LIZARDC -> 2, CROCODILE -> 1)
       case l if (l == 4) => chances = 
-        Map(GOBLINA -> 8, GOBLINB -> 2, HOUND -> 5, LIZARDA -> 20, LIZARDB -> 8, LIZARDC -> 2, 
-            CROCODILE -> 5)
+        Map(RAT -> 10, GOBLINA -> 8, GOBLINB -> 2, HOUND -> 5, LIZARDA -> 20, LIZARDB -> 8, 
+            LIZARDC -> 2, CROCODILE -> 5)
       case _ => {chances = Map(BAT -> 100)}
     }
     chances
@@ -483,6 +488,7 @@ object MonsterType extends Enumeration {
   /** returns texture of the given monster */
   def image(MonsterType: Monster): Texture = {
     MonsterType match {
+      case t if (t == RAT) => rat
       case t if (t == BAT) => bat
       case t if (t == SNAKE) => snake
       case t if (t == SPIDER) => spider
@@ -500,6 +506,7 @@ object MonsterType extends Enumeration {
   /** returns max health of the given monster */
   def maxHP(MonsterType: Monster): Int = {
     MonsterType match {
+      case t if (t == RAT) => 2
       case t if (t == BAT) => 2
       case t if (t == SNAKE) => 5
       case t if (t == SPIDER) => 5
@@ -521,6 +528,7 @@ object MonsterType extends Enumeration {
    *  */
   def damage(MonsterType: Monster): Tuple3[Int, Int, Int] = {
     MonsterType match {
+      case t if (t == RAT) => (1, 1, 1)
       case t if (t == BAT) => (1, 2, 0)
       case t if (t == SNAKE) => (1, 2, 0)
       case t if (t == SPIDER) => (1, 2, 0)
@@ -538,6 +546,7 @@ object MonsterType extends Enumeration {
   /** returns armor of the given monster */
   def armor(MonsterType: Monster): Double = {
     MonsterType match {
+      case t if (t == RAT) => 0
       case t if (t == BAT) => 0
       case t if (t == SNAKE) => 0
       case t if (t == SPIDER) => 0
@@ -555,6 +564,7 @@ object MonsterType extends Enumeration {
   /** returns accuracy of the given monster */
   def accuracy(MonsterType: Monster): Int = {
     MonsterType match {
+      case t if (t == RAT) => 100
       case t if (t == BAT) => 95
       case t if (t == SNAKE) => 90
       case t if (t == SPIDER) => 90
@@ -572,6 +582,7 @@ object MonsterType extends Enumeration {
   /** returns critical chance of the given monster */
   def criticalChance(MonsterType: Monster): Int = {
     MonsterType match {
+      case t if (t == RAT) => 0
       case t if (t == BAT) => 2
       case t if (t == SNAKE) => 4
       case t if (t == SPIDER) => 2
@@ -589,6 +600,7 @@ object MonsterType extends Enumeration {
   /** returns dodge chance of the given monster */
   def dodge(MonsterType: Monster): Int = {
     MonsterType match {
+      case t if (t == RAT) => 20
       case t if (t == BAT) => 30
       case t if (t == SNAKE) => 10
       case t if (t == SPIDER) => 15
@@ -606,6 +618,7 @@ object MonsterType extends Enumeration {
   /** returns armor pierce of the given monster */
   def armorPierce(MonsterType: Monster): Int = {
     MonsterType match {
+      case t if (t == RAT) => 0
       case t if (t == BAT) => 0
       case t if (t == SNAKE) => 0
       case t if (t == SPIDER) => 0
@@ -623,6 +636,7 @@ object MonsterType extends Enumeration {
   /** returns gold of the given monster */
   def gold(MonsterType: Monster): Int = {
     MonsterType match {
+      case t if (t == RAT) => 0
       case t if (t == BAT) => 1
       case t if (t == SNAKE) => 3
       case t if (t == SPIDER) => 2
@@ -640,6 +654,7 @@ object MonsterType extends Enumeration {
   /** returns experience of the given monster */
   def experience(MonsterType: Monster): Int = {
     MonsterType match {
+      case t if (t == RAT) => 1
       case t if (t == BAT) => 1
       case t if (t == SNAKE) => 3
       case t if (t == SPIDER) => 2
@@ -657,6 +672,7 @@ object MonsterType extends Enumeration {
   /** returns piety of the given monster */
   def piety(MonsterType: Monster): Int = {
     MonsterType match {
+      case t if (t == RAT) => 2
       case t if (t == BAT) => 1
       case t if (t == SNAKE) => 2
       case t if (t == SPIDER) => 4
@@ -674,6 +690,7 @@ object MonsterType extends Enumeration {
   /** returns name of the given monster */
   def name(MonsterType: Monster): String = {
     MonsterType match {
+      case t if (t == RAT) => "Rat"
       case t if (t == BAT) => "Bat"
       case t if (t == SNAKE) => "Snake"
       case t if (t == SPIDER) => "Spider"
@@ -691,6 +708,7 @@ object MonsterType extends Enumeration {
   /** returns description of the given monster */
   def description(MonsterType: Monster): String = {
     MonsterType match {
+      case t if (t == RAT) => "TODO"
       case t if (t == BAT) => "TODO"
       case t if (t == SNAKE) => "TODO"
       case t if (t == SPIDER) => "TODO"

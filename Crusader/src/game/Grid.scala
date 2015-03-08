@@ -24,8 +24,8 @@ class Grid() {
   private var size: Int = 1
   private var map = Array.ofDim[Tile](size, size)
   private var stairs: Tile = new Tile(-100, -100, TileType.STAIRS)
-  private var altar: PassiveObject = null
-  private var djinn: PassiveObject = null
+  private var altar: PassiveObject = new PassiveObject("Altar", " TODO ", -100, -100, "Environment/altar1")
+  private var djinn: PassiveObject = new PassiveObject("Djinn", " TODO ", -100, -100, "tempDjinn")
   
   /** Different levels make different maps */
   def init() {
