@@ -1,7 +1,6 @@
 package game
 
 import scala.collection.mutable.Buffer
-import scala.io.Source
 import scala.util.Random
 
 import org.lwjgl.input.{Keyboard, Mouse}
@@ -14,11 +13,13 @@ import Effect._
 import Output.{drawCharacterCreation, drawGame, drawMainMenu, startDisplay}
 import MonsterType.levelChance
 
+import java.io._
+import scala.io.Source
+
 /** Main object is responsible for the allocation of tasks to other parts of the program and 
  *  running the mainloop.
  */
 object Main {
-  
   private val rnd = new Random
   private var gameState: GameState.Value = MAIN_MENU
   private var monsterList = Buffer[Monster]()
@@ -34,9 +35,9 @@ object Main {
   private var itemChances = Map[ItemType.Item, Int]()
   private var shopVisited = false
   
-  private var frameRate: Int = 0
-  private var height: Int = 0
-  private var width: Int = 0
+  private var frameRate: Int = 60
+  private var height: Int = 720
+  private var width: Int = 1280
   private var version: String = "alpha 0.01"
   
   private var player: Player = null
@@ -44,17 +45,6 @@ object Main {
   private var episode: Int = 1
   private var level: Int = 1
   private var turn: Int = 0
-  
-  /** Loads some data from init-file */
-  val initFile = Source.fromFile("src/init.txt")
-  try {
-    for (row <- initFile.getLines().toVector) {
-      if (row.split("=")(0).trim.toUpperCase == "FRAMERATE") frameRate = row.split("=")(1).trim.toString.toInt
-      else if (row.split("=")(0).trim.toUpperCase == "HEIGHT") height = row.split("=")(1).trim.toString.toInt
-      else if (row.split("=")(0).trim.toUpperCase == "WIDTH") width = row.split("=")(1).trim.toString.toInt
-      else if (row.split("=")(0).trim.toUpperCase == "VERSION") version = row.split("=")(1).trim.toString
-    }
-  } finally initFile.close
   
   /** The program's main method.
     *
@@ -94,11 +84,12 @@ object Main {
   
   /** Start new game */
   def newGame() {
-    monsterList.clear
+    if (new File("save.dat").exists) new File("save.dat").delete
+    gameLog.clear
+    clearLists
     level = 0
     episode = 1
     turn = 0
-    while (Keyboard.next) {}
     nextMap()
   }
   
@@ -249,6 +240,14 @@ object Main {
       Display.destroy()
       System.exit(0)
     }
+    else if ((Mouse.isButtonDown(0) && Mouse.getX > 905 && Mouse.getX < 1162 && 
+        (height - Mouse.getY) > 216 && (height - Mouse.getY) < 281) || 
+        Keyboard.isKeyDown(Keyboard.KEY_Q)) {
+      if (new File("save.dat").exists && loadGame) {
+        gameState = GAME
+        while (Keyboard.next) {}
+      }
+    }
   }
   
   /** Follow user input in game */
@@ -260,6 +259,7 @@ object Main {
     }
     else if (Mouse.isButtonDown(0) && Mouse.getX > 1080 && Mouse.getX < 1255 && 
         (height - Mouse.getY) > 640 && (height - Mouse.getY) < 705) {
+      if (player.health > 0) saveGame
       gameState = MAIN_MENU
       while (Keyboard.next) {}
     }
@@ -267,6 +267,7 @@ object Main {
       while (Keyboard.next) {
         Keyboard.getEventKey match {
           case k if (k == Keyboard.KEY_ESCAPE) => {
+            if (player.health > 0) saveGame
             gameState = MAIN_MENU
             while (Keyboard.next) {}
           }
@@ -356,6 +357,80 @@ object Main {
     equipmentList.clear
     consumableList.clear
     scrollList.clear
+  }
+  
+  /** Save current game */
+  def saveGame = {
+    val file = new ObjectOutputStream(new FileOutputStream("save.dat"))
+    try {
+      file.writeUTF(version)
+      
+      file.writeInt(turn)
+      file.writeInt(level)
+      file.writeInt(episode)
+      file.writeBoolean(shopVisited)
+      
+      file.writeInt(gameLog.size)
+      for (log <- gameLog) file.writeUTF(log)
+      
+      file.writeInt(2 + monsterList.size + passiveObjectList.size + equipmentList.size + 
+          consumableList.size + scrollList.size)
+      file.writeObject(player)
+      file.writeObject(grid)
+      for (obj <- monsterList) file.writeObject(obj)
+      for (obj <- passiveObjectList) file.writeObject(obj)
+      for (obj <- equipmentList) file.writeObject(obj)
+      for (obj <- consumableList) file.writeObject(obj)
+      for (obj <- scrollList) file.writeObject(obj)
+      
+    } finally {
+      file.close
+    }
+  }
+  
+  /** Load game */
+  def loadGame:Boolean = {
+    var boo = true
+    var list = Buffer[java.lang.Object]()
+    val file = new ObjectInputStream(new FileInputStream("save.dat"))
+    var toRead: Int = 0
+    try {
+      if (file.readUTF == version) {
+        turn = file.readInt
+        level = file.readInt
+        episode = file.readInt
+        shopVisited = file.readBoolean
+        
+        toRead = file.readInt
+        gameLog.clear
+        for (log <- 0 until toRead) addLog(file.readUTF)
+        
+        toRead = file.readInt
+        for (i <- 0 until toRead) list += file.readObject
+      }
+      else boo = false
+    } finally {
+      file.close()
+    }
+    
+    if (new File("save.dat").exists) new File("save.dat").delete
+    
+    clearLists
+    for (obj <- list) obj match {
+            case o: Player => player = o
+            case o: Grid => grid = o
+            case o: Monster => monsterList.append(o)
+            case o: PassiveObject => passiveObjectList.append(o)
+            case o: Equipment => equipmentList.append(o)
+            case o: Consumable => consumableList.append(o)
+            case o: Scroll => scrollList.append(o)
+            case _ => {}
+          }
+    updateMonsterChances
+    updateItemChances
+    lastMonster = null
+    
+    boo
   }
   
   /** Updaters */

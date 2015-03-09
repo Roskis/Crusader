@@ -7,6 +7,15 @@ import java.io.{IOException, InputStream}
 import scala.collection.mutable.Buffer
 import Math.abs
 
+/** Simple coordinate system */
+class Coordinate(var x: Int, var y: Int) extends Serializable {
+  /** Getters and setters for coordinates */
+  def getX = x
+  def getY = y
+  def setX(newX: Int) = x = newX
+  def setY(newY: Int) = y = newY
+}
+
 /** There are three states of game */
 object GameState extends Enumeration {
 
@@ -102,6 +111,160 @@ object Direction extends Enumeration {
 object Helpers {
 
   private val rnd =  getRnd
+  
+  /** Load textures */
+  private val imissing = loadTexture("UI/missing")
+  private val iplayerImage =  loadTexture("Player/humanBase")
+  private val iplayerGrave =  loadTexture("Environment/grave")
+  private val irat = loadTexture("Monsters/rat1")
+  private val ibat = loadTexture("Monsters/bat1")
+  private val isnake = loadTexture("Monsters/snake1")
+  private val ispider = loadTexture("Monsters/spider1")
+  private val igoblina = loadTexture("Monsters/goblina1")
+  private val igoblinb = loadTexture("Monsters/goblinb1")
+  private val ihound = loadTexture("Monsters/hound1")
+  private val ilizarda = loadTexture("Monsters/lizarda1")
+  private val ilizardb = loadTexture("Monsters/lizardb1")
+  private val ilizardc = loadTexture("Monsters/lizardc1")
+  private val icrocodile = loadTexture("Monsters/crocodile1")
+  private val iknifeG = loadTexture("Items/knifeG")
+  private val iknifeE = loadTexture("Player/knifeE")
+  private val irobesG = loadTexture("Items/robesG")
+  private val irobesE = loadTexture("Player/robesE")
+  private val iironArmorG = loadTexture("Items/ironArmorG")
+  private val iironArmorE = loadTexture("Player/ironArmorE")
+  private val isteelSwordG = loadTexture("Items/steelSwordG")
+  private val isteelSwordE = loadTexture("Player/steelSwordE")
+  private val iwoodenShieldG = loadTexture("Items/woodenShieldG")
+  private val iwoodenShieldE = loadTexture("Player/woodenShieldE")
+  private val iratG = loadTexture("Items/ratG")
+  private val iratE = loadTexture("Player/ratE")
+  private val ifog: Texture = loadTexture("Tiles/fog")
+  private val igrass1 = loadTexture("Tiles/grass1")
+  private val iwall1 = loadTexture("Tiles/wall1")
+  private val itempStairs = loadTexture("tempStairs")
+  private val itempDjinnDoorH = loadTexture("Tiles/djinnDoorH")
+  private val itempDjinnDoorV = loadTexture("Tiles/djinnDoorV")
+  private val itempDjinnFloor = {
+    val ran = rnd.nextInt(3)
+    if (ran == 0) loadTexture("Tiles/djinnFloor1")
+    else if (ran == 1 ) loadTexture("Tiles/djinnFloor2")
+    else loadTexture("Tiles/djinnFloor3")
+  }
+  private val itempDjinnWall = {
+    val ran = rnd.nextInt(3)
+    if (ran == 0) loadTexture("Tiles/djinnWall1")
+    else if (ran == 1 ) loadTexture("Tiles/djinnWall2")
+    else loadTexture("Tiles/djinnWall3")
+  }
+  private val ibackground = loadTexture("tempBackground")
+  private val icharacterBackground = loadTexture("tempCharacterBackground")
+  private val icontinue = loadTexture("UI/Continue")
+  private val icontinue2 = loadTexture("UI/Continue2")
+  private val inewgame = loadTexture("UI/Newgame")
+  private val inewgame2 = loadTexture("UI/Newgame2")
+  private val iexit = loadTexture("UI/Exit")
+  private val iback = loadTexture("UI/Back")
+  private val iunseen = loadTexture("Tiles/unseen")
+  private val iheart = loadTexture("UI/Heart")
+  private val iXP = loadTexture("UI/XP")
+  private val iXPButton = loadTexture("UI/XPButton")
+  private val iXPButton2 = loadTexture("UI/XPButton2")
+  private val iquit = loadTexture("UI/Quit")
+  private val iHPBar = loadTexture("UI/HPBar")
+  private val iXPBar = loadTexture("UI/XPBar")
+  private val iblackBorder = loadTexture("UI/BlackBorder")
+  private val izeal = loadTexture("UI/Zeal")
+  private val izeal2 = loadTexture("UI/Zeal2")
+  private val ihumility = loadTexture("UI/Humility")
+  private val ihumility2 = loadTexture("UI/Humility2")
+  private val itemperance = loadTexture("UI/temperance")
+  private val itemperance2 = loadTexture("UI/temperance2")
+  private val ikindness = loadTexture("UI/kindness")
+  private val ikindness2 = loadTexture("UI/kindness2")
+  private val ipatience = loadTexture("UI/patience")
+  private val ipatience2 = loadTexture("UI/patience2")
+  private val icharity = loadTexture("UI/charity")
+  private val icharity2 = loadTexture("UI/charity2")
+  private val idiligence = loadTexture("UI/diligence")
+  private val idiligence2 = loadTexture("UI/diligence2")
+  private val ilevel = loadTexture("UI/Level")
+  private val ilevel2 = loadTexture("UI/Level2")
+  private val itempUIBackground = loadTexture("tempUIBackground")
+  private val itempUIBackground2 = loadTexture("tempUIBackground2")
+  private val itempLevelBackground = loadTexture("tempLevelBackground")
+  
+  /** Return textures */
+  def playerImage = iplayerImage
+  def playerGrave = iplayerGrave
+  def missing = imissing
+  def rat = irat
+  def bat = ibat
+  def snake = isnake
+  def spider = ispider
+  def goblina = igoblina
+  def goblinb = igoblinb
+  def hound = ihound
+  def lizarda = ilizarda
+  def lizardb = ilizardb
+  def lizardc = ilizardc
+  def crocodile = icrocodile
+  def knifeG = iknifeG
+  def knifeE = iknifeE
+  def robesG = irobesG
+  def robesE = irobesE
+  def ironArmorG = iironArmorG
+  def ironArmorE = iironArmorE
+  def steelSwordG = isteelSwordG
+  def steelSwordE = isteelSwordE
+  def woodenShieldG = iwoodenShieldG
+  def woodenShieldE = iwoodenShieldE
+  def ratG = iratG
+  def ratE = iratE
+  def fog = ifog
+  def grass1 = igrass1
+  def wall1 = iwall1
+  def tempStairs = itempStairs
+  def tempDjinnDoorH = itempDjinnDoorH
+  def tempDjinnDoorV = itempDjinnDoorV
+  def tempDjinnFloor = itempDjinnFloor
+  def tempDjinnWall = itempDjinnWall
+  def background = ibackground
+  def characterBackground = icharacterBackground
+  def continue = icontinue
+  def continue2 = icontinue2
+  def newgame = inewgame
+  def newgame2 = inewgame2
+  def exit = iexit
+  def back = iback
+  def unseen = iunseen
+  def heart = iheart
+  def XP = iXP
+  def XPButton = iXPButton
+  def XPButton2 = iXPButton2
+  def quit = iquit
+  def HPBar = iHPBar
+  def XPBar = iXPBar
+  def blackBorder = iblackBorder
+  def zeal = izeal
+  def zeal2 = izeal2
+  def humility = ihumility
+  def humility2 = ihumility2
+  def temperance = itemperance
+  def temperance2 = itemperance2
+  def kindness = ikindness
+  def kindness2 = ikindness2
+  def patience = ipatience
+  def patience2 = ipatience2
+  def charity = icharity
+  def charity2 = icharity2
+  def diligence = idiligence
+  def diligence2 = idiligence2
+  def level = ilevel
+  def level2 = ilevel2
+  def tempUIBackground = itempUIBackground
+  def tempUIBackground2 = itempUIBackground2
+  def tempLevelBackground = itempLevelBackground
   
   /** Few djinn names */
   def djinnName: String = {

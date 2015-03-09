@@ -2,6 +2,7 @@ package game
 
 import java.awt.Font
 import java.io.IOException
+import java.io.File
 
 import scala.Range
 import scala.collection.mutable.Buffer
@@ -33,42 +34,6 @@ object Output {
   var font: TrueTypeFont = null
   private var fontMenu: TrueTypeFont = null  
   private var awtFont: Font = null
-  private var background:Texture = null
-  private var characterBackground: Texture = null
-  private var continue:Texture = null
-  private var continue2:Texture = null
-  private var newgame:Texture = null
-  private var newgame2:Texture = null
-  private var exit:Texture = null
-  private var back:Texture = null
-  private var unseen: Texture = null
-  private var heart: Texture = null
-  private var XP: Texture = null
-  private var XPButton: Texture = null
-  private var XPButton2: Texture = null
-  private var quit: Texture = null
-  private var HPBar: Texture = null
-  private var XPBar: Texture = null
-  private var blackBorder: Texture = null
-  private var zeal:Texture = null
-  private var zeal2:Texture = null
-  private var humility:Texture = null
-  private var humility2:Texture = null
-  private var temperance:Texture = null
-  private var temperance2:Texture = null
-  private var kindness:Texture = null
-  private var kindness2:Texture = null
-  private var patience:Texture = null
-  private var patience2:Texture = null
-  private var charity:Texture = null
-  private var charity2:Texture = null
-  private var diligence:Texture = null
-  private var diligence2:Texture = null
-  private var level:Texture = null
-  private var level2: Texture = null
-  private var tempUIBackground: Texture = null
-  private var tempUIBackground2: Texture = null
-  private var tempLevelBackground: Texture = null
   
   /** Prepares, launches and initializes the display.
    *
@@ -145,43 +110,6 @@ object Output {
     
     org.lwjgl.input.Keyboard.enableRepeatEvents(true)
     
-    background = loadTexture("tempBackground")
-    characterBackground = loadTexture("tempCharacterBackground")
-    continue = loadTexture("UI/Continue")
-    continue2 = loadTexture("UI/Continue2")
-    newgame = loadTexture("UI/Newgame")
-    newgame2 = loadTexture("UI/Newgame2")
-    exit = loadTexture("UI/Exit")
-    back = loadTexture("UI/Back")
-    unseen = loadTexture("Tiles/unseen")
-    heart = loadTexture("UI/Heart")
-    XP = loadTexture("UI/XP")
-    XPButton = loadTexture("UI/XPButton")
-    XPButton2 = loadTexture("UI/XPButton2")
-    quit = loadTexture("UI/Quit")
-    HPBar = loadTexture("UI/HPBar")
-    XPBar = loadTexture("UI/XPBar")
-    blackBorder = loadTexture("UI/BlackBorder")
-    zeal = loadTexture("UI/Zeal")
-    zeal2 = loadTexture("UI/Zeal2")
-    humility = loadTexture("UI/Humility")
-    humility2 = loadTexture("UI/Humility2")
-    temperance = loadTexture("UI/temperance")
-    temperance2 = loadTexture("UI/temperance2")
-    kindness = loadTexture("UI/kindness")
-    kindness2 = loadTexture("UI/kindness2")
-    patience = loadTexture("UI/patience")
-    patience2 = loadTexture("UI/patience2")
-    charity = loadTexture("UI/charity")
-    charity2 = loadTexture("UI/charity2")
-    diligence = loadTexture("UI/diligence")
-    diligence2 = loadTexture("UI/diligence2")
-    level = loadTexture("UI/Level")
-    level2 = loadTexture("UI/Level2")
-    tempUIBackground = loadTexture("tempUIBackground")
-    tempUIBackground2 = loadTexture("tempUIBackground2")
-    tempLevelBackground = loadTexture("tempLevelBackground")
-    
     addLog("Your holy mission is to purify the world from evil.")
     
   }
@@ -233,7 +161,8 @@ object Output {
     glClear(GL_COLOR_BUFFER_BIT)
     drawQuadTex(background, (width-background.getImageWidth)/2, 
         (height-background.getImageHeight)/2, background.getImageWidth, background.getImageHeight)
-    drawQuadTex(continue2, width*17/24, height*1/6, continue.getImageWidth, continue.getImageHeight)
+    if (new File("save.dat").exists) drawQuadTex(continue, width*17/24, height*1/6, continue.getImageWidth, continue.getImageHeight)
+    else drawQuadTex(continue2, width*17/24, height*1/6, continue2.getImageWidth, continue2.getImageHeight)
     drawQuadTex(newgame, width*17/24, height*1/6+100, newgame.getImageWidth, newgame.getImageHeight)
     drawQuadTex(exit, width*17/24, height*1/6+200, exit.getImageWidth, exit.getImageHeight)
     fontMenu.drawString(920, height/10, "Crusader", Color.black)        

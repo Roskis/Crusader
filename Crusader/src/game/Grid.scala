@@ -9,17 +9,8 @@ import Direction._
 import Main._
 import Helpers._
 
-/** Simple coordinate system */
-class Coordinate(var x: Int, var y: Int) {
-  /** Getters and setters for coordinates */
-  def getX = x
-  def getY = y
-  def setX(newX: Int) = x = newX
-  def setY(newY: Int) = y = newY
-}
-
 /** Grid is reponsible for handling the map */
-class Grid() {
+class Grid() extends Serializable {
   private val rnd = getRnd
   private var size: Int = 1
   private var map = Array.ofDim[Tile](size, size)

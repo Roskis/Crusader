@@ -17,11 +17,11 @@ import Helpers._
    * @param Ycoord is tile's y-coordinate
    * @param tileType is tile's type that it is made of
    */
-class Tile(Xcoord: Int, Ycoord: Int, tileType: TileType.Value) {
+class Tile(Xcoord: Int, Ycoord: Int, tileType: TileType.Value) extends Serializable {
 
   private var x = Xcoord * 32
   private var y = Ycoord * 32
-  private var image: Texture = TileType.image(tileType)
+  def image = TileType.image(tileType)
   var objectList = Buffer[Object]()
   var explored: Boolean = false
   var label: Int = 0
@@ -103,34 +103,8 @@ class Tile(Xcoord: Int, Ycoord: Int, tileType: TileType.Value) {
 object TileType extends Enumeration {
 
   type Type = Value
-  val FLOOR = Value
-  val WALL = Value
-  val STAIRS = Value
-  val DJINNDOORH = Value
-  val DJINNDOORV = Value
-  val DJINNFLOOR = Value
-  val DJINNWALL = Value
+  val FLOOR, WALL, STAIRS, DJINNDOORH, DJINNDOORV, DJINNFLOOR, DJINNWALL = Value
   private val rnd = Main.getRnd
-  
-  private val missing = loadTexture("UI/missing")
-  private val fog: Texture = loadTexture("Tiles/fog")
-  private val grass1 = loadTexture("Tiles/grass1")
-  private val wall1 = loadTexture("Tiles/wall1")
-  private val tempStairs = loadTexture("tempStairs")
-  private val tempDjinnDoorH = loadTexture("Tiles/djinnDoorH")
-  private val tempDjinnDoorV = loadTexture("Tiles/djinnDoorV")
-  private val tempDjinnFloor = {
-    val ran = rnd.nextInt(3)
-    if (ran == 0) loadTexture("Tiles/djinnFloor1")
-    else if (ran == 1 ) loadTexture("Tiles/djinnFloor2")
-    else loadTexture("Tiles/djinnFloor3")
-  }
-  private val tempDjinnWall = {
-    val ran = rnd.nextInt(3)
-    if (ran == 0) loadTexture("Tiles/djinnWall1")
-    else if (ran == 1 ) loadTexture("Tiles/djinnWall2")
-    else loadTexture("Tiles/djinnWall3")
-  }
   
   /** returns texture of the given tile type */
   def image(tileType: Type): Texture = {

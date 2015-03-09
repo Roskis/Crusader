@@ -20,9 +20,11 @@ trait Object {
   var description: String
   var x: Int
   var y: Int
-  var image: Texture
   var blockMovement: Boolean
   var blockVision: Boolean
+  
+  /** Location to the object's texture */
+  def image: Texture
   
   /** Add object to the tile it is on */
   def init() = if (getGrid.isWithinGrid(getX, getY)) getGrid.getTile(getX, getY).addObject(this)
@@ -78,14 +80,14 @@ trait Object {
 }
 
 /** User's controllable player character */
-class Player(playerName: String, startX: Int, startY: Int) extends Object {
+class Player(playerName: String, startX: Int, startY: Int) extends Object with Serializable {
   
   val rnd = getRnd
   var name = playerName
   var description = "TODO"
   var x = startX * 32
   var y = startY * 32
-  var image = loadTexture("Player/humanBase")
+  def image = playerImage
   var blockMovement = true
   var blockVision = false
   
@@ -109,8 +111,6 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
   var slotRing: Equipment = null
   var slotAmulet: Equipment = null
   var slotItem: Item = null
-  
-  val grave = loadTexture("Environment/grave")
   
   /** When player succeeds praying one random prayer is selected */
   def pray = {
@@ -293,21 +293,21 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object {
       if (slotRing != null) drawQuadTex(slotRing.imageEquipped, 16 * 32, 8 * 32, slotRing.imageEquipped.getImageWidth, slotRing.imageEquipped.getImageHeight)
       if (slotAmulet != null) drawQuadTex(slotAmulet.imageEquipped, 16 * 32, 8 * 32, slotAmulet.imageEquipped.getImageWidth, slotAmulet.imageEquipped.getImageHeight)
     }
-    else drawQuadTex(grave, 16 * 32, 8 * 32, grave.getImageWidth, grave.getImageHeight)
+    else drawQuadTex(playerGrave, 16 * 32, 8 * 32, playerGrave.getImageWidth, playerGrave.getImageHeight)
   }
   
 }
 
 /** Passive objects are mostly decorative, but might also block some movement */
 class PassiveObject(objectName: String, objectDescription: String, startX: Int, startY: Int, 
-    objectImage: String) extends Object {
+    objectImage: String) extends Object with Serializable {
   
   val rnd = getRnd
   var name = objectName
   var description = objectDescription
   var x = startX * 32
   var y = startY * 32
-  var image = loadTexture(objectImage)
+  def image = loadTexture(objectImage)
   var blockMovement = false
   var blockVision = false
   
@@ -317,7 +317,7 @@ class PassiveObject(objectName: String, objectDescription: String, startX: Int, 
 }
 
 /** All of monsters and npc will be under this class */
-class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends Object {
+class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends Object with Serializable {
   
   val mType = monsterType
   val rnd = getRnd
@@ -325,7 +325,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   var description = MonsterType.description(mType)
   var x = startX * 32
   var y = startY * 32
-  var image = MonsterType.image(mType)
+  def image = MonsterType.image(mType)
   var blockMovement = true
   var blockVision = false
   var mode = "passive"
@@ -455,23 +455,10 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   }
 }
 
-object MonsterType extends Enumeration {
+object MonsterType extends Enumeration with Serializable {
 
   type Monster = Value
   val RAT, BAT, SNAKE, SPIDER, GOBLINA, GOBLINB, HOUND, LIZARDA, LIZARDB, LIZARDC, CROCODILE = Value
-  
-  private val missing = loadTexture("UI/missing")
-  private val rat = loadTexture("Monsters/rat1")
-  private val bat = loadTexture("Monsters/bat1")
-  private val snake = loadTexture("Monsters/snake1")
-  private val spider = loadTexture("Monsters/spider1")
-  private val goblina = loadTexture("Monsters/goblina1")
-  private val goblinb = loadTexture("Monsters/goblinb1")
-  private val hound = loadTexture("Monsters/hound1")
-  private val lizarda = loadTexture("Monsters/lizarda1")
-  private val lizardb = loadTexture("Monsters/lizardb1")
-  private val lizardc = loadTexture("Monsters/lizardc1")
-  private val crocodile = loadTexture("Monsters/crocodile1")
   
   /** return chances how monsters occur in game */
   def levelChance(level: Int): Map[Monster, Int] = {
@@ -734,7 +721,7 @@ object MonsterType extends Enumeration {
 }
 
 /** All of the game's items will be under this trait */
-trait Item extends Object {
+trait Item extends Object with Serializable {
   
   var price: Int
   var inShop: Boolean
@@ -786,7 +773,7 @@ trait Item extends Object {
 }
 
 /** Player usable equipments */
-class Equipment(startX: Int, startY: Int, equipmentType: ItemType.Value, isEquipped: Boolean) extends Item {
+class Equipment(startX: Int, startY: Int, equipmentType: ItemType.Value, isEquipped: Boolean) extends Item with Serializable {
   
   val rnd = getRnd
   val itemType = equipmentType
@@ -794,8 +781,8 @@ class Equipment(startX: Int, startY: Int, equipmentType: ItemType.Value, isEquip
   var description = ItemType.description(itemType)
   var x = startX * 32
   var y = startY * 32
-  var image = ItemType.imageGround(itemType)
-  val imageEquipped = ItemType.imageEquipped(itemType)
+  def image = ItemType.imageGround(itemType)
+  def imageEquipped = ItemType.imageEquipped(itemType)
   var blockMovement = false
   var blockVision = false
   var price = ItemType.price(itemType)
@@ -847,24 +834,10 @@ class Equipment(startX: Int, startY: Int, equipmentType: ItemType.Value, isEquip
   
 }
 
-object ItemType extends Enumeration {
+object ItemType extends Enumeration with Serializable {
 
   type Item = Value
   val KNIFE, ROBES, IRONARMOR, STEELSWORD, WOODENSHIELD, RATMEAT = Value
-  
-  private val missing = loadTexture("UI/missing")
-  private val knifeG = loadTexture("Items/knifeG")
-  private val knifeE = loadTexture("Player/knifeE")
-  private val robesG = loadTexture("Items/robesG")
-  private val robesE = loadTexture("Player/robesE")
-  private val ironArmorG = loadTexture("Items/ironArmorG")
-  private val ironArmorE = loadTexture("Player/ironArmorE")
-  private val steelSwordG = loadTexture("Items/steelSwordG")
-  private val steelSwordE = loadTexture("Player/steelSwordE")
-  private val woodenShieldG = loadTexture("Items/woodenShieldG")
-  private val woodenShieldE = loadTexture("Player/woodenShieldE")
-  private val ratG = loadTexture("Items/ratG")
-  private val ratE = loadTexture("Player/ratE")
   
   /** return chances how items occur in game */
   def levelChance(level: Int): Map[Item, Int] = {
@@ -1052,7 +1025,7 @@ object ItemType extends Enumeration {
 }
 
 /** Player usable consumables */
-class Consumable(startX: Int, startY: Int, val itemType: ItemType.Value, isEquipped: Boolean) extends Item {
+class Consumable(startX: Int, startY: Int, val itemType: ItemType.Value, isEquipped: Boolean) extends Item with Serializable {
 
   val rnd = getRnd
   val weight = ItemType.weight(itemType)
@@ -1060,8 +1033,8 @@ class Consumable(startX: Int, startY: Int, val itemType: ItemType.Value, isEquip
   var description = ItemType.description(itemType)
   var x = startX * 32
   var y = startY * 32
-  var image = ItemType.imageGround(itemType)
-  val imageEquipped = ItemType.imageEquipped(itemType)
+  def image = ItemType.imageGround(itemType)
+  def imageEquipped = ItemType.imageEquipped(itemType)
   var blockMovement = false
   var blockVision = false
   var price = ItemType.price(itemType)
@@ -1108,7 +1081,7 @@ class Consumable(startX: Int, startY: Int, val itemType: ItemType.Value, isEquip
 
 /** Player usable scrolls */
 class Scroll(scrollName: String, scrollDescription: String, startX: Int, startY: Int, 
-    scrollImage: String, scrollPrice: Int, isEquipped: Boolean) extends Item {
+    scrollImage: String, scrollPrice: Int, isEquipped: Boolean) extends Item with Serializable {
   
   val rnd = getRnd
   val itemType = null
@@ -1117,7 +1090,7 @@ class Scroll(scrollName: String, scrollDescription: String, startX: Int, startY:
   var description = scrollDescription
   var x = startX * 32
   var y = startY * 32
-  var image = loadTexture(scrollImage)
+  def image = loadTexture(scrollImage)
   var blockMovement = false
   var blockVision = false
   var price = scrollPrice
