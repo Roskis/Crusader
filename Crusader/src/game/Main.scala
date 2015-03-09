@@ -162,7 +162,35 @@ object Main {
         Keyboard.getEventKey match {
           case k if (k == Keyboard.KEY_Q && Keyboard.getEventKeyState) => {
             gameState = GAME
-            while (Keyboard.next) {}
+            while (Keyboard.next) {} 
+          }
+          case k if (k == Keyboard.KEY_1 && Keyboard.getEventKeyState) => {
+            player.experience -= xpNeededForLevel(player.zeal)
+            player.zeal += 1
+          }
+          case k if (k == Keyboard.KEY_2 && Keyboard.getEventKeyState) => {
+            player.experience -= xpNeededForLevel(player.humility)
+            player.humility += 1
+          }
+          case k if (k == Keyboard.KEY_3 && Keyboard.getEventKeyState) => {
+            player.experience -= xpNeededForLevel(player.temperance)
+            player.temperance += 1
+          }
+          case k if (k == Keyboard.KEY_4 && Keyboard.getEventKeyState) => {
+            player.experience -= xpNeededForLevel(player.kindness)
+            player.kindness += 1
+          }
+          case k if (k == Keyboard.KEY_5 && Keyboard.getEventKeyState) => {
+            player.experience -= xpNeededForLevel(player.patience)
+            player.patience += 1
+          }
+          case k if (k == Keyboard.KEY_6 && Keyboard.getEventKeyState) => {
+            player.experience -= xpNeededForLevel(player.charity)
+            player.charity += 1
+          }
+          case k if (k == Keyboard.KEY_7 && Keyboard.getEventKeyState) => {
+            player.experience -= xpNeededForLevel(player.diligence)
+            player.diligence += 1
           }
           case _ => {}
         }
@@ -174,7 +202,8 @@ object Main {
   /** Follow user input when creating new character */
   def characterKeys {
     if ((Mouse.isButtonDown(0) && Mouse.getX > 799 && Mouse.getX < 1056 && 
-        (height - Mouse.getY) > 600 && (height - Mouse.getY) < 665)) {
+        (height - Mouse.getY) > 600 && (height - Mouse.getY) < 665) && player.name != "" && 
+        Output.font.getWidth(getPlayer.name) < 200) {
           gameState = GAME
           while (Keyboard.next) {}
           newGame
@@ -197,8 +226,8 @@ object Main {
           if (k == 57 && Keyboard.getEventKeyState) player.name = player.name + " "
           else if ((k == 0 || k == 12 || k == 13 || k == 15 || k == 26 || k == 27 || k == 28 || k == 29 || k == 39 || 
               k == 40 || k == 41 || k == 42 || k == 43 || k > 50) && Keyboard.getEventKeyState) {}
-          else if (player.name == "" && Keyboard.getEventKeyState) player.name = Keyboard.getKeyName(k).toUpperCase
-          else player.name = player.name + Keyboard.getKeyName(k).toLowerCase
+          else if ((Keyboard.isKeyDown(42) || Keyboard.isKeyDown(54)) && Keyboard.getEventKeyState) player.name += Keyboard.getKeyName(k).toUpperCase
+          else player.name += Keyboard.getKeyName(k).toLowerCase
           }
         case _ => {}
       }
@@ -281,8 +310,7 @@ object Main {
             player.moveOrAttack(SW)
             playTurn
             }
-          case k if ((k == Keyboard.KEY_SPACE || k == Keyboard.KEY_R) && Keyboard.getEventKeyState && 
-              getPlayer.health > 0) => {
+          case k if ((k == Keyboard.KEY_R) && Keyboard.getEventKeyState && getPlayer.health > 0) => {
             player.pray
             playTurn
           }
