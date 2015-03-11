@@ -735,6 +735,7 @@ trait Item extends Object with Serializable {
     pickUp
   }
   
+  def imageEquipped: Texture
   def equip: Unit
   def unequip: Unit
   def use: Unit
@@ -1091,6 +1092,7 @@ class Scroll(scrollName: String, scrollDescription: String, startX: Int, startY:
   var x = startX * 32
   var y = startY * 32
   def image = loadTexture(scrollImage)
+  def imageEquipped = null
   var blockMovement = false
   var blockVision = false
   var price = scrollPrice

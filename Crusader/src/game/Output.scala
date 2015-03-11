@@ -284,9 +284,9 @@ object Output {
     if (getPlayer.slotAmulet != null) drawQuadTex(getPlayer.slotAmulet.image, 
         middle-getPlayer.slotAmulet.image.getImageWidth/2, h, 
         getPlayer.slotAmulet.image.getImageWidth, getPlayer.slotAmulet.image.getImageHeight)
-    if (getPlayer.slotItem != null) drawQuadTex(getPlayer.slotItem.image, 
-        middle+getPlayer.slotItem.image.getImageWidth*3/2, h, 
-        getPlayer.slotItem.image.getImageWidth, getPlayer.slotItem.image.getImageHeight)
+    if (getPlayer.slotItem != null) drawQuadTex(getPlayer.slotItem.imageEquipped, 
+        middle+getPlayer.slotItem.imageEquipped.getImageWidth*3/2, h, 
+        getPlayer.slotItem.imageEquipped.getImageWidth, getPlayer.slotItem.imageEquipped.getImageHeight)
     
     h += 64
     val heroLevel = "Hero level: " + getPlayer.totalLevel
