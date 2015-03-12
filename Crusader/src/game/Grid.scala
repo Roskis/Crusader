@@ -316,14 +316,15 @@ class Grid() extends Serializable {
   /** Move stairs to player's location */
   def moveStairsToPlayer = {
     val tempList = stairs.getObjectList
+    val tile = giveTileNearPlayer(5)
     stairs.objectList = Buffer[Object]()
-    for (obj <- getTile(getPlayer.getX, getPlayer.getY).getObjectList) stairs.addObject(obj)
+    for (obj <- getTile(tile.getX, tile.getY).getObjectList) stairs.addObject(obj)
     map(stairs.getX)(stairs.getY) = new Tile(stairs.getX, stairs.getY, TileType.FLOOR)
     for (obj <- tempList) getTile(stairs.getX, stairs.getY).addObject(obj)
-    stairs.setX(getPlayer.getX)
-    stairs.setY(getPlayer.getY)
+    stairs.setX(tile.getX)
+    stairs.setY(tile.getY)
     stairs.explored = true
-    map(getPlayer.getX)(getPlayer.getY) = stairs
+    map(tile.getX)(tile.getY) = stairs
   }
   
   /** Returns the neighbors of given tile */
@@ -472,6 +473,22 @@ class Grid() extends Serializable {
       points.append(new Coordinate(x1, y1))
     }
     points
+  }
+  
+  /** Returns random floor tile near player within range */
+  def giveTileNearPlayer(maxRange: Int): Tile = {
+    var tile = giveRandomFloor
+    do tile = giveRandomFloor
+    while (tile.distance(getPlayer) > maxRange || tile.distance(getPlayer) < 1)
+    tile
+  }
+  
+  /** Returns random floor */
+  def giveRandomFloor(): Tile = {
+    var tile: Tile = new Tile(-100, -100, TileType.WALL)
+    do tile = getTile(randomX, randomY)
+    while (tile.getType != TileType.FLOOR)
+    tile
   }
   
   /** Returns random nonblocking coordinates */

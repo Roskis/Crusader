@@ -59,7 +59,7 @@ object Effect extends Enumeration {
   /** Stairs are moved to the player's location */
   def stairs = {
     getGrid.moveStairsToPlayer
-    addLog("Stairs appear under you.")
+    addLog("Stairs appear near you.")
   }
   
   /** Smite the monster player is fighting with */
