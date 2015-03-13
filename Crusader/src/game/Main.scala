@@ -382,7 +382,7 @@ object Main {
             player.pray
             playTurn
           }
-          case k if ((k == Keyboard.KEY_W || k == Keyboard.KEY_NUMPAD5) && 
+          case k if ((k == Keyboard.KEY_W || k == Keyboard.KEY_NUMPAD5 || k == 52) && 
               Keyboard.getEventKeyState && getPlayer.health > 0) => {
             playTurn
           }
