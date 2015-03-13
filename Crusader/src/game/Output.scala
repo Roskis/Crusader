@@ -24,9 +24,6 @@ object Output {
   
   private val antiAlias: Boolean = true
   private val vSync: Boolean = false
-  private val height: Int = getHeight
-  private val width: Int = getWidth
-  private val version: String = getVersion
   private var mouseXCoord: Int = 0
   private var mouseYCoord: Int = 0
   
@@ -46,10 +43,9 @@ object Output {
   def startDisplay() {
     
     try {
-      //for (mode <- Display.getAvailableDisplayModes) if (mode.getWidth == 1920 && mode.getHeight == 1080 && mode.getBitsPerPixel == 16 && mode.getFrequency == 60) Display.setDisplayMode(mode)
-      //Display.setFullscreen(true)
-      Display.setDisplayMode(new DisplayMode(width, height))
-      Display.setTitle("Crusader" + " " + version)
+      Display.setFullscreen(getFullscreen)
+      Display.setDisplayMode(getDisplayMode)
+      Display.setTitle("Crusader" + " " + getVersion)
       /** TODO
       // Window's game icon is not loaded right.
       //Display.setIcon(Array(ByteBuffer.allocate(0x4000).put(new ImageIOImageData().imageToByteBuffer(ImageIO.read(new File("data/icon.png")), false, false, null))))
@@ -86,11 +82,11 @@ object Output {
     glClearDepth(1)
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    glViewport(0,0,width,height)
+    glViewport(0,0,getWidth,getHeight)
     
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
-    glOrtho(0, width, height, 0, 1, -1)
+    glOrtho(0, getWidth, getHeight, 0, 1, -1)
     glMatrixMode(GL_MODELVIEW)
     
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
@@ -108,9 +104,34 @@ object Output {
       case e: Throwable => e.printStackTrace()
     }
     
-    org.lwjgl.input.Keyboard.enableRepeatEvents(true)
+    buttonContinue = new Button(905, 200, 256, 64, continue, continue2)
+    buttonNewGameMenu = new Button(905, 280, 256, 64, newgame, newgame2)
+    buttonOptions = new Button(905, 360, 256, 64, options, options)
+    buttonCredits = new Button(905, 440, 256, 64, credits, credits)
+    buttonExit = new Button(905, 520, 256, 64, exit, exit)
+    buttonNewGameChar = new Button(799, 600, 256, 64, newgame, newgame2)
+    buttonBackChar = new Button(257, 600, 256, 64, back, back)
+    buttonXP = new Button(1070, 242, 200, 64, XPButton, XPButton2)
+    buttonQuit = new Button(1070, 640, 200, 64, quit, quit)
+    buttonBackLVL = new Button(149, 606, 256, 64, back, back)
+    buttonCharity = new Button(149, 117, 256, 64, charity, charity2)
+    buttonDiligence = new Button(149, 187, 256, 64, diligence, diligence2)
+    buttonHumility = new Button(149, 257, 256, 64, humility, humility2)
+    buttonKindness = new Button(149, 327, 256, 64, kindness, kindness2)
+    buttonPatience = new Button(149, 397, 256, 64, patience, patience2)
+    buttonTemperance = new Button(149, 467, 256, 64, temperance, temperance2)
+    buttonZeal = new Button(149, 537, 256, 64, zeal, zeal2)
     
+    org.lwjgl.input.Keyboard.enableRepeatEvents(true)
     addLog("Your holy mission is to purify the world from evil.")
+    
+  }
+  
+  /** Method is called when we want to change the resolution. */
+  def changeResolution() = {
+    Display.setDisplayMode(getDisplayMode)
+    glViewport(0,0,getDisplayMode.getWidth,getDisplayMode.getHeight)
+    Display.setFullscreen(getFullscreen)
     
   }
   
@@ -142,55 +163,80 @@ object Output {
   /** Draw the character creation */
   def drawCharacterCreation() {
     glClear(GL_COLOR_BUFFER_BIT)
-    drawQuadTex(characterBackground, (width-characterBackground.getImageWidth)/2, 
-        (height-characterBackground.getImageHeight)/2, characterBackground.getImageWidth, characterBackground.getImageHeight)
+    drawQuadTex(emptyBackground, (getWidth-emptyBackground.getImageWidth)/2, 
+        (getHeight-emptyBackground.getImageHeight)/2, emptyBackground.getImageWidth, emptyBackground.getImageHeight)
     if (font.getWidth(getPlayer.name) >= 200) {
-      font.drawString(width/2-font.getWidth("Name is too long")/2, height*5/9, "Name is too long", Color.red)
-      drawQuadTex(newgame2, width*23/24-newgame2.getImageWidth+54, height*7/10, newgame2.getImageWidth, newgame2.getImageHeight)
+      font.drawString(getWidth/2-font.getWidth("Name is too long")/2, getHeight*5/9, "Name is too long", Color.red)
+      drawQuadTex(buttonNewGameChar.tex2, buttonNewGameChar.getDrawX, buttonNewGameChar.getDrawY, buttonNewGameChar.tex2.getImageWidth, buttonNewGameChar.tex2.getImageHeight)
     }
-    else drawQuadTex(newgame, width*5/8, height*7/10, newgame.getImageWidth, newgame.getImageHeight)
-    drawQuadTex(back, width*3/8-back.getImageWidth+34, height*7/10, back.getImageWidth, back.getImageHeight)
-    fontMenu.drawString(width/2-fontMenu.getWidth("Enter name:")/2, height*3/9, "Enter name:", Color.black)
-    font.drawString(width/2-font.getWidth(getPlayer.name)/2, height*4/9, getPlayer.name, Color.black)
-    font.drawString(2, height - 24, "Mouse X: " + Mouse.getX.toString, Color.red)
-    font.drawString(130, height - 24, "Y: " + (height - Mouse.getY).toString, Color.red)
+    else drawQuadTex(buttonNewGameChar.tex, buttonNewGameChar.getDrawX, buttonNewGameChar.getDrawY, buttonNewGameChar.tex.getImageWidth, buttonNewGameChar.tex.getImageHeight)
+    drawQuadTex(buttonBackChar.tex, buttonBackChar.getDrawX, buttonBackChar.getDrawY, buttonBackChar.tex.getImageWidth, buttonBackChar.tex.getImageHeight)
+    fontMenu.drawString(getWidth/2-fontMenu.getWidth("Enter name:")/2, getHeight*3/9, "Enter name:", Color.black)
+    font.drawString(getWidth/2-font.getWidth(getPlayer.name)/2, getHeight*4/9, getPlayer.name, Color.black)
+    font.drawString(2, getHeight - 24, "Mouse X: " + Mouse.getX.toString, Color.red)
+    font.drawString(130, getHeight - 24, "Y: " + (getHeight - Mouse.getY).toString, Color.red)
+  }
+  
+  /** Draw options */
+  def drawOptions() {
+    glClear(GL_COLOR_BUFFER_BIT)
+    drawQuadTex(emptyBackground, (getWidth-emptyBackground.getImageWidth)/2, 
+        (getHeight-emptyBackground.getImageHeight)/2, emptyBackground.getImageWidth, emptyBackground.getImageHeight)
+    val text = "Resolution: " + getDisplayMode.getWidth + "x" + getDisplayMode.getHeight
+    font.drawString(getWidth/2-font.getWidth(text)/2, getHeight/3, text, Color.black)
+    val text1 = "Up and down to change resolution."
+    font.drawString(getWidth/2-font.getWidth(text1)/2, getHeight/3+25, text1, Color.black)
+    val text2 = "ALT+ENTER to change to fullscreen."
+    font.drawString(getWidth/2-font.getWidth(text2)/2, getHeight/3+50, text2, Color.black)
+    val text3 = "Escape to go back."
+    font.drawString(getWidth/2-font.getWidth(text3)/2, getHeight/3+75, text3, Color.black)
+    val text4 = "Recommended resolution: 1280x720."
+    font.drawString(getWidth/2-font.getWidth(text4)/2, getHeight/3+100, text4, Color.black)
   }
   
   /** Draw the main menu */
   def drawMainMenu() {
     glClear(GL_COLOR_BUFFER_BIT)
-    drawQuadTex(background, (width-background.getImageWidth)/2, 
-        (height-background.getImageHeight)/2, background.getImageWidth, background.getImageHeight)
-    if (new File("save.dat").exists) drawQuadTex(continue, width*17/24, height*1/6, continue.getImageWidth, continue.getImageHeight)
-    else drawQuadTex(continue2, width*17/24, height*1/6, continue2.getImageWidth, continue2.getImageHeight)
-    drawQuadTex(newgame, width*17/24, height*1/6+100, newgame.getImageWidth, newgame.getImageHeight)
-    drawQuadTex(exit, width*17/24, height*1/6+200, exit.getImageWidth, exit.getImageHeight)
-    fontMenu.drawString(920, height/10, "Crusader", Color.black)        
-    font.drawString(2, height - 24, "Mouse X: " + Mouse.getX.toString, Color.red)
-    font.drawString(130, height - 24, "Y: " + (height - Mouse.getY).toString, Color.red)
+    drawQuadTex(background, (getWidth-background.getImageWidth)/2, 
+        (getHeight-background.getImageHeight)/2, background.getImageWidth, background.getImageHeight)
+    if (new File("save.dat").exists) drawQuadTex(buttonContinue.tex, buttonContinue.getDrawX.toInt, 
+        buttonContinue.getDrawY.toInt, buttonContinue.tex.getImageWidth, buttonContinue.tex.getImageHeight)
+    else drawQuadTex(buttonContinue.tex2, buttonContinue.getDrawX, buttonContinue.getDrawY, 
+        buttonContinue.tex2.getImageWidth, buttonContinue.tex2.getImageHeight)
+    drawQuadTex(buttonNewGameMenu.tex, buttonNewGameMenu.getDrawX, buttonNewGameMenu.getDrawY, 
+        buttonNewGameMenu.tex.getImageWidth, buttonNewGameMenu.tex.getImageHeight)
+    drawQuadTex(buttonOptions.tex, buttonOptions.getDrawX, buttonOptions.getDrawY, 
+        buttonOptions.tex.getImageWidth, buttonOptions.tex.getImageHeight)
+    drawQuadTex(buttonCredits.tex, buttonCredits.getDrawX, buttonCredits.getDrawY, 
+        buttonCredits.tex.getImageWidth, buttonCredits.tex.getImageHeight)
+    drawQuadTex(buttonExit.tex, buttonExit.getDrawX, buttonExit.getDrawY, 
+        buttonExit.tex.getImageWidth, buttonExit.tex.getImageHeight)
+    fontMenu.drawString(920, getHeight/10, "Crusader", Color.black)        
+    font.drawString(2, getHeight - 24, "Mouse X: " + Mouse.getX.toString, Color.red)
+    font.drawString(130, getHeight - 24, "Y: " + (getHeight - Mouse.getY).toString, Color.red)
   }
   
   /** Draw game screen */
   def drawGame() {
     mouseXCoord = (Mouse.getX * 1.0 / 32 + getPlayer.getX - 16).toInt
-    mouseYCoord = ((height - Mouse.getY) * 1.0 / 32 + getPlayer.getY - 8).toInt
+    mouseYCoord = ((getHeight - Mouse.getY) * 1.0 / 32 + getPlayer.getY - 8).toInt
     glClear(GL_COLOR_BUFFER_BIT)
-    drawQuadTex(tempUIBackground2, (width-tempUIBackground2.getImageWidth)/2, 
-        (height-tempUIBackground2.getImageHeight)/2, tempUIBackground2.getImageWidth, tempUIBackground2.getImageHeight)
+    drawQuadTex(tempUIBackground2, (getWidth-tempUIBackground2.getImageWidth)/2, 
+        (getHeight-tempUIBackground2.getImageHeight)/2, tempUIBackground2.getImageWidth, tempUIBackground2.getImageHeight)
     drawTiles
     drawSideBar
     drawLog
     drawFog
-    font.drawString(2, height - 245, "Mouse X: " + mouseXCoord.toString, Color.red)
-    font.drawString(130, height - 245, "Y: " + mouseYCoord.toString, Color.red)
-    font.drawString(2, height - 225, "Mouse X: " + Mouse.getX.toString, Color.red)
-    font.drawString(130, height - 225, "Y: " + (height - Mouse.getY).toString, Color.red)
-    font.drawString(2, height - 205, "Version: " + version, Color.white)
-    font.drawString(900, height - 205, "Episode: " + getEpisode, Color.white)
-    font.drawString(990, height - 205, "Level: " + getLevel, Color.white)
+    font.drawString(2, getHeight - 245, "Mouse X: " + mouseXCoord.toString, Color.red)
+    font.drawString(130, getHeight - 245, "Y: " + mouseYCoord.toString, Color.red)
+    font.drawString(2, getHeight - 225, "Mouse X: " + Mouse.getX.toString, Color.red)
+    font.drawString(130, getHeight - 225, "Y: " + (getHeight - Mouse.getY).toString, Color.red)
+    font.drawString(2, getHeight - 205, "Version: " + getVersion, Color.white)
+    font.drawString(900, getHeight - 205, "Episode: " + getEpisode, Color.white)
+    font.drawString(990, getHeight - 205, "Level: " + getLevel, Color.white)
     val name = getPlayer.name + " " + getPlayer.title
     font.drawString(2, 2, name, Color.white)
-    if (Mouse.getX < 1057 && (height - Mouse.getY) < 545) drawInfoBox
+    if (Mouse.getX < 1057 && (getHeight - Mouse.getY) < 545) drawInfoBox
     if (getGameState == GameState.LEVEL) drawLevel
     if (getLastMonster != null) {
       drawQuadTex(blackBorder, 33*32/2-204, 2, 408, 4)
@@ -222,13 +268,13 @@ object Output {
     var num: Int = 0
     for (line <- tempLog.reverse) {
       num += 1
-      font.drawString(10, height - 20 - num * 20, line, Color.black)
+      font.drawString(10, getHeight - 20 - num * 20, line, Color.black)
     }
   }
   
   /** Draw sidebar to right of the screen */
   def drawSideBar() {
-    val middle = 33*32 + (width - 33*32)/2
+    val middle = 33*32 + (getWidth - 33*32)/2
     var h = 0
     
     var HPHeight = getPlayer.health / getPlayer.maxHealth
@@ -243,8 +289,9 @@ object Output {
     drawQuadTex(XPBar, middle-XP.getImageWidth/2+40, 186, 
         ((XP.getImageWidth-80)*XPWidth).toInt, XP.getImageHeight-134)
     
-    drawQuadTex(tempUIBackground, (width-tempUIBackground.getImageWidth)/2, 
-        (height-tempUIBackground.getImageHeight)/2, tempUIBackground.getImageWidth, tempUIBackground.getImageHeight)
+    drawQuadTex(tempUIBackground, (getWidth-tempUIBackground.getImageWidth)/2, 
+        (getHeight-tempUIBackground.getImageHeight)/2, tempUIBackground.getImageWidth, 
+        tempUIBackground.getImageHeight)
     
     h -= 25
     drawQuadTex(heart, middle-heart.getImageWidth/2, h, heart.getImageWidth, heart.getImageHeight)
@@ -261,10 +308,10 @@ object Output {
     font.drawString(middle-font.getWidth(xptext)/2, h, xptext, Color.black)
     
     if (getPlayer.experience >= getPlayer.smallestLevel) 
-      drawQuadTex(XPButton, middle-XPButton.getImageWidth/2, 194-48, XPButton.getImageWidth, 
-          XPButton.getImageHeight)
-    else drawQuadTex(XPButton2, middle-XPButton2.getImageWidth/2, 194-48, XPButton2.getImageWidth, 
-        XPButton2.getImageHeight)
+      drawQuadTex(buttonXP.tex, buttonXP.getDrawX, buttonXP.getDrawY, buttonXP.tex.getImageWidth, 
+          buttonXP.tex.getImageHeight)
+    else drawQuadTex(buttonXP.tex2, buttonXP.getDrawX, buttonXP.getDrawY, 
+        buttonXP.tex2.getImageWidth, buttonXP.tex2.getImageHeight)
         
     h += 150
     if (getPlayer.slotWeapon != null) drawQuadTex(getPlayer.slotWeapon.image, 
@@ -301,7 +348,7 @@ object Output {
     font.drawString(middle-80, h, piety, Color.black)
     
     h += 40
-    drawQuadTex(quit, middle-quit.getImageWidth/2, h, quit.getImageWidth, quit.getImageHeight)
+    drawQuadTex(buttonQuit.tex, buttonQuit.getDrawX, buttonQuit.getDrawY, buttonQuit.tex.getImageWidth, buttonQuit.tex.getImageHeight)
   }
   
   /** Draws Tiles */
@@ -342,100 +389,60 @@ object Output {
   
   /** Draw the character level up screen */
   def drawLevel {
-    drawQuadTex(tempLevelBackground, (width-tempLevelBackground.getImageWidth)/2, 
-        (height-tempLevelBackground.getImageHeight)/2, tempLevelBackground.getImageWidth, 
+    drawQuadTex(tempLevelBackground, (getWidth-tempLevelBackground.getImageWidth)/2, 
+        (getHeight-tempLevelBackground.getImageHeight)/2, tempLevelBackground.getImageWidth, 
         tempLevelBackground.getImageHeight)
     val title = "Choose level:"
     var h = 20
     var v = 150
+    
     fontMenu.drawString(v, 35, title, Color.black)
-    if (getPlayer.experience >= xpNeededForLevel(getPlayer.zeal)) 
-      drawQuadTex(zeal, v, h, zeal.getImageWidth, zeal.getImageHeight)
-    else drawQuadTex(zeal2, v, h, zeal2.getImageWidth, zeal2.getImageHeight)
-    h += 70
-    if (getPlayer.experience >= xpNeededForLevel(getPlayer.humility)) 
-      drawQuadTex(humility, v, h, humility.getImageWidth, humility.getImageHeight)
-    else drawQuadTex(humility2, v, h, humility2.getImageWidth, humility2.getImageHeight)
-    h += 70
-    if (getPlayer.experience >= xpNeededForLevel(getPlayer.temperance)) 
-      drawQuadTex(temperance, v, h, temperance.getImageWidth, temperance.getImageHeight)
-    else drawQuadTex(temperance2, v, h, temperance2.getImageWidth, temperance2.getImageHeight)
-    h += 70
-    if (getPlayer.experience >= xpNeededForLevel(getPlayer.kindness)) 
-      drawQuadTex(kindness, v, h, kindness.getImageWidth, kindness.getImageHeight)
-    else drawQuadTex(kindness2, v, h, kindness2.getImageWidth, kindness2.getImageHeight)
-    h += 70
-    if (getPlayer.experience >= xpNeededForLevel(getPlayer.patience)) 
-      drawQuadTex(patience, v, h, patience.getImageWidth, patience.getImageHeight)
-    else drawQuadTex(patience2, v, h, patience2.getImageWidth, patience2.getImageHeight)
-    h += 70
     if (getPlayer.experience >= xpNeededForLevel(getPlayer.charity)) 
-      drawQuadTex(charity, v, h, charity.getImageWidth, charity.getImageHeight)
-    else drawQuadTex(charity2, v, h, charity2.getImageWidth, charity2.getImageHeight)
+      drawQuadTex(buttonCharity.tex, buttonCharity.getDrawX, buttonCharity.getDrawY, 
+          buttonCharity.tex.getImageWidth, buttonCharity.tex.getImageHeight)
+    else drawQuadTex(buttonCharity.tex2, buttonCharity.getDrawX, buttonCharity.getDrawY, 
+        buttonCharity.tex2.getImageWidth, buttonCharity.tex2.getImageHeight)
     h += 70
     if (getPlayer.experience >= xpNeededForLevel(getPlayer.diligence)) 
-      drawQuadTex(diligence, v, h, diligence.getImageWidth, diligence.getImageHeight)
-    else drawQuadTex(diligence2, v, h, diligence2.getImageWidth, diligence2.getImageHeight)
+      drawQuadTex(buttonDiligence.tex, buttonDiligence.getDrawX, buttonDiligence.getDrawY, 
+          buttonDiligence.tex.getImageWidth, buttonDiligence.tex2.getImageHeight)
+    else drawQuadTex(buttonDiligence.tex2, buttonDiligence.getDrawX, buttonDiligence.getDrawY, 
+        buttonDiligence.tex2.getImageWidth, buttonDiligence.tex2.getImageHeight)
     h += 70
-    drawQuadTex(back, v, h, back.getImageWidth, back.getImageHeight)
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.humility)) 
+      drawQuadTex(buttonHumility.tex, buttonHumility.getDrawX, buttonHumility.getDrawY, 
+          buttonHumility.tex.getImageWidth, buttonHumility.tex.getImageHeight)
+    else drawQuadTex(buttonHumility.tex2, buttonHumility.getDrawX, buttonHumility.getDrawY, 
+        buttonHumility.tex2.getImageWidth, buttonHumility.tex2.getImageHeight)
+    h += 70
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.kindness)) 
+      drawQuadTex(buttonKindness.tex, buttonKindness.getDrawX, buttonKindness.getDrawY, 
+          buttonKindness.tex.getImageWidth, buttonKindness.tex.getImageHeight)
+    else drawQuadTex(buttonKindness.tex2, buttonKindness.getDrawX, buttonKindness.getDrawY, 
+        buttonKindness.tex2.getImageWidth, buttonKindness.tex2.getImageHeight)
+    h += 70
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.patience)) 
+      drawQuadTex(buttonPatience.tex, buttonPatience.getDrawX, buttonPatience.getDrawY, 
+          buttonPatience.tex.getImageWidth, buttonPatience.tex.getImageHeight)
+    else drawQuadTex(buttonPatience.tex2, buttonPatience.getDrawX, buttonPatience.getDrawY, 
+        buttonPatience.tex2.getImageWidth, buttonPatience.tex2.getImageHeight)
+    h += 70
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.temperance)) 
+      drawQuadTex(buttonTemperance.tex, buttonTemperance.getDrawX, buttonTemperance.getDrawY, 
+          buttonTemperance.tex.getImageWidth, buttonTemperance.tex.getImageHeight)
+    else drawQuadTex(buttonTemperance.tex2, buttonTemperance.getDrawX, buttonTemperance.getDrawY, 
+        buttonTemperance.tex2.getImageWidth, buttonTemperance.tex2.getImageHeight)
+    h += 70
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.zeal)) 
+      drawQuadTex(buttonZeal.tex, buttonZeal.getDrawX, buttonZeal.getDrawY, 
+          buttonZeal.tex.getImageWidth, buttonZeal.tex.getImageHeight)
+    else drawQuadTex(buttonZeal.tex2, buttonZeal.getDrawX, buttonZeal.getDrawY, 
+        buttonZeal.tex2.getImageWidth, buttonZeal.tex2.getImageHeight)
+    h += 70
+    drawQuadTex(buttonBackLVL.tex, buttonBackLVL.getDrawX, buttonBackLVL.getDrawY, 
+        buttonBackLVL.tex.getImageWidth, buttonBackLVL.tex.getImageHeight)
     
     h = 128
-    v = 400
-    
-    for (lev <- Range(0,10)) {
-      v += 16
-      if (lev + 1 <= getPlayer.zeal) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
-      else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
-    }
-    v += 32
-    font.drawString(v, h, "Costs: " + xpNeededForLevel(getPlayer.zeal), Color.black)
-    v += 128
-    font.drawString(v, h, "Zeal increases damage.", Color.black)
-    h += 70
-    v = 400
-    for (lev <- Range(0,10)) {
-      v += 16
-      if (lev + 1 <= getPlayer.humility) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
-      else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
-    }
-    v += 32
-    font.drawString(v, h, "Costs: " + xpNeededForLevel(getPlayer.humility), Color.black)
-    v += 128
-    font.drawString(v, h, "Humility increases dodge chance.", Color.black)
-    h += 70
-    v = 400
-    for (lev <- Range(0,10)) {
-      v += 16
-      if (lev + 1 <= getPlayer.temperance) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
-      else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
-    }
-    v += 32
-    font.drawString(v, h, "Costs: " + xpNeededForLevel(getPlayer.temperance), Color.black)
-    v += 128
-    font.drawString(v, h, "Temperance increases accuracy.", Color.black)
-    h += 70
-    v = 400
-    for (lev <- Range(0,10)) {
-      v += 16
-      if (lev + 1 <= getPlayer.kindness) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
-      else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
-    }
-    v += 32
-    font.drawString(v, h, "Costs: " + xpNeededForLevel(getPlayer.kindness), Color.black)
-    v += 128
-    font.drawString(v, h, "Kindness increases maximum health.", Color.black)
-    h += 70
-    v = 400
-    for (lev <- Range(0,10)) {
-      v += 16
-      if (lev + 1 <= getPlayer.patience) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
-      else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
-    }
-    v += 32
-    font.drawString(v, h, "Costs: " + xpNeededForLevel(getPlayer.patience), Color.black)
-    v += 128
-    font.drawString(v, h, "Patience increases weight limit.", Color.black)
-    h += 70
     v = 400
     for (lev <- Range(0,10)) {
       v += 16
@@ -443,7 +450,7 @@ object Output {
       else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
     }
     v += 32
-    font.drawString(v, h, "Costs: " + xpNeededForLevel(getPlayer.charity), Color.black)
+    font.drawString(v, h, if (getPlayer.charity < 10) "Costs: " + xpNeededForLevel(getPlayer.charity) else "", Color.black)
     v += 128
     font.drawString(v, h, "Charity increases piety gain.", Color.black)
     h += 70
@@ -454,10 +461,64 @@ object Output {
       else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
     }
     v += 32
-    font.drawString(v, h, "Costs: " + xpNeededForLevel(getPlayer.diligence), Color.black)
+    font.drawString(v, h, if (getPlayer.diligence < 10) "Costs: " + xpNeededForLevel(getPlayer.diligence) else "", Color.black)
     v += 128
     font.drawString(v, h, "Diligence increases gold and xp gain.", Color.black)
-    
+    h += 70
+    v = 400
+    for (lev <- Range(0,10)) {
+      v += 16
+      if (lev + 1 <= getPlayer.humility) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
+      else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
+    }
+    v += 32
+    font.drawString(v, h, if (getPlayer.humility < 10) "Costs: " + xpNeededForLevel(getPlayer.humility) else "", Color.black)
+    v += 128
+    font.drawString(v, h, "Humility increases dodge chance.", Color.black)
+    h += 70
+    v = 400
+    for (lev <- Range(0,10)) {
+      v += 16
+      if (lev + 1 <= getPlayer.kindness) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
+      else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
+    }
+    v += 32
+    font.drawString(v, h, if (getPlayer.kindness < 10) "Costs: " + xpNeededForLevel(getPlayer.kindness) else "", Color.black)
+    v += 128
+    font.drawString(v, h, "Kindness increases maximum health.", Color.black)
+    h += 70
+    v = 400
+    for (lev <- Range(0,10)) {
+      v += 16
+      if (lev + 1 <= getPlayer.patience) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
+      else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
+    }
+    v += 32
+    font.drawString(v, h, if (getPlayer.patience < 10) "Costs: " + xpNeededForLevel(getPlayer.patience) else "", Color.black)
+    v += 128
+    font.drawString(v, h, "Patience increases weight limit.", Color.black)
+    h += 70
+    v = 400
+    for (lev <- Range(0,10)) {
+      v += 16
+      if (lev + 1 <= getPlayer.temperance) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
+      else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
+    }
+    v += 32
+    font.drawString(v, h, if (getPlayer.temperance < 10) "Costs: " + xpNeededForLevel(getPlayer.temperance) else "", Color.black)
+    v += 128
+    font.drawString(v, h, "Temperance increases accuracy.", Color.black)
+    h += 70
+    v = 400
+    for (lev <- Range(0,10)) {
+      v += 16
+      if (lev + 1 <= getPlayer.zeal) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
+      else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
+    }
+    v += 32
+    font.drawString(v, h, if (getPlayer.zeal < 10) "Costs: " + xpNeededForLevel(getPlayer.zeal) else "", Color.black)
+    v += 128
+    font.drawString(v, h, "Zeal increases damage.", Color.black)
   }
   
 }

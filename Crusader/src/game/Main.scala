@@ -4,13 +4,13 @@ import scala.collection.mutable.Buffer
 import scala.util.Random
 
 import org.lwjgl.input.{Keyboard, Mouse}
-import org.lwjgl.opengl.Display
+import org.lwjgl.opengl.{Display, DisplayMode}
 
 import Helpers._
 import Direction._
 import GameState._
 import Effect._
-import Output.{drawCharacterCreation, drawGame, drawMainMenu, startDisplay}
+import Output._
 import MonsterType.levelChance
 
 import java.io._
@@ -34,17 +34,47 @@ object Main {
   private var monsterChances = Map[MonsterType.Monster, Int]()
   private var itemChances = Map[ItemType.Item, Int]()
   private var shopVisited = false
-  
-  private var frameRate: Int = 60
-  private var height: Int = 720
-  private var width: Int = 1280
-  private var version: String = "alpha 0.01"
-  
   private var player: Player = null
   private var grid: Grid = null
   private var episode: Int = 1
   private var level: Int = 1
   private var turn: Int = 0
+  
+  private val bbp: Int = 32
+  private val frameRate: Int = 60
+  private val height: Int = 720
+  private val width: Int = 1280
+  private val version: Double = 0.1
+  private var displayModes = Array[DisplayMode]()
+  for (mode <- Display.getAvailableDisplayModes) 
+    if (mode.isFullscreenCapable && mode.getFrequency == frameRate && mode.getBitsPerPixel == bbp)
+      displayModes = displayModes :+ mode
+  displayModes = displayModes.sortWith(_.getHeight < _.getHeight)
+  displayModes = displayModes.sortWith(_.getWidth < _.getWidth)
+  private var displayModeSelector: Int = 0
+  do {
+    displayModeSelector += 1
+  }
+  while (getDisplayMode.getWidth < width)
+  private var fullscreen = false
+  
+  var buttonContinue: Button = null
+  var buttonNewGameMenu: Button = null
+  var buttonOptions: Button = null
+  var buttonCredits: Button = null
+  var buttonExit: Button = null
+  var buttonNewGameChar: Button = null
+  var buttonBackChar: Button = null
+  var buttonXP: Button = null
+  var buttonQuit: Button = null
+  var buttonBackLVL: Button = null
+  var buttonCharity: Button = null
+  var buttonDiligence: Button = null
+  var buttonHumility: Button = null
+  var buttonKindness: Button = null
+  var buttonPatience: Button = null
+  var buttonTemperance: Button = null
+  var buttonZeal: Button = null
   
   /** The program's main method.
     *
@@ -60,6 +90,10 @@ object Main {
         case g if (g == MAIN_MENU) => {
           menuKeys
           drawMainMenu
+        }
+        case g if (g == OPTIONS) => {
+          optionKeys
+          drawOptions
         }
         case g if (g == GAME) => {
           gameKeys
@@ -108,80 +142,79 @@ object Main {
   
   /** Follow user input when choosing new level */
   def levelKeys {
-    if (Mouse.isButtonDown(0) && Mouse.getX > 149 && Mouse.getX < 406 && !prevMouseState && 
-        (height - Mouse.getY) > 606 && (height - Mouse.getY) < 671) {
+    if (Mouse.isButtonDown(0) && buttonBackLVL.isMouseWithin(Mouse.getX, Mouse.getY)) {
       gameState = GAME
       while (Keyboard.next) {}
     }
     else if (player.health > 0) {
-      if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.zeal) && !prevMouseState && 
-          Mouse.getX > 149 && Mouse.getX < 406 && (height - Mouse.getY) > 117 && (height - Mouse.getY) < 181) {
-        player.experience -= xpNeededForLevel(player.zeal)
-        player.zeal += 1
-      }
-      else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.humility) && !prevMouseState && 
-          Mouse.getX > 149 && Mouse.getX < 406 && (height - Mouse.getY) > 187 && (height - Mouse.getY) < 251) {
-        player.experience -= xpNeededForLevel(player.humility)
-        player.humility += 1
-      }
-      else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.temperance) && !prevMouseState && 
-          Mouse.getX > 149 && Mouse.getX < 406 && (height - Mouse.getY) > 257 && (height - Mouse.getY) < 321) {
-        player.experience -= xpNeededForLevel(player.temperance)
-        player.temperance += 1
-      }
-      else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.kindness) && !prevMouseState && 
-          Mouse.getX > 149 && Mouse.getX < 406 && (height - Mouse.getY) > 327 && (height - Mouse.getY) < 391) {
-        player.experience -= xpNeededForLevel(player.kindness)
-        player.kindness += 1
-      }
-      else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.patience) && !prevMouseState && 
-          Mouse.getX > 149 && Mouse.getX < 406 && (height - Mouse.getY) > 397 && (height - Mouse.getY) < 461) {
-        player.experience -= xpNeededForLevel(player.patience)
-        player.patience += 1
-      }
-      else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.charity) && !prevMouseState && 
-          Mouse.getX > 149 && Mouse.getX < 406 && (height - Mouse.getY) > 467 && (height - Mouse.getY) < 531) {
+      if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.charity) && 
+          player.charity < 10 && !prevMouseState && buttonCharity.isMouseWithin(Mouse.getX, Mouse.getY)) {
         player.experience -= xpNeededForLevel(player.charity)
         player.charity += 1
-      }
-      else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.diligence) && !prevMouseState && 
-          Mouse.getX > 149 && Mouse.getX < 406 && (height - Mouse.getY) > 537 && (height - Mouse.getY) < 601) {
+      } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.diligence) && 
+          player.diligence < 10 && !prevMouseState && buttonDiligence.isMouseWithin(Mouse.getX, Mouse.getY)) {
         player.experience -= xpNeededForLevel(player.diligence)
         player.diligence += 1
-      }
-      else while (Keyboard.next) {
+      } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.humility) && 
+          player.humility < 10 && !prevMouseState && buttonHumility.isMouseWithin(Mouse.getX, Mouse.getY)) {
+        player.experience -= xpNeededForLevel(player.humility)
+        player.humility += 1
+      } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.kindness) && 
+          player.kindness < 10 && !prevMouseState && buttonKindness.isMouseWithin(Mouse.getX, Mouse.getY)) {
+        player.experience -= xpNeededForLevel(player.kindness)
+        player.kindness += 1
+      } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.patience) && 
+          player.patience < 10 && !prevMouseState && buttonPatience.isMouseWithin(Mouse.getX, Mouse.getY)) {
+        player.experience -= xpNeededForLevel(player.patience)
+        player.patience += 1
+      } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.temperance) && 
+          player.temperance < 10 && !prevMouseState && buttonTemperance.isMouseWithin(Mouse.getX, Mouse.getY)) {
+        player.experience -= xpNeededForLevel(player.temperance)
+        player.temperance += 1
+      } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.zeal) && 
+          player.zeal < 10 && !prevMouseState && buttonZeal.isMouseWithin(Mouse.getX, Mouse.getY)) {
+        player.experience -= xpNeededForLevel(player.zeal)
+        player.zeal += 1
+      } else while (Keyboard.next) {
         Keyboard.getEventKey match {
           case k if (k == Keyboard.KEY_Q && Keyboard.getEventKeyState) => {
             gameState = GAME
             while (Keyboard.next) {} 
           }
-          case k if (k == Keyboard.KEY_1 && Keyboard.getEventKeyState) => {
-            player.experience -= xpNeededForLevel(player.zeal)
-            player.zeal += 1
-          }
-          case k if (k == Keyboard.KEY_2 && Keyboard.getEventKeyState) => {
-            player.experience -= xpNeededForLevel(player.humility)
-            player.humility += 1
-          }
-          case k if (k == Keyboard.KEY_3 && Keyboard.getEventKeyState) => {
-            player.experience -= xpNeededForLevel(player.temperance)
-            player.temperance += 1
-          }
-          case k if (k == Keyboard.KEY_4 && Keyboard.getEventKeyState) => {
-            player.experience -= xpNeededForLevel(player.kindness)
-            player.kindness += 1
-          }
-          case k if (k == Keyboard.KEY_5 && Keyboard.getEventKeyState) => {
-            player.experience -= xpNeededForLevel(player.patience)
-            player.patience += 1
-          }
-          case k if (k == Keyboard.KEY_6 && Keyboard.getEventKeyState) => {
+          case k if (k == Keyboard.KEY_1 && Keyboard.getEventKeyState && 
+              player.experience >= xpNeededForLevel(player.charity) && player.charity < 10) => {
             player.experience -= xpNeededForLevel(player.charity)
             player.charity += 1
           }
-          case k if (k == Keyboard.KEY_7 && Keyboard.getEventKeyState) => {
+          case k if (k == Keyboard.KEY_2 && Keyboard.getEventKeyState && 
+              player.experience >= xpNeededForLevel(player.diligence) && player.diligence < 10) => {
             player.experience -= xpNeededForLevel(player.diligence)
             player.diligence += 1
+          }
+          case k if (k == Keyboard.KEY_3 && Keyboard.getEventKeyState && 
+              player.experience >= xpNeededForLevel(player.humility) && player.humility < 10) => {
+            player.experience -= xpNeededForLevel(player.humility)
+            player.humility += 1
+          }
+          case k if (k == Keyboard.KEY_4 && Keyboard.getEventKeyState && 
+              player.experience >= xpNeededForLevel(player.kindness) && player.kindness < 10) => {
+            player.experience -= xpNeededForLevel(player.kindness)
+            player.kindness += 1
+          }
+          case k if (k == Keyboard.KEY_5 && Keyboard.getEventKeyState && 
+              player.experience >= xpNeededForLevel(player.patience) && player.patience < 10) => {
+            player.experience -= xpNeededForLevel(player.patience)
+            player.patience += 1
+          }
+          case k if (k == Keyboard.KEY_6 && Keyboard.getEventKeyState && 
+              player.experience >= xpNeededForLevel(player.temperance) && player.temperance < 10) => {
+            player.experience -= xpNeededForLevel(player.temperance)
+            player.temperance += 1
+          }
+          case k if (k == Keyboard.KEY_7 && Keyboard.getEventKeyState && 
+              player.experience >= xpNeededForLevel(player.zeal) && player.zeal < 10) => {
+            player.experience -= xpNeededForLevel(player.zeal)
+            player.zeal += 1
           }
           case _ => {}
         }
@@ -192,15 +225,13 @@ object Main {
   
   /** Follow user input when creating new character */
   def characterKeys {
-    if ((Mouse.isButtonDown(0) && Mouse.getX > 799 && Mouse.getX < 1056 && 
-        (height - Mouse.getY) > 600 && (height - Mouse.getY) < 665) && player.name != "" && 
+    if (Mouse.isButtonDown(0) && buttonNewGameChar.isMouseWithin(Mouse.getX, Mouse.getY) && player.name != "" && 
         Output.font.getWidth(getPlayer.name) < 200) {
           gameState = GAME
           while (Keyboard.next) {}
           newGame
     }
-    else if ((Mouse.isButtonDown(0) && Mouse.getX > 257 && Mouse.getX < 514 && 
-        (height - Mouse.getY) > 600 && (height - Mouse.getY) < 665)) {
+    else if (Mouse.isButtonDown(0) && buttonBackChar.isMouseWithin(Mouse.getX, Mouse.getY)) {
       gameState = MAIN_MENU
       while (Keyboard.next) {}
     }
@@ -225,40 +256,76 @@ object Main {
     }
   }
   
+  /** Follow user input in options */
+  def optionKeys {
+    while (Keyboard.next) {
+      Keyboard.getEventKey match {
+        case k if (k == Keyboard.KEY_UP && Keyboard.getEventKeyState) => {
+          displayModeSelector -= 1
+          if (displayModeSelector < 0) displayModeSelector = displayModes.size - 1
+          changeResolution
+        }
+        case k if (k == Keyboard.KEY_DOWN && Keyboard.getEventKeyState) => {
+          displayModeSelector += 1
+          if (displayModeSelector > displayModes.size - 1) displayModeSelector = 0
+          changeResolution
+        }
+        case k if (Keyboard.isKeyDown(56) && k == Keyboard.KEY_RETURN && Keyboard.getEventKeyState) => {
+          fullscreen = !fullscreen
+          changeResolution
+        }
+        case k if (k == Keyboard.KEY_ESCAPE && Keyboard.getEventKeyState) => {
+          gameState = MAIN_MENU
+          while (Keyboard.next) {}
+        }
+        case _ => {}
+      }
+    }
+  }
+  
   /** Follow user input in menu */
   def menuKeys {
-    if ((Mouse.isButtonDown(0) && Mouse.getX > 905 && Mouse.getX < 1162 && 
-        (height - Mouse.getY) > 316 && (height - Mouse.getY) < 381) || 
-        Keyboard.isKeyDown(Keyboard.KEY_N)) {
+    if ((Mouse.isButtonDown(0) && buttonNewGameMenu.isMouseWithin(Mouse.getX, Mouse.getY))) {
       gameState = CHARACTER_CREATION
       while (Keyboard.next) {}
       player = new Player(player.name, 0, 0)
-    }
-    else if ((Mouse.isButtonDown(0) && Mouse.getX > 905 && Mouse.getX < 1162 && 
-        (height - Mouse.getY) > 416 && (height - Mouse.getY) < 481) || 
+    } else if ((Mouse.isButtonDown(0) && buttonExit.isMouseWithin(Mouse.getX, Mouse.getY)) || 
         Keyboard.isKeyDown(Keyboard.KEY_Q)) {
       Display.destroy()
       System.exit(0)
-    }
-    else if ((Mouse.isButtonDown(0) && Mouse.getX > 905 && Mouse.getX < 1162 && 
-        (height - Mouse.getY) > 216 && (height - Mouse.getY) < 281) || 
+    } else if ((Mouse.isButtonDown(0) && buttonContinue.isMouseWithin(Mouse.getX, Mouse.getY)) || 
         Keyboard.isKeyDown(Keyboard.KEY_Q)) {
       if (new File("save.dat").exists && loadGame) {
         gameState = GAME
         while (Keyboard.next) {}
+      }
+    } else if ((Mouse.isButtonDown(0) && buttonOptions.isMouseWithin(Mouse.getX, Mouse.getY))) {
+      gameState = OPTIONS
+      while (Keyboard.next) {}
+    } else if ((Mouse.isButtonDown(0) && buttonCredits.isMouseWithin(Mouse.getX, Mouse.getY))) {
+      println("Credits: Antti (Roskis) Karkinen")
+    } else {
+      while (Keyboard.next) {
+        Keyboard.getEventKey match {
+          case k if (k == Keyboard.KEY_N && Keyboard.getEventKeyState) => {
+            gameState = CHARACTER_CREATION
+            while (Keyboard.next) {}
+            player = new Player(player.name, 0, 0)
+          }
+          case _ => {}
+        }
       }
     }
   }
   
   /** Follow user input in game */
   def gameKeys {
-    if (Mouse.isButtonDown(0) && getPlayer.experience >= getPlayer.smallestLevel && Mouse.getX > 1080 &&
-        Mouse.getX < 1255 && (height - Mouse.getY) > 242 && (height - Mouse.getY) < 307) {
+    if (Mouse.isButtonDown(0) && getPlayer.experience >= getPlayer.smallestLevel && 
+        buttonXP.isMouseWithin(Mouse.getX, Mouse.getY)) {
       gameState = LEVEL
       while (Keyboard.next) {}
     }
-    else if (Mouse.isButtonDown(0) && Mouse.getX > 1080 && Mouse.getX < 1255 && 
-        (height - Mouse.getY) > 640 && (height - Mouse.getY) < 705) {
+    else if (Mouse.isButtonDown(0) && buttonQuit.isMouseWithin(Mouse.getX, Mouse.getY)) {
       if (player.health > 0) saveGame
       gameState = MAIN_MENU
       while (Keyboard.next) {}
@@ -315,7 +382,8 @@ object Main {
             player.pray
             playTurn
           }
-          case k if (k == Keyboard.KEY_W && Keyboard.getEventKeyState && getPlayer.health > 0) => {
+          case k if ((k == Keyboard.KEY_W || k == Keyboard.KEY_NUMPAD5) && 
+              Keyboard.getEventKeyState && getPlayer.health > 0) => {
             playTurn
           }
           case k if (k == Keyboard.KEY_E && Keyboard.getEventKeyState && getPlayer.health > 0 && 
@@ -363,7 +431,7 @@ object Main {
   def saveGame = {
     val file = new ObjectOutputStream(new FileOutputStream("save.dat"))
     try {
-      file.writeUTF(version)
+      file.writeDouble(version)
       
       file.writeInt(turn)
       file.writeInt(level)
@@ -395,7 +463,7 @@ object Main {
     val file = new ObjectInputStream(new FileInputStream("save.dat"))
     var toRead: Int = 0
     try {
-      if (file.readUTF == version) {
+      if (file.readDouble == version) {
         turn = file.readInt
         level = file.readInt
         episode = file.readInt
@@ -439,6 +507,10 @@ object Main {
   def updateLastMonster(monster: Monster) = lastMonster = monster
   def visitShop = shopVisited = true 
   
+  /** Scale height and width when screenresolution is different. */
+  def widthScale() = {1.0*getDisplayMode.getWidth/getWidth}
+  def heightScale() = {1.0*getDisplayMode.getHeight/getHeight}
+  
   /** Get more good effects when piety is higher and more bad ones with negative piety */
   def getPrayerChances() = {
     var chances = Map(PARTIALRESTORATION -> 80, FULLRESTORATION -> 20, STAIRS -> 10, SMITE -> 10, 
@@ -475,5 +547,7 @@ object Main {
   def getItemChances() = itemChances
   def getLastMonster() = lastMonster
   def getShopVisited() = shopVisited
+  def getDisplayMode() = displayModes(displayModeSelector)
+  def getFullscreen() = fullscreen
   
 }

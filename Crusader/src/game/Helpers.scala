@@ -7,6 +7,21 @@ import java.io.{IOException, InputStream}
 import scala.collection.mutable.Buffer
 import Math.abs
 
+/** Basic button */
+class Button(val x: Int, val y: Int, val width: Int, val height: Int, val tex: Texture, val tex2: Texture) {
+  def getX = x*widthScale
+  def getY = y*heightScale
+  def getWidth = width*widthScale
+  def getHeight = height*heightScale
+  def getDrawX = x-(tex.getImageWidth-width)/2
+  def getDrawY = y-(tex.getImageHeight-height)/2
+  def isMouseWithin(mouseX: Int, mouseY: Int): Boolean = 
+    mouseX > getX && 
+    mouseX < getX+getWidth && 
+    (Main.getHeight * heightScale - mouseY) > getY && 
+    (Main.getHeight * heightScale - mouseY) < (getY+getHeight)
+}
+
 /** Simple coordinate system */
 class Coordinate(var x: Int, var y: Int) extends Serializable {
   /** Getters and setters for coordinates */
@@ -20,7 +35,7 @@ class Coordinate(var x: Int, var y: Int) extends Serializable {
 object GameState extends Enumeration {
 
   type GameState = Value
-  val GAME, MAIN_MENU, CHARACTER_CREATION, LEVEL = Value
+  val GAME, MAIN_MENU, CHARACTER_CREATION, LEVEL, OPTIONS, CREDITS = Value
 
 }
 
@@ -158,11 +173,13 @@ object Helpers {
     else loadTexture("Tiles/djinnWall3")
   }
   private val ibackground = loadTexture("tempBackground")
-  private val icharacterBackground = loadTexture("tempCharacterBackground")
+  private val iemptyBackground = loadTexture("tempEmptyBackground")
   private val icontinue = loadTexture("UI/Continue")
   private val icontinue2 = loadTexture("UI/Continue2")
   private val inewgame = loadTexture("UI/Newgame")
   private val inewgame2 = loadTexture("UI/Newgame2")
+  private val ioptions = loadTexture("UI/Options")
+  private val icredits = loadTexture("UI/Credits")
   private val iexit = loadTexture("UI/Exit")
   private val iback = loadTexture("UI/Back")
   private val iunseen = loadTexture("Tiles/unseen")
@@ -230,11 +247,13 @@ object Helpers {
   def tempDjinnFloor = itempDjinnFloor
   def tempDjinnWall = itempDjinnWall
   def background = ibackground
-  def characterBackground = icharacterBackground
+  def emptyBackground = iemptyBackground
   def continue = icontinue
   def continue2 = icontinue2
   def newgame = inewgame
   def newgame2 = inewgame2
+  def options = ioptions
+  def credits = icredits
   def exit = iexit
   def back = iback
   def unseen = iunseen
