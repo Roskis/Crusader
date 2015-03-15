@@ -96,16 +96,12 @@ class Grid() extends Serializable {
     addStairs
     addTrees(16)
     addRocks(4)
-    var coord: Coordinate = null
-    do coord = giveRandomNonBlockinCoordinates
-    while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || 
-        !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
-    addItem(coord)
     addMonsters(20)
+    makeSecret
     
-    var playerPosition = giveRandomNonBlockinCoordinates
+    var playerPosition = giveRandomFloor
     do {
-      playerPosition = giveRandomNonBlockinCoordinates
+      playerPosition = giveRandomFloor
       getPlayer.setX(playerPosition.getX)
       getPlayer.setY(playerPosition.getY)
     }
@@ -246,7 +242,7 @@ class Grid() extends Serializable {
     var tree: PassiveObject = null
     var coord: Coordinate = null
     for (n <- Range(0, num)) {
-      do coord = giveRandomNonBlockinCoordinates
+      do coord = giveRandomNonBlockingCoordinates
       while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || 
           !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
       if (rnd.nextInt(2) == 0 ) {
@@ -263,7 +259,7 @@ class Grid() extends Serializable {
     var rock: PassiveObject = null
     var coord: Coordinate = null
     for (n <- Range(0, num)) {
-      do coord = giveRandomNonBlockinCoordinates
+      do coord = giveRandomNonBlockingCoordinates
       while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || 
           !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
       rock = new PassiveObject("Rock", "TODO", coord.getX, coord.getY, if (rnd.nextInt(2) == 0) "Environment/rock1" else "Environment/rock2")
@@ -274,7 +270,7 @@ class Grid() extends Serializable {
   def addMonsters(num: Int) = {
     var coord: Coordinate = null
     for (n <- Range(0, num)) {
-      do coord = giveRandomNonBlockinCoordinates
+      do coord = giveRandomNonBlockingCoordinates
       while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || 
           !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
       new Monster(coord.getX, coord.getY, chooseRandomMonster(getMonsterChances))
@@ -287,7 +283,7 @@ class Grid() extends Serializable {
   /** Add altar */
   def addAltar() = {
     var coord: Coordinate = null
-    do coord = giveRandomNonBlockinCoordinates
+    do coord = giveRandomNonBlockingCoordinates
     while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
     altar.setX(coord.getX)
     altar.setY(coord.getY)
@@ -301,15 +297,25 @@ class Grid() extends Serializable {
   
   /** Add stairs */
   def addStairs() = {
-    var coord: Coordinate = new Coordinate(-100, -100)
+    val startTile = getTile(size-1, rnd.nextInt(size))
+    var boo = true
+    val tunnel = line(startTile, getTile(size/2, size/2))
+    var n = 0
+    var next = getTile(tunnel(n))
+    var current = startTile
+    var neigh = neighbors(startTile, 8)
     do {
-      coord = giveRandomNonBlockinCoordinates
-      stairs.setX(coord.getX)
-      stairs.setY(coord.getY)
+      boo = true
+      current = next
+      n+= 1
+      next = getTile(tunnel(n))
+      neigh = neighbors(next, 8)
+      neigh -= current
+      for (ne <- neigh) if (!ne.blockMovement) boo = false
     }
-    while ((stairs.getX > size/3 && stairs.getX < size*2/3) || (stairs.getY > size/3 && 
-        stairs.getY < size*2/3) || getTile(stairs.getX, stairs.getY).getType != TileType.FLOOR || 
-        !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
+    while (boo)
+    stairs.setX(next.getX)
+    stairs.setY(next.getY)
     setTile(stairs)
   }
   
@@ -325,6 +331,38 @@ class Grid() extends Serializable {
     stairs.setY(tile.getY)
     stairs.explored = true
     map(tile.getX)(tile.getY) = stairs
+  }
+  
+  /** Add secret to the level */
+  def makeSecret {
+    var boo = false
+    var secretTile = getTile(randomX, randomY)
+    var neigh = neighbors(secretTile, 8)
+    do {
+      boo = false
+      secretTile = getTile(randomX, randomY)
+      neigh = neighbors(secretTile, 8)
+      for (n <- neigh) if (!n.blockMovement) boo = true
+      }
+    while (boo)
+    val goto = giveRandomFloor
+    val tunnel = line(secretTile, goto)
+    var n = 0
+    var next = getTile(tunnel(n))
+    var current = secretTile
+    do {
+      boo = true
+      current = next
+      map(current.getX)(current.getY) = new Tile(current.getX, current.getY, TileType.FLOOR)
+      n+= 1
+      next = getTile(tunnel(n))
+      neigh = neighbors(next, 8)
+      neigh -= current
+      for (ne <- neigh) if (!ne.blockMovement) boo = false
+    }
+    while (boo)
+    map(next.getX)(next.getY) = new Tile(next.getX, next.getY, TileType.SECRETDOOR)
+    addItem(new Coordinate(secretTile.getX, secretTile.getY))
   }
   
   /** Returns the neighbors of given tile */
@@ -440,6 +478,9 @@ class Grid() extends Serializable {
   }
   
   /** Alternative line */
+  def line(tile1: Tile, tile2: Tile): Buffer[Coordinate] = line(new Coordinate(tile1.getX, tile1.getY), new Coordinate(tile2.getX, tile2.getY))
+  
+  /** Alternative line */
   def line(x1: Int, y1: Int, x2: Int, y2: Int): Buffer[Coordinate] = line(new Coordinate(x1, y1), new Coordinate(x2, y2))
   
   /** Uses Bresenham's Line Algorithm to calculate straight line between two coordinates.
@@ -492,7 +533,7 @@ class Grid() extends Serializable {
   }
   
   /** Returns random nonblocking coordinates */
-  def giveRandomNonBlockinCoordinates(): Coordinate = {
+  def giveRandomNonBlockingCoordinates(): Coordinate = {
     val tile = giveRandomNonBlockingTile
     new Coordinate(tile.getX, tile.getY)
   }
@@ -520,7 +561,7 @@ class Grid() extends Serializable {
       for (j <- Range(0,size)) {
         if (!map(i)(j).blockMovement) {
           map(i)(j).label = size*size+1
-          for (near <- neighbors(map(i)(j), 4)) {
+          for (near <- neighbors(map(i)(j), 8)) {
             if (near.label != 0 && near.label < map(i)(j).label) map(i)(j).label = near.label
             else if (near.label != 0 && near.label > map(i)(j).label) changeLabels(near.label, map(i)(j).label)
           }
@@ -540,7 +581,7 @@ class Grid() extends Serializable {
     for (n <- Range(0,size)) {
       for (m <- Range(0,size)) {
         if (map(n)(m).label == num) {
-          for (near <- neighbors(map(n)(m), 4)) 
+          for (near <- neighbors(map(n)(m), 8)) 
             if (near.label != 0 && near.label < map(n)(m).label) num2 = near.label
         }
       }

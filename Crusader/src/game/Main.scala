@@ -47,16 +47,12 @@ object Main {
   private val version: Double = 0.1
   private var displayModes = Array[DisplayMode]()
   for (mode <- Display.getAvailableDisplayModes) 
-    if (mode.isFullscreenCapable && mode.getFrequency == frameRate && mode.getBitsPerPixel == bbp)
+    if (mode.isFullscreenCapable && mode.getWidth == width && mode.getHeight == height && mode.getFrequency == frameRate)
       displayModes = displayModes :+ mode
-  displayModes = displayModes.sortWith(_.getHeight < _.getHeight)
-  displayModes = displayModes.sortWith(_.getWidth < _.getWidth)
+  displayModes = displayModes.sortWith(_.getBitsPerPixel > _.getBitsPerPixel)
+  displayModes = displayModes :+ new DisplayMode(width, height)
   private var displayModeSelector: Int = 0
-  do {
-    displayModeSelector += 1
-  }
-  while (getDisplayMode.getWidth < width)
-  private var fullscreen = false
+  private var fullscreen = getDisplayMode.isFullscreenCapable
   
   var buttonContinue: Button = null
   var buttonNewGameMenu: Button = null
@@ -260,16 +256,6 @@ object Main {
   def optionKeys {
     while (Keyboard.next) {
       Keyboard.getEventKey match {
-        case k if (k == Keyboard.KEY_UP && Keyboard.getEventKeyState) => {
-          displayModeSelector -= 1
-          if (displayModeSelector < 0) displayModeSelector = displayModes.size - 1
-          changeResolution
-        }
-        case k if (k == Keyboard.KEY_DOWN && Keyboard.getEventKeyState) => {
-          displayModeSelector += 1
-          if (displayModeSelector > displayModes.size - 1) displayModeSelector = 0
-          changeResolution
-        }
         case k if (Keyboard.isKeyDown(56) && k == Keyboard.KEY_RETURN && Keyboard.getEventKeyState) => {
           fullscreen = !fullscreen
           changeResolution
@@ -384,6 +370,7 @@ object Main {
           }
           case k if ((k == Keyboard.KEY_W || k == Keyboard.KEY_NUMPAD5 || k == 52) && 
               Keyboard.getEventKeyState && getPlayer.health > 0) => {
+            player.waitTurn
             playTurn
           }
           case k if (k == Keyboard.KEY_E && Keyboard.getEventKeyState && getPlayer.health > 0 && 
@@ -521,6 +508,7 @@ object Main {
       chances += (GOLDLOSS -> 100)
       chances += (LIGHTNINGBOLT -> 100)
     }
+    if (player.piety > 200) chances += (FULLRESTORATION -> 20)
     chances
   } 
   

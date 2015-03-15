@@ -182,16 +182,12 @@ object Output {
     glClear(GL_COLOR_BUFFER_BIT)
     drawQuadTex(emptyBackground, (getWidth-emptyBackground.getImageWidth)/2, 
         (getHeight-emptyBackground.getImageHeight)/2, emptyBackground.getImageWidth, emptyBackground.getImageHeight)
-    val text = "Resolution: " + getDisplayMode.getWidth + "x" + getDisplayMode.getHeight
-    font.drawString(getWidth/2-font.getWidth(text)/2, getHeight/3, text, Color.black)
-    val text1 = "Up and down to change resolution."
-    font.drawString(getWidth/2-font.getWidth(text1)/2, getHeight/3+25, text1, Color.black)
+    val text1 = "Resolution: " + getDisplayMode.getWidth + "x" + getDisplayMode.getHeight
+    font.drawString(getWidth/2-font.getWidth(text1)/2, getHeight/3, text1, Color.black)
     val text2 = "ALT+ENTER to change to fullscreen."
-    font.drawString(getWidth/2-font.getWidth(text2)/2, getHeight/3+50, text2, Color.black)
+    font.drawString(getWidth/2-font.getWidth(text2)/2, getHeight/3+25, text2, Color.black)
     val text3 = "Escape to go back."
-    font.drawString(getWidth/2-font.getWidth(text3)/2, getHeight/3+75, text3, Color.black)
-    val text4 = "Recommended resolution: 1280x720."
-    font.drawString(getWidth/2-font.getWidth(text4)/2, getHeight/3+100, text4, Color.black)
+    font.drawString(getWidth/2-font.getWidth(text3)/2, getHeight/3+50, text3, Color.black)
   }
   
   /** Draw the main menu */
@@ -232,10 +228,14 @@ object Output {
     font.drawString(2, getHeight - 225, "Mouse X: " + Mouse.getX.toString, Color.red)
     font.drawString(130, getHeight - 225, "Y: " + (getHeight - Mouse.getY).toString, Color.red)
     font.drawString(2, getHeight - 205, "Version: " + getVersion, Color.white)
-    font.drawString(900, getHeight - 205, "Episode: " + getEpisode, Color.white)
-    font.drawString(990, getHeight - 205, "Level: " + getLevel, Color.white)
+    val level = "Episode: " + getEpisode + " Level: " + getLevel
+    font.drawString(1046-font.getWidth(level), getHeight - 205, level, Color.white)
     val name = getPlayer.name + " " + getPlayer.title
     font.drawString(2, 2, name, Color.white)
+    val gold = "Gold: " + getPlayer.gold.toInt
+    font.drawString(1046-font.getWidth(gold), 2, gold, Color.white)
+    val piety = "Piety: " + getPlayer.piety.toInt
+    font.drawString(1046-font.getWidth(piety), 22, piety, Color.white)
     if (Mouse.getX < 1057 && (getHeight - Mouse.getY) < 545) drawInfoBox
     if (getGameState == GameState.LEVEL) drawLevel
     if (getLastMonster != null) {
@@ -277,6 +277,7 @@ object Output {
     val middle = 33*32 + (getWidth - 33*32)/2
     var h = 0
     
+    
     var HPHeight = getPlayer.health / getPlayer.maxHealth
     if (HPHeight > 1) HPHeight = 1
     if (HPHeight < 0) HPHeight = 0
@@ -293,7 +294,11 @@ object Output {
         (getHeight-tempUIBackground.getImageHeight)/2, tempUIBackground.getImageWidth, 
         tempUIBackground.getImageHeight)
     
-    h -= 25
+    h += 10
+    val heroLevel = "Hero level: " + getPlayer.totalLevel
+    font.drawString(middle-font.getWidth(heroLevel)/2, h, heroLevel, Color.black)
+        
+    h -= 35
     drawQuadTex(heart, middle-heart.getImageWidth/2, h, heart.getImageWidth, heart.getImageHeight)
     
     h += 115
@@ -335,19 +340,7 @@ object Output {
         middle+getPlayer.slotItem.imageEquipped.getImageWidth*3/2, h, 
         getPlayer.slotItem.imageEquipped.getImageWidth, getPlayer.slotItem.imageEquipped.getImageHeight)
     
-    h += 64
-    val heroLevel = "Hero level: " + getPlayer.totalLevel
-    font.drawString(middle-80, h, heroLevel, Color.black)
-    
-    h += 20
-    val gold = "Gold: " + getPlayer.gold.toInt
-    font.drawString(middle-80, h, gold, Color.black)
-    
-    h += 20
-    val piety = "Piety: " + getPlayer.piety.toInt
-    font.drawString(middle-80, h, piety, Color.black)
-    
-    h += 40
+    h += 144
     drawQuadTex(buttonQuit.tex, buttonQuit.getDrawX, buttonQuit.getDrawY, buttonQuit.tex.getImageWidth, buttonQuit.tex.getImageHeight)
   }
   

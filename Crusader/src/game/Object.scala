@@ -257,6 +257,25 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object with S
   /** Move to given coordinates or go to next map */
   def move(coord: Coordinate) = changePosition(coord.getX, coord.getY)
   
+  /** Wait one turn, pick up item or equip item */
+  def waitTurn {
+    for (obj <- getGrid.getTile(getX, getY).getObjectList - this) {
+      obj match {
+        case item: Item => {
+          if(item.inShop && getPlayer.gold >= item.price) {
+            addLog("SOLD!!!")
+            item.buy
+          }
+          else if (item.inShop) {
+            addLog("You don't have enought gold.")
+          }
+          else item.pickUp
+        }
+        case _ => {}
+      }
+    }
+  }
+  
   /** Move and attack command */
   def moveOrAttack(direction: Direction.Value) = {
     val coord = getCoordinates(direction, getX, getY)
@@ -269,13 +288,9 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object with S
             attack(monster)
           }
           case item: Item => {
-            if(item.inShop && getPlayer.gold >= item.price) item.buy
-            else if (item.inShop) {
-              canMove = false
-              addLog(item.name + " is " + item.price + " gold.")
-            }
-            else item.pickUp
-            }
+            if (item.inShop) addLog(item.name + " is " + item.price + " gold.")
+            else if (ItemType.slot(item.itemType) == "item" && slotItem == null) item.pickUp
+          }
           case _ => {}
         }
       }
@@ -419,7 +434,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   
   /** Simple ai for most of the monsters */
   def basicAI = {
-    if (distance(getPlayer) > 7 && mode == "passive") move(randomDirection(8))
+    if (distance(getPlayer) > 7 && mode == "passive") {}
     else {
       mode = "aggressive"
       tryAttack
@@ -845,13 +860,13 @@ object ItemType extends Enumeration with Serializable {
     var chances = Map[Item, Int]()
     level match {
       case l if (l == 1) => chances = 
-        Map(KNIFE -> 25, ROBES -> 25, WOODENSHIELD -> 20, STEELSWORD -> 5, IRONARMOR -> 5)
+        Map(KNIFE -> 1, ROBES -> 1, WOODENSHIELD -> 2, STEELSWORD -> 1, IRONARMOR -> 1)
       case l if (l == 2) => chances = 
-        Map(KNIFE -> 20, ROBES -> 20, WOODENSHIELD -> 15, STEELSWORD -> 10, IRONARMOR -> 10)
+        Map(KNIFE -> 1, ROBES -> 1, WOODENSHIELD -> 2, STEELSWORD -> 1, IRONARMOR -> 1)
       case l if (l == 3) => chances = 
-        Map(KNIFE -> 15, ROBES -> 15, WOODENSHIELD -> 10, STEELSWORD -> 15, IRONARMOR -> 15)
+        Map(WOODENSHIELD -> 2, STEELSWORD -> 2, IRONARMOR -> 2)
       case l if (l == 4) => chances = 
-        Map(KNIFE -> 10, ROBES -> 10, WOODENSHIELD -> 5, STEELSWORD -> 20, IRONARMOR -> 20)
+        Map(WOODENSHIELD -> 1, STEELSWORD -> 2, IRONARMOR -> 2)
       case _ => {chances = Map(KNIFE -> 100)}
     }
     chances

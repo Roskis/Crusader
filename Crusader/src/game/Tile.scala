@@ -17,7 +17,7 @@ import Helpers._
    * @param Ycoord is tile's y-coordinate
    * @param tileType is tile's type that it is made of
    */
-class Tile(Xcoord: Int, Ycoord: Int, tileType: TileType.Value) extends Serializable {
+class Tile(Xcoord: Int, Ycoord: Int, var tileType: TileType.Value) extends Serializable {
 
   private var x = Xcoord * 32
   private var y = Ycoord * 32
@@ -47,6 +47,10 @@ class Tile(Xcoord: Int, Ycoord: Int, tileType: TileType.Value) extends Serializa
     if (obj.isInstanceOf[Player] && 
         (tileType == TileType.DJINNDOORH || tileType == TileType.DJINNDOORV)) shopGreet
     else if (obj.isInstanceOf[Player] && tileType == TileType.STAIRS) nextMap
+    else if (obj.isInstanceOf[Player] && tileType == TileType.SECRETDOOR) {
+      addLog("You have found a secret!")
+      tileType = TileType.FLOOR
+    }
   }
   
   /** remove object from this tile */
@@ -103,7 +107,7 @@ class Tile(Xcoord: Int, Ycoord: Int, tileType: TileType.Value) extends Serializa
 object TileType extends Enumeration {
 
   type Type = Value
-  val FLOOR, WALL, STAIRS, DJINNDOORH, DJINNDOORV, DJINNFLOOR, DJINNWALL = Value
+  val FLOOR, WALL, STAIRS, DJINNDOORH, DJINNDOORV, DJINNFLOOR, DJINNWALL, SECRETDOOR = Value
   private val rnd = Main.getRnd
   
   /** returns texture of the given tile type */
@@ -116,6 +120,7 @@ object TileType extends Enumeration {
       case t if (t == DJINNDOORV) => tempDjinnDoorV
       case t if (t == DJINNFLOOR) => tempDjinnFloor
       case t if (t == DJINNWALL) => tempDjinnWall
+      case t if (t == SECRETDOOR) => wall1
       case _ => missing
     }
   }
@@ -130,6 +135,7 @@ object TileType extends Enumeration {
       case t if (t == DJINNDOORV) => false
       case t if (t == DJINNFLOOR) => false
       case t if (t == DJINNWALL) => true
+      case t if (t == SECRETDOOR) => false
       case _ => true
     }
   }
@@ -144,6 +150,7 @@ object TileType extends Enumeration {
       case t if (t == DJINNDOORV) => true
       case t if (t == DJINNFLOOR) => false
       case t if (t == DJINNWALL) => true
+      case t if (t == SECRETDOOR) => true
       case _ => true
     }
   }
