@@ -68,7 +68,7 @@ object Prayers extends Enumeration {
       val damage = roll(getPlayer.zeal, 6)
       getLastMonster.health -= damage
       if (getLastMonster.health <= 0) getLastMonster.kill
-      addLog(getLastMonster.name + " takes " + damage.toInt +  " damage.")
+      addLog(getLastMonster.name.toUpperCase.head + getLastMonster.name.tail + " takes " + damage.toInt +  " damage.")
     }
   }
   
@@ -93,6 +93,7 @@ object Prayers extends Enumeration {
   }
 }
 
+/** Temporary effects on characters */
 trait Effect {
   val name: String
   val target: Character
@@ -100,6 +101,7 @@ trait Effect {
   def turn: Unit
 }
 
+/** Small heal heal over time */
 class smallHeal(dur: Int, tar: Character) extends Effect {
   val name = "healing salve"
   val target = tar
@@ -107,9 +109,29 @@ class smallHeal(dur: Int, tar: Character) extends Effect {
   def turn {
     val toAdd = roll(2)
     target.health += toAdd
-    if (getPlayer.health > getPlayer.maxHealth) getPlayer.health = getPlayer.maxHealth
+    target match {
+      case m: Monster => {if (m.health > MonsterType.maxHP(m.mType)) m.health = MonsterType.maxHP(m.mType)}
+      case p: Player => {if (p.health > p.maxHealth) p.health = p.maxHealth}
+      case _ => {}
+    }
     duration -= 1
-    val dur = if (duration == 0) " Effect of " + name + " has ended." else ""
-    addLog(getPlayer.name + " gains " + toAdd + " health from " + name + "." + dur)
+    addLog(target.name.toUpperCase.head + target.name.tail + " gains " + toAdd + " health from " + name + ".")
+    if (duration == 0) addLog("Effect of " + name + " has ended.")
+  }
+}
+
+/** Poison hurts over time */
+class poison(dur: Int, tar: Character) extends Effect {
+  val name = "poison"
+  val target = tar
+  var duration = dur
+  def turn {
+    val toRemove = roll(2)-1
+    if (toRemove != 0) {
+      target.health -= toRemove
+      addLog(target.name.toUpperCase.head + target.name.tail + " loses " + toRemove + " health from " + name + ".")
+    }
+    duration -= 1
+    if (duration == 0) addLog("Effect of " + name + " has ended.")
   }
 }

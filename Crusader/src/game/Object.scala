@@ -34,7 +34,8 @@ trait Object {
     if (image.getImageWidth == 32 && image.getImageHeight == 32)
       drawQuadTex(image, x - (getPlayer.getX - 16) * 32, 
           y - (getPlayer.getY - 8) * 32, image.getImageWidth, image.getImageHeight)
-    else drawQuadTex(image, x - (getPlayer.getX - 16) * 32 - 16, y - (getPlayer.getY - 8) * 32 - 32, image.getImageWidth, image.getImageHeight)
+    else drawQuadTex(image, x - (getPlayer.getX - 16) * 32 - 16, y - (getPlayer.getY - 8) * 32 - 32, 
+        image.getImageWidth, image.getImageHeight)
   }
   
   /** Changes the position of this object
@@ -226,7 +227,8 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
     var effectiveDamage = (damage - effectiveArmor)
     if (effectiveDamage < 0) effectiveDamage = 0
     health -= effectiveDamage
-    addLog(attacker.name + " deals " + effectiveDamage.toInt.toString + " damage to " + name + ".")
+    addLog(attacker.name.toUpperCase.head + attacker.name.tail + " deals " + 
+        effectiveDamage.toInt.toString + " damage to " + name.toUpperCase.head + name.tail + ".")
   }
   
   def armor: Double = {
@@ -303,7 +305,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
             attack(monster)
           }
           case item: Item => {
-            if (item.inShop) addLog(item.name + " is " + item.price + " gold.")
+            if (item.inShop) addLog(item.name.toUpperCase.head + item.name.tail + " is " + item.price + " gold.")
             else if (ItemType.slot(item.itemType) == "item" && slotUseable == null) item.pickUp
           }
           case _ => {}
@@ -359,7 +361,6 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   var blockMovement = true
   var blockVision = false
   var mode = "passive"
-  
   var health: Double = MonsterType.maxHP(mType)
   def armor: Double = MonsterType.armor(mType)
   def damage = MonsterType.damage(mType)
@@ -372,7 +373,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   var dodge = MonsterType.dodge(mType)
   var blockChance = 0
   var shieldArmor = 0
-  
+  var usedAbility = false
   var effectList = Buffer[Effect]()
   
   init
@@ -386,7 +387,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     if (this.monsterType == MonsterType.RAT) new Useable(getX, getY, ItemType.RATMEAT, false)
     x = -100
     y = -100
-    addLog(name + " dies.")
+    addLog(name.toUpperCase.head + name.tail + " dies.")
     getPlayer.giveXP(experience)
     getPlayer.giveGold(gold)
     getPlayer.givePiety(piety)
@@ -401,7 +402,8 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     var effectiveDamage = (damage - effectiveArmor)
     if (effectiveDamage < 0) effectiveDamage = 0
     health -= effectiveDamage
-    addLog(attacker.name + " deals " + effectiveDamage.toInt.toString + " damage to " + name + ".")
+    addLog(attacker.name.toUpperCase.head + attacker.name.tail + " deals " + 
+        effectiveDamage.toInt.toString + " damage to " + name.toUpperCase.head + name.tail + ".")
     mode = "aggressive"
     if (health <= 0) kill
   }
@@ -434,6 +436,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     monsterType match {
       case m if (m == MonsterType.BAT) => batAI
       case m if (m == MonsterType.RAT) => ratAI
+      case m if (m == MonsterType.SNAKE) => snakeAI
       case _ => basicAI
     }
   }
@@ -446,9 +449,30 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   
   /** AI for rat */
   def ratAI = {
-    if (mode == "passive" && distance(getPlayer) <= 3) mode = "flee"
-    else if (mode == "flee") move(getCoordinates(getDirection(getPlayer.getCoordinate, getCoordinate), this))
+    if (mode == "passive" && distance(getPlayer) <= 4) mode = "flee"
+    else if (mode == "flee") {
+      if (rnd.nextInt(2) == 0) move(getCoordinates(getDirection(getPlayer.getCoordinate, getCoordinate), this))
+      else if (rnd.nextInt(5) == 0) addLog(name.toUpperCase.head + name.tail + " squeaks.")
+    }
     else if (mode == "aggressive") tryAttack
+  }
+  
+  /** AI for snake */
+  def snakeAI = {
+    if (distance(getPlayer) > 3 && mode == "passive") {
+      if (distance(getPlayer) < 5 && rnd.nextInt(5) == 0) 
+        addLog(name.toUpperCase.head + name.tail + " hisses.")
+    }
+    else if (distance(getPlayer) < 2 && !usedAbility) {
+      usedAbility = true
+      addLog(name.toUpperCase.head + name.tail + " bites " + getPlayer.name.toUpperCase.head + 
+          getPlayer.name.tail + " with its poisonous fangs.")
+      getPlayer.effectList = getPlayer.effectList :+ new poison(roll(5)+5, getPlayer)
+    }
+    else {
+      mode = "aggressive"
+      tryAttack
+    }
   }
   
   /** Simple ai for most of the monsters */
@@ -470,7 +494,8 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   def move(coord: Coordinate): Unit = {
     if (getGrid.isWithinGrid(coord.getX, coord.getY)) {
       var boo = true
-      for (obj <- getGrid.getTile(coord.getX, coord.getY).getObjectList) if (obj.isInstanceOf[Monster]) boo = false
+      for (obj <- getGrid.getTile(coord.getX, coord.getY).getObjectList) 
+        if (obj.isInstanceOf[Monster]) boo = false
       if (distance(coord) < 2 && !getGrid.getTile(coord.getX, coord.getY).blockMovement && boo) {
         changePosition(coord.getX, coord.getY)
       }
@@ -720,17 +745,17 @@ object MonsterType extends Enumeration with Serializable {
   /** returns name of the given monster */
   def name(MonsterType: Monster): String = {
     MonsterType match {
-      case t if (t == RAT) => "Rat"
-      case t if (t == BAT) => "Bat"
-      case t if (t == SNAKE) => "Snake"
-      case t if (t == SPIDER) => "Spider"
-      case t if (t == GOBLINA) => "Goblin"
-      case t if (t == GOBLINB) => "Goblin"
-      case t if (t == HOUND) => "Hound"
-      case t if (t == LIZARDA) => "Lizard"
-      case t if (t == LIZARDB) => "Lizard"
-      case t if (t == LIZARDC) => "Lizard"
-      case t if (t == CROCODILE) => "Crocodile"
+      case t if (t == RAT) => "rat"
+      case t if (t == BAT) => "bat"
+      case t if (t == SNAKE) => "snake"
+      case t if (t == SPIDER) => "spider"
+      case t if (t == GOBLINA) => "goblin"
+      case t if (t == GOBLINB) => "goblin"
+      case t if (t == HOUND) => "hound"
+      case t if (t == LIZARDA) => "lizard"
+      case t if (t == LIZARDB) => "lizard"
+      case t if (t == LIZARDC) => "lizard"
+      case t if (t == CROCODILE) => "crocodile"
       case _ => "Unknown monster name"
     }
   }
@@ -869,9 +894,11 @@ object ItemType extends Enumeration with Serializable {
     var chances = Map[Item, Int]()
     level match {
       case l if (l == 1) => chances = 
-        Map(KNIFE -> 1, ROBES -> 1, WOODENSHIELD -> 2, STEELSWORD -> 1, IRONARMOR -> 1, SMALLHEALPOTION -> 2)
+        Map(KNIFE -> 1, ROBES -> 1, WOODENSHIELD -> 2, STEELSWORD -> 1, IRONARMOR -> 1, 
+            SMALLHEALPOTION -> 2)
       case l if (l == 2) => chances = 
-        Map(KNIFE -> 1, ROBES -> 1, WOODENSHIELD -> 2, STEELSWORD -> 1, IRONARMOR -> 1, SMALLHEALPOTION -> 2)
+        Map(KNIFE -> 1, ROBES -> 1, WOODENSHIELD -> 2, STEELSWORD -> 1, IRONARMOR -> 1, 
+            SMALLHEALPOTION -> 2)
       case l if (l == 3) => chances = 
         Map(WOODENSHIELD -> 2, STEELSWORD -> 2, IRONARMOR -> 2, SMALLHEALPOTION -> 2)
       case l if (l == 4) => chances = 
@@ -1030,13 +1057,13 @@ object ItemType extends Enumeration with Serializable {
   /** returns name of the given equipment */
   def name(ItemType: Item): String = {
     ItemType match {
-      case t if (t == KNIFE) => "Knife"
-      case t if (t == ROBES) => "Robes"
-      case t if (t == IRONARMOR) => "Iron armor"
-      case t if (t == STEELSWORD) => "Steel sword"
-      case t if (t == WOODENSHIELD) => "Wooden shield"
-      case t if (t == RATMEAT) => "Rat meat"
-      case t if (t == SMALLHEALPOTION) => "Small healing salve"
+      case t if (t == KNIFE) => "knife"
+      case t if (t == ROBES) => "robes"
+      case t if (t == IRONARMOR) => "iron armor"
+      case t if (t == STEELSWORD) => "steel sword"
+      case t if (t == WOODENSHIELD) => "wooden shield"
+      case t if (t == RATMEAT) => "rat meat"
+      case t if (t == SMALLHEALPOTION) => "small healing salve"
       case _ => "Unknown item name"
     }
   }
@@ -1096,12 +1123,12 @@ class Useable(startX: Int, startY: Int, val itemType: ItemType.Value, isEquipped
       case i if (i == ItemType.RATMEAT) => {
         getPlayer.health += roll(6)
         if (getPlayer.health > getPlayer.maxHealth) getPlayer.health = getPlayer.maxHealth
-        addLog(getPlayer.name + " eats " + name + ".")
+        addLog(getPlayer.name.toUpperCase.head + getPlayer.name.tail + " eats " + name + ".")
 
       }
       case i if (i == ItemType.SMALLHEALPOTION) => {
         getPlayer.effectList = getPlayer.effectList :+ new smallHeal(roll(5)+5, getPlayer)
-        addLog(getPlayer.name + " drinks " + name + ".")
+        addLog(getPlayer.name.toUpperCase.head + getPlayer.name.tail + " drinks " + name + ".")
       }
       case _ => {}
     }

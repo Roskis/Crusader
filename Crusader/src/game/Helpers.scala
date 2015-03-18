@@ -289,8 +289,8 @@ object Helpers {
   
   /** Few djinn names */
   def djinnName: String = {
-    val list = List("Aku", "Erham", "Goham", "Halam", "Juzam", "Mahamoti", "Mijae", "Ruham", 
-        "Serendib", "Sulam", "Zanam")
+    val list = List("aku", "erham", "goham", "halam", "juzam", "mahamoti", "mijae", "ruham", 
+        "serendib", "sulam", "zanam")
     list(rnd.nextInt(list.size))
   }
   
@@ -313,7 +313,7 @@ object Helpers {
   def shopGreet = {
     if (!getShopVisited) {
       visitShop
-      addLog(getGrid.getDjinn.name + ": \"" + shopWelcome + "\"")
+      addLog(getGrid.getDjinn.name.toUpperCase.head + getGrid.getDjinn.name.tail + ": \"" + shopWelcome + "\"")
     }
   }
   
