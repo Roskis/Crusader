@@ -10,7 +10,7 @@ import Direction._
 import Main._
 import Output.drawQuadTex
 import Helpers._
-import Effect._
+import Prayers._
 
 /** All of the game's objects will be under this trait */
 trait Object {
@@ -76,11 +76,24 @@ trait Object {
   def distance(x: Int, y: Int): Int = sqrt((xDif(x))*(xDif(x)) + (yDif(y))*(yDif(y))).toInt
   def distance(coordinate: Coordinate): Double = sqrt((xDif(coordinate.getX))*(xDif(coordinate.getX)) + 
       (yDif(coordinate.getY))*(yDif(coordinate.getY)))
+}
+
+trait Character extends Object with Serializable {
+  
+  var health: Double
+  var experience: Double
+  var gold: Double
+  var piety: Double
+  var effectList: Buffer[Effect]
+  def armor: Double
+  def accuracy: Int
+  def ap: Double
+  def crit: Int
   
 }
 
 /** User's controllable player character */
-class Player(playerName: String, startX: Int, startY: Int) extends Object with Serializable {
+class Player(playerName: String, startX: Int, startY: Int) extends Character with Serializable {
   
   val rnd = getRnd
   var name = playerName
@@ -110,7 +123,9 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object with S
   var slotShield: Equipment = null
   var slotRing: Equipment = null
   var slotAmulet: Equipment = null
-  var slotItem: Item = null
+  var slotUseable: Useable = null
+  
+  var effectList = Buffer[Effect]()
   
   /** When player succeeds praying one random prayer is selected */
   def pray = {
@@ -183,9 +198,9 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object with S
   /** Method to deal damage to monsters */
   def attack(target: Monster) {
     if (rnd.nextInt(100) <= accuracy - target.dodge) {
-      target.takeDamage(damage(rnd.nextInt(100) <= crit), armorPierce, this)
+      target.takeDamage(damage(rnd.nextInt(100) <= crit), ap, this)
     }
-    else target.takeDamage(smallestDamage, armorPierce, this)
+    else target.takeDamage(smallestDamage, ap, this)
   }
   
   /** Damage is based on player's weapon */
@@ -225,7 +240,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object with S
     slotArmor.armor + patienceBonus
   }
   
-  def armorPierce: Double = if (slotWeapon != null) slotWeapon.armorPiercing else 0
+  def ap: Double = if (slotWeapon != null) slotWeapon.armorPiercing else 0
   
   /** Critical chance of weapon used */
   def crit: Int = if (slotWeapon != null) slotWeapon.critChance else 2
@@ -244,7 +259,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object with S
     if (slotShield != null) num += slotShield.weight
     if (slotRing != null) num += slotRing.weight
     if (slotAmulet != null) num += slotAmulet.weight
-    if (slotItem != null) num += slotItem.weight
+    if (slotUseable != null) num += slotUseable.weight
     ((1 - (0.05*patience)).toInt * num)
   }
   
@@ -289,7 +304,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Object with S
           }
           case item: Item => {
             if (item.inShop) addLog(item.name + " is " + item.price + " gold.")
-            else if (ItemType.slot(item.itemType) == "item" && slotItem == null) item.pickUp
+            else if (ItemType.slot(item.itemType) == "item" && slotUseable == null) item.pickUp
           }
           case _ => {}
         }
@@ -332,7 +347,7 @@ class PassiveObject(objectName: String, objectDescription: String, startX: Int, 
 }
 
 /** All of monsters and npc will be under this class */
-class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends Object with Serializable {
+class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends Character with Serializable {
   
   val mType = monsterType
   val rnd = getRnd
@@ -346,17 +361,19 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   var mode = "passive"
   
   var health: Double = MonsterType.maxHP(mType)
-  var armor: Double = MonsterType.armor(mType)
-  var damage = MonsterType.damage(mType)
-  var accuracy = MonsterType.accuracy(mType)
-  var ap: Double = MonsterType.armorPierce(mType)
-  var crit = MonsterType.criticalChance(mType)
-  var experience = MonsterType.experience(mType)
-  var gold = MonsterType.gold(mType)
-  var piety = MonsterType.piety(mType)
+  def armor: Double = MonsterType.armor(mType)
+  def damage = MonsterType.damage(mType)
+  def accuracy = MonsterType.accuracy(mType)
+  def ap: Double = MonsterType.armorPierce(mType)
+  def crit = MonsterType.criticalChance(mType)
+  var experience = MonsterType.experience(mType).toDouble
+  var gold = MonsterType.gold(mType).toDouble
+  var piety = MonsterType.piety(mType).toDouble
   var dodge = MonsterType.dodge(mType)
   var blockChance = 0
   var shieldArmor = 0
+  
+  var effectList = Buffer[Effect]()
   
   init
   getMonsterList.append(this)
@@ -366,7 +383,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     getMonsterList.filter(_ == this) foreach {getMonsterList -= _}
     updateLastMonster(null)
     getGrid.getTile(getX, getY).removeObject(this)
-    if (this.monsterType == MonsterType.RAT) new Consumable(getX, getY, ItemType.RATMEAT, false)
+    if (this.monsterType == MonsterType.RAT) new Useable(getX, getY, ItemType.RATMEAT, false)
     x = -100
     y = -100
     addLog(name + " dies.")
@@ -412,6 +429,8 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   
   /** Monster's turn depends on it's ai */
   def turn() {
+    for (effect <- effectList) effect.turn
+    effectList = effectList.filter(_.duration <= 0)
     monsterType match {
       case m if (m == MonsterType.BAT) => batAI
       case m if (m == MonsterType.RAT) => ratAI
@@ -751,39 +770,44 @@ trait Item extends Object with Serializable {
   }
   
   def imageEquipped: Texture
-  def equip: Unit
   def unequip: Unit
   def use: Unit
+  
+  /** equip item */
+  def equip {
+    this match {
+      case u: Useable => {
+        getPlayer.slotUseable = u
+        getUseableList.filter(_ == u) foreach {getUseableList -= _}
+      }
+      case e: Equipment => {
+        if (ItemType.slot(itemType) == "weapon") getPlayer.slotWeapon = e
+        else if (ItemType.slot(itemType) == "armor") getPlayer.slotArmor = e
+        else if (ItemType.slot(itemType) == "shield") getPlayer.slotShield = e
+        else if (ItemType.slot(itemType) == "ring") getPlayer.slotRing = e
+        else if (ItemType.slot(itemType) == "amulet") getPlayer.slotAmulet = e
+        getEquipmentList.filter(_ == e) foreach {getEquipmentList -= _}
+      }
+      case _ => {}
+    }
+    getGrid.getTile(getX, getY).removeObject(this)
+    equipped = true
+    x = -100
+    y = -100
+  }
   
   /** Pick up */
   def pickUp = {
     ItemType.slot(itemType) match {
-      case s if (s == "weapon") => {
-        if (getPlayer.slotWeapon != null) getPlayer.slotWeapon.unequip
-        equip
-      }
-      case s if (s == "armor") => {
-        if (getPlayer.slotArmor != null) getPlayer.slotArmor.unequip
-        equip
-      }
-      case s if (s == "shield") => {
-        if (getPlayer.slotShield != null) getPlayer.slotShield.unequip
-        equip
-      }
-      case s if (s == "ring") => {
-        if (getPlayer.slotRing != null) getPlayer.slotRing.unequip
-        equip
-      }
-      case s if (s == "amulet") => {
-        if (getPlayer.slotAmulet != null) getPlayer.slotAmulet.unequip
-        equip
-      }
-      case s if (s == "item") => {
-        if (getPlayer.slotItem != null) getPlayer.slotItem.unequip
-        equip
-      }
+      case s if (s == "weapon") => if (getPlayer.slotWeapon != null) getPlayer.slotWeapon.unequip
+      case s if (s == "armor") => if (getPlayer.slotArmor != null) getPlayer.slotArmor.unequip
+      case s if (s == "shield") => if (getPlayer.slotShield != null) getPlayer.slotShield.unequip
+      case s if (s == "ring") => if (getPlayer.slotRing != null) getPlayer.slotRing.unequip
+      case s if (s == "amulet") => if (getPlayer.slotAmulet != null) getPlayer.slotAmulet.unequip
+      case s if (s == "item") => if (getPlayer.slotUseable != null) getPlayer.slotUseable.unequip
       case _ =>
     }
+    equip
   }
   
 }
@@ -833,40 +857,25 @@ class Equipment(startX: Int, startY: Int, equipmentType: ItemType.Value, isEquip
     init
     getEquipmentList.append(this)
   }
-  
-  /** equip item */
-  def equip {
-    if (ItemType.slot(itemType) == "weapon") getPlayer.slotWeapon = this
-    else if (ItemType.slot(itemType) == "armor") getPlayer.slotArmor = this
-    else if (ItemType.slot(itemType) == "shield") getPlayer.slotShield = this
-    else if (ItemType.slot(itemType) == "ring") getPlayer.slotRing = this
-    else if (ItemType.slot(itemType) == "amulet") getPlayer.slotAmulet = this
-    getEquipmentList.filter(_ == this) foreach {getEquipmentList -= _}
-    getGrid.getTile(getX, getY).removeObject(this)
-    equipped = true
-    x = -100
-    y = -100
-  }
-  
 }
 
 object ItemType extends Enumeration with Serializable {
 
   type Item = Value
-  val KNIFE, ROBES, IRONARMOR, STEELSWORD, WOODENSHIELD, RATMEAT = Value
+  val KNIFE, ROBES, IRONARMOR, STEELSWORD, WOODENSHIELD, RATMEAT, SMALLHEALPOTION = Value
   
   /** return chances how items occur in game */
   def levelChance(level: Int): Map[Item, Int] = {
     var chances = Map[Item, Int]()
     level match {
       case l if (l == 1) => chances = 
-        Map(KNIFE -> 1, ROBES -> 1, WOODENSHIELD -> 2, STEELSWORD -> 1, IRONARMOR -> 1)
+        Map(KNIFE -> 1, ROBES -> 1, WOODENSHIELD -> 2, STEELSWORD -> 1, IRONARMOR -> 1, SMALLHEALPOTION -> 2)
       case l if (l == 2) => chances = 
-        Map(KNIFE -> 1, ROBES -> 1, WOODENSHIELD -> 2, STEELSWORD -> 1, IRONARMOR -> 1)
+        Map(KNIFE -> 1, ROBES -> 1, WOODENSHIELD -> 2, STEELSWORD -> 1, IRONARMOR -> 1, SMALLHEALPOTION -> 2)
       case l if (l == 3) => chances = 
-        Map(WOODENSHIELD -> 2, STEELSWORD -> 2, IRONARMOR -> 2)
+        Map(WOODENSHIELD -> 2, STEELSWORD -> 2, IRONARMOR -> 2, SMALLHEALPOTION -> 2)
       case l if (l == 4) => chances = 
-        Map(WOODENSHIELD -> 1, STEELSWORD -> 2, IRONARMOR -> 2)
+        Map(WOODENSHIELD -> 1, STEELSWORD -> 2, IRONARMOR -> 2, SMALLHEALPOTION -> 2)
       case _ => {chances = Map(KNIFE -> 100)}
     }
     chances
@@ -881,6 +890,7 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == STEELSWORD) => "weapon"
       case t if (t == WOODENSHIELD) => "shield"
       case t if (t == RATMEAT) => "item"
+      case t if (t == SMALLHEALPOTION) => "item"
       case _ => ""
     }
   }
@@ -894,6 +904,7 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == STEELSWORD) => steelSwordG
       case t if (t == WOODENSHIELD) => woodenShieldG
       case t if (t == RATMEAT) => ratG
+      case t if (t == SMALLHEALPOTION) => smallhealpotion
       case _ => missing
     }
   }
@@ -907,6 +918,7 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == STEELSWORD) => steelSwordE
       case t if (t == WOODENSHIELD) => woodenShieldE
       case t if (t == RATMEAT) => ratE
+      case t if (t == SMALLHEALPOTION) => smallhealpotion
       case _ => missing
     }
   }
@@ -932,6 +944,7 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == STEELSWORD) => 12
       case t if (t == WOODENSHIELD) => 5
       case t if (t == RATMEAT) => 3
+      case t if (t == SMALLHEALPOTION) => 2
       case _ => 0
     }
   }
@@ -1008,6 +1021,8 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == IRONARMOR) => 250
       case t if (t == STEELSWORD) => 400
       case t if (t == WOODENSHIELD) => 50
+      case t if (t == RATMEAT) => 25
+      case t if (t == SMALLHEALPOTION) => 50
       case _ => 0
     }
   }
@@ -1021,6 +1036,7 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == STEELSWORD) => "Steel sword"
       case t if (t == WOODENSHIELD) => "Wooden shield"
       case t if (t == RATMEAT) => "Rat meat"
+      case t if (t == SMALLHEALPOTION) => "Small healing salve"
       case _ => "Unknown item name"
     }
   }
@@ -1034,6 +1050,7 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == STEELSWORD) => "TODO"
       case t if (t == WOODENSHIELD) => "TODO"
       case t if (t == RATMEAT) => "TODO"
+      case t if (t == SMALLHEALPOTION) => "TODO"
       case _ => "Unknown item description"
     }
   }
@@ -1041,7 +1058,7 @@ object ItemType extends Enumeration with Serializable {
 }
 
 /** Player usable consumables */
-class Consumable(startX: Int, startY: Int, val itemType: ItemType.Value, isEquipped: Boolean) extends Item with Serializable {
+class Useable(startX: Int, startY: Int, val itemType: ItemType.Value, isEquipped: Boolean) extends Item with Serializable {
 
   val rnd = getRnd
   val weight = ItemType.weight(itemType)
@@ -1059,85 +1076,38 @@ class Consumable(startX: Int, startY: Int, val itemType: ItemType.Value, isEquip
   
   if (!equipped) {
     init
-    getConsumableList.append(this)
+    getUseableList.append(this)
   }
 
   
   /** Unequip item */
   def unequip {
-    if (getPlayer.slotItem != null) getPlayer.slotItem = null
+    if (getPlayer.slotUseable != null) getPlayer.slotUseable = null
     equipped = false
     x = getPlayer.getX * 32
     y = getPlayer.getY * 32
     init
-    getConsumableList.append(this)
+    getUseableList.append(this)
   }
-  
-  /** Equip item */
-  def equip {
-    if (ItemType.slot(itemType) == "item") getPlayer.slotItem = this
-    getConsumableList.filter(_ == this) foreach {getConsumableList -= _}
-    getGrid.getTile(getX, getY).removeObject(this)
-    equipped = true
-    x = -100
-    y = -100
-  }
-  
+
   /** Use item */
   def use = {
-    getPlayer.health += roll(6)
-    if (getPlayer.health > getPlayer.maxHealth) getPlayer.health = getPlayer.maxHealth
-    addLog("You eat " + name + ".")
-    getPlayer.slotItem = null
-    equipped = false
-    x = -100
-    y = -100
-  }
-}
+    itemType match {
+      case i if (i == ItemType.RATMEAT) => {
+        getPlayer.health += roll(6)
+        if (getPlayer.health > getPlayer.maxHealth) getPlayer.health = getPlayer.maxHealth
+        addLog(getPlayer.name + " eats " + name + ".")
 
-/** Player usable scrolls */
-class Scroll(scrollName: String, scrollDescription: String, startX: Int, startY: Int, 
-    scrollImage: String, scrollPrice: Int, isEquipped: Boolean) extends Item with Serializable {
-  
-  val rnd = getRnd
-  val itemType = null
-  val weight = 0
-  var name = scrollName
-  var description = scrollDescription
-  var x = startX * 32
-  var y = startY * 32
-  def image = loadTexture(scrollImage)
-  def imageEquipped = null
-  var blockMovement = false
-  var blockVision = false
-  var price = scrollPrice
-  var inShop = false
-  var equipped: Boolean = isEquipped
-  
-  init
-  getScrollList.append(this)
-  
-  /** Unequip item */
-  def unequip {
-    if (getPlayer.slotItem != null) getPlayer.slotItem = null
+      }
+      case i if (i == ItemType.SMALLHEALPOTION) => {
+        getPlayer.effectList = getPlayer.effectList :+ new smallHeal(roll(5)+5, getPlayer)
+        addLog(getPlayer.name + " drinks " + name + ".")
+      }
+      case _ => {}
+    }
+    getPlayer.slotUseable = null
     equipped = false
-    x = getPlayer.getX * 32
-    y = getPlayer.getY * 32
-    init
-    getScrollList.append(this)
-  }
-  
-  /** Equip item */
-  def equip {
-    if (ItemType.slot(itemType) == "item") getPlayer.slotItem = this
-    getScrollList.filter(_ == this) foreach {getScrollList -= _}
-    getGrid.getTile(getX, getY).removeObject(this)
-    equipped = true
     x = -100
     y = -100
   }
-  
-  /** Use the scroll */
-  def use = {}
-  
 }

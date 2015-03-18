@@ -9,7 +9,7 @@ import org.lwjgl.opengl.{Display, DisplayMode}
 import Helpers._
 import Direction._
 import GameState._
-import Effect._
+import Prayers._
 import Output._
 import MonsterType.levelChance
 
@@ -25,8 +25,7 @@ object Main {
   private var monsterList = Buffer[Monster]()
   private var passiveObjectList = Buffer[PassiveObject]()
   private var equipmentList = Buffer[Equipment]()
-  private var consumableList = Buffer[Consumable]()
-  private var scrollList = Buffer[Scroll]()
+  private var useableList = Buffer[Useable]()
   private var gameLog = Buffer[String]()
   private var lastWheel: Int = 0
   private var lastMonster: Monster = null
@@ -374,8 +373,8 @@ object Main {
             playTurn
           }
           case k if (k == Keyboard.KEY_E && Keyboard.getEventKeyState && getPlayer.health > 0 && 
-              player.slotItem != null) => {
-            player.slotItem.use
+              player.slotUseable != null) => {
+            player.slotUseable.use
             playTurn
           }
           case k if (k == Keyboard.KEY_Q && Keyboard.getEventKeyState && 
@@ -397,8 +396,9 @@ object Main {
   
   /** Play one turn */
   def playTurn() {
-    for (monster <- monsterList)
-      monster.turn
+    for (effect <- player.effectList) effect.turn
+    player.effectList.filter(_.duration <= 0) foreach {player.effectList -= _}
+    for (monster <- monsterList) monster.turn
     turn += 1
     if (player.health <= 0) {
       addLog("You died! Score: " + getPlayer.gold.toInt + ".")
@@ -410,8 +410,7 @@ object Main {
     monsterList.clear
     passiveObjectList.clear
     equipmentList.clear
-    consumableList.clear
-    scrollList.clear
+    useableList.clear
   }
   
   /** Save current game */
@@ -429,14 +428,13 @@ object Main {
       for (log <- gameLog) file.writeUTF(log)
       
       file.writeInt(2 + monsterList.size + passiveObjectList.size + equipmentList.size + 
-          consumableList.size + scrollList.size)
+          useableList.size)
       file.writeObject(player)
       file.writeObject(grid)
       for (obj <- monsterList) file.writeObject(obj)
       for (obj <- passiveObjectList) file.writeObject(obj)
       for (obj <- equipmentList) file.writeObject(obj)
-      for (obj <- consumableList) file.writeObject(obj)
-      for (obj <- scrollList) file.writeObject(obj)
+      for (obj <- useableList) file.writeObject(obj)
       
     } finally {
       file.close
@@ -477,8 +475,7 @@ object Main {
             case o: Monster => monsterList.append(o)
             case o: PassiveObject => passiveObjectList.append(o)
             case o: Equipment => equipmentList.append(o)
-            case o: Consumable => consumableList.append(o)
-            case o: Scroll => scrollList.append(o)
+            case o: Useable => useableList.append(o)
             case _ => {}
           }
     updateMonsterChances
@@ -518,8 +515,7 @@ object Main {
   def getMonsterList() = monsterList
   def getPassiveObjectList() = passiveObjectList
   def getEquipmentList() = equipmentList
-  def getConsumableList() = consumableList
-  def getScrollList() = scrollList
+  def getUseableList() = useableList
   def getGameLog() = gameLog
   def getFrameRate() = frameRate
   def getHeight() = height

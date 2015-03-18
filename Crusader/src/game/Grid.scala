@@ -230,7 +230,6 @@ class Grid() extends Serializable {
       }
     }
     for (tile <- slotList) {
-      //setTile(new Tile(tile.getX, tile.getY, TileType.DJINNSLOT))
       addItem(new Coordinate(tile.getX, tile.getY)).inShop=true
     }
     setTile(new Tile(door.getX, door.getY, 
@@ -290,7 +289,13 @@ class Grid() extends Serializable {
   }
   
   /** Add random item */
-  def addItem(coord: Coordinate) = new Equipment(coord.getX, coord.getY, chooseRandomItem(getItemChances), false)
+  def addItem(coord: Coordinate) = {
+    val itemType = chooseRandomItem(getItemChances)
+    var item: Item = null
+    if (ItemType.slot(itemType) == "item") item = new Useable(coord.getX, coord.getY, itemType, false)
+    else item = new Equipment(coord.getX, coord.getY, itemType, false)
+    item
+  }
   
   /** getter for stairs */
   def getStairs() = stairs

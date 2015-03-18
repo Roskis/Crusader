@@ -3,8 +3,8 @@ package game
 import Main._
 import Helpers._
 
-/** Effects like prayers */
-object Effect extends Enumeration {
+/** Player used prayers */
+object Prayers extends Enumeration {
   
   type Prayer = Value
   val PARTIALRESTORATION, FULLRESTORATION, LIGHTNINGBOLT, GOLDLOSS, EXPERIENCELOSS, DEMENTIA, 
@@ -90,5 +90,26 @@ object Effect extends Enumeration {
   def clairvoyance = {
     getGrid.exploreAll
     addLog("Whole map is revealed to you.")
+  }
+}
+
+trait Effect {
+  val name: String
+  val target: Character
+  var duration: Int
+  def turn: Unit
+}
+
+class smallHeal(dur: Int, tar: Character) extends Effect {
+  val name = "healing salve"
+  val target = tar
+  var duration = dur
+  def turn {
+    val toAdd = roll(2)
+    target.health += toAdd
+    if (getPlayer.health > getPlayer.maxHealth) getPlayer.health = getPlayer.maxHealth
+    duration -= 1
+    val dur = if (duration == 0) " Effect of " + name + " has ended." else ""
+    addLog(getPlayer.name + " gains " + toAdd + " health from " + name + "." + dur)
   }
 }

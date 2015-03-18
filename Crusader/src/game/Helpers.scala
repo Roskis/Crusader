@@ -154,6 +154,7 @@ object Helpers {
   private val iwoodenShieldE = loadTexture("Player/woodenShieldE")
   private val iratG = loadTexture("Items/ratG")
   private val iratE = loadTexture("Player/ratE")
+  private val ismallhealpotion = loadTexture("Items/smallhealpotion")
   private val ifog: Texture = loadTexture("Tiles/fog")
   private val igrass1 = loadTexture("Tiles/grass1")
   private val iwall1 = loadTexture("Tiles/wall1")
@@ -238,6 +239,7 @@ object Helpers {
   def woodenShieldE = iwoodenShieldE
   def ratG = iratG
   def ratE = iratE
+  def smallhealpotion = ismallhealpotion
   def fog = ifog
   def grass1 = igrass1
   def wall1 = iwall1
@@ -348,7 +350,7 @@ object Helpers {
   }
   
   /** Select random prayer from map containing choices and their chances */
-  def chooseRandomPrayer(chances: Map[Effect.Prayer, Int]) = {
+  def chooseRandomPrayer(chances: Map[Prayers.Prayer, Int]) = {
     var random = 0
     for (choice <- chances) random += choice._2
     random = rnd.nextInt(random) + 1

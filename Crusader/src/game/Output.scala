@@ -45,7 +45,7 @@ object Output {
     try {
       Display.setFullscreen(getFullscreen)
       Display.setDisplayMode(getDisplayMode)
-      Display.setTitle("Crusader" + " " + getVersion)
+      Display.setTitle("Crusader" + " Version " + getVersion)
       /** TODO
       // Window's game icon is not loaded right.
       //Display.setIcon(Array(ByteBuffer.allocate(0x4000).put(new ImageIOImageData().imageToByteBuffer(ImageIO.read(new File("data/icon.png")), false, false, null))))
@@ -210,6 +210,7 @@ object Output {
     fontMenu.drawString(920, getHeight/10, "Crusader", Color.black)        
     font.drawString(2, getHeight - 24, "Mouse X: " + Mouse.getX.toString, Color.red)
     font.drawString(130, getHeight - 24, "Y: " + (getHeight - Mouse.getY).toString, Color.red)
+    font.drawString(getWidth - 10 - font.getWidth("Version: " + getVersion), getHeight - 24, "Version: " + getVersion, Color.black)
   }
   
   /** Draw game screen */
@@ -227,7 +228,7 @@ object Output {
     font.drawString(130, getHeight - 245, "Y: " + mouseYCoord.toString, Color.red)
     font.drawString(2, getHeight - 225, "Mouse X: " + Mouse.getX.toString, Color.red)
     font.drawString(130, getHeight - 225, "Y: " + (getHeight - Mouse.getY).toString, Color.red)
-    font.drawString(2, getHeight - 205, "Version: " + getVersion, Color.white)
+    font.drawString(2, getHeight - 205, "Turn: " + getTurn, Color.white)
     val level = "Episode: " + getEpisode + " Level: " + getLevel
     font.drawString(1046-font.getWidth(level), getHeight - 205, level, Color.white)
     val name = getPlayer.name + " " + getPlayer.title
@@ -336,9 +337,9 @@ object Output {
     if (getPlayer.slotAmulet != null) drawQuadTex(getPlayer.slotAmulet.image, 
         middle-getPlayer.slotAmulet.image.getImageWidth/2, h, 
         getPlayer.slotAmulet.image.getImageWidth, getPlayer.slotAmulet.image.getImageHeight)
-    if (getPlayer.slotItem != null) drawQuadTex(getPlayer.slotItem.imageEquipped, 
-        middle+getPlayer.slotItem.imageEquipped.getImageWidth*3/2, h, 
-        getPlayer.slotItem.imageEquipped.getImageWidth, getPlayer.slotItem.imageEquipped.getImageHeight)
+    if (getPlayer.slotUseable != null) drawQuadTex(getPlayer.slotUseable.imageEquipped, 
+        middle+getPlayer.slotUseable.imageEquipped.getImageWidth*3/2, h, 
+        getPlayer.slotUseable.imageEquipped.getImageWidth, getPlayer.slotUseable.imageEquipped.getImageHeight)
     
     h += 144
     drawQuadTex(buttonQuit.tex, buttonQuit.getDrawX, buttonQuit.getDrawY, buttonQuit.tex.getImageWidth, buttonQuit.tex.getImageHeight)
@@ -356,7 +357,7 @@ object Output {
   
   /** Draw objects */
   def drawObjects() {
-    for (list <- List(getEquipmentList, getScrollList, getConsumableList, getMonsterList, getPassiveObjectList)) {
+    for (list <- List(getEquipmentList, getUseableList, getMonsterList, getPassiveObjectList)) {
       for (obj <- list) {
         if (obj.xDif(getPlayer) <= 16 && obj.yDif(getPlayer) <= 8 && 
             getGrid.getTile(obj.getX, obj.getY).explored) obj.draw
