@@ -12,7 +12,7 @@ import Helpers._
 /** Grid is reponsible for handling the map */
 class Grid() extends Serializable {
   private val rnd = getRnd
-  private var size: Int = 1
+  private var size: Int = 1 // maximum size 49x49 or minimap won't work
   private var map = Array.ofDim[Tile](size, size)
   private var stairs: Tile = new Tile(-100, -100, TileType.STAIRS)
   private var altar: PassiveObject = null
@@ -93,21 +93,15 @@ class Grid() extends Serializable {
       altar.setX(-100)
       altar.setY(-100)
     }
-    addStairs
+    addStairsEp1
     addTrees(16)
     addRocks(4)
     addMonsters(20)
     makeSecret
     
-    var playerPosition = giveRandomFloor
-    do {
-      playerPosition = giveRandomFloor
-      getPlayer.setX(playerPosition.getX)
-      getPlayer.setY(playerPosition.getY)
-    }
-    while (getPlayer.distance(getStairs) < 15 || 
-        getTile(playerPosition.getX, playerPosition.getY).getType != TileType.FLOOR || 
-        !(getTile(playerPosition.getX, playerPosition.getY)).getObjectList.isEmpty)
+    do {movePlayerEp1}
+    while (!(getTile(getPlayer.getX, getPlayer.getY)).getObjectList.isEmpty)
+    setTile(new Tile(getPlayer.getX, getPlayer.getY, TileType.FLOOR))
     map(getPlayer.getX)(getPlayer.getY).explored = true
   }
   
@@ -159,7 +153,7 @@ class Grid() extends Serializable {
             else TileType.FLOOR)
       }
     }
-    addStairs()
+    addStairsEp1
     getPlayer.setX(size/2)
     getPlayer.setY(size/2)
   }
@@ -300,8 +294,31 @@ class Grid() extends Serializable {
   /** getter for stairs */
   def getStairs() = stairs
   
+  /** Add player to the map */
+  def movePlayerEp1() = {
+    val startTile = getTile(1, rnd.nextInt(size))
+    var boo = true
+    val tunnel = line(startTile, getTile(size/2, size/2))
+    var n = 0
+    var next = getTile(tunnel(n))
+    var current = startTile
+    var neigh = neighbors(startTile, 8)
+    do {
+      boo = true
+      current = next
+      n+= 1
+      next = getTile(tunnel(n))
+      neigh = neighbors(next, 8)
+      neigh -= current
+      for (ne <- neigh) if (!ne.blockMovement) boo = false
+    }
+    while (boo)
+    getPlayer.setX(next.getX)
+    getPlayer.setY(next.getY)
+  }
+  
   /** Add stairs */
-  def addStairs() = {
+  def addStairsEp1() = {
     val startTile = getTile(size-1, rnd.nextInt(size))
     var boo = true
     val tunnel = line(startTile, getTile(size/2, size/2))

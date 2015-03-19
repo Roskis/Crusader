@@ -191,6 +191,14 @@ object Helpers {
   private val iquit = loadTexture("UI/Quit")
   private val iHPBar = loadTexture("UI/HPBar")
   private val iXPBar = loadTexture("UI/XPBar")
+  private val iminimapAltar = loadTexture("UI/minimapAltar")
+  private val iminimapDjinn = loadTexture("UI/minimapDjinn")
+  private val iminimapEnemy = loadTexture("UI/minimapEnemy")
+  private val iminimapFloor = loadTexture("UI/minimapFloor")
+  private val iminimapFog = loadTexture("UI/minimapFog")
+  private val iminimapItem = loadTexture("UI/minimapItem")
+  private val iminimapStairs = loadTexture("UI/minimapStairs")
+  private val iminimapWall = loadTexture("UI/minimapWall")
   private val iblackBorder = loadTexture("UI/BlackBorder")
   private val izeal = loadTexture("UI/Zeal")
   private val izeal2 = loadTexture("UI/Zeal2")
@@ -266,6 +274,14 @@ object Helpers {
   def quit = iquit
   def HPBar = iHPBar
   def XPBar = iXPBar
+  def minimapAltar = iminimapAltar
+  def minimapDjinn = iminimapDjinn
+  def minimapEnemy = iminimapEnemy
+  def minimapFloor = iminimapFloor
+  def minimapFog = iminimapFog
+  def minimapItem = iminimapItem
+  def minimapStairs = iminimapStairs
+  def minimapWall = iminimapWall
   def blackBorder = iblackBorder
   def zeal = izeal
   def zeal2 = izeal2
@@ -286,6 +302,24 @@ object Helpers {
   def tempUIBackground = itempUIBackground
   def tempUIBackground2 = itempUIBackground2
   def tempLevelBackground = itempLevelBackground
+  
+  buttonContinue = new Button(905, 200, 256, 64, continue, continue2)
+  buttonNewGameMenu = new Button(905, 280, 256, 64, newgame, newgame2)
+  buttonOptions = new Button(905, 360, 256, 64, options, options)
+  buttonCredits = new Button(905, 440, 256, 64, credits, credits)
+  buttonExit = new Button(905, 520, 256, 64, exit, exit)
+  buttonNewGameChar = new Button(799, 600, 256, 64, newgame, newgame2)
+  buttonBackChar = new Button(257, 600, 256, 64, back, back)
+  buttonXP = new Button(1070, 222, 200, 64, XPButton, XPButton2)
+  buttonQuit = new Button(1070, 640, 200, 64, quit, quit)
+  buttonBackLVL = new Button(149, 606, 256, 64, back, back)
+  buttonCharity = new Button(149, 117, 256, 64, charity, charity2)
+  buttonDiligence = new Button(149, 187, 256, 64, diligence, diligence2)
+  buttonHumility = new Button(149, 257, 256, 64, humility, humility2)
+  buttonKindness = new Button(149, 327, 256, 64, kindness, kindness2)
+  buttonPatience = new Button(149, 397, 256, 64, patience, patience2)
+  buttonTemperance = new Button(149, 467, 256, 64, temperance, temperance2)
+  buttonZeal = new Button(149, 537, 256, 64, zeal, zeal2)
   
   /** Few djinn names */
   def djinnName: String = {

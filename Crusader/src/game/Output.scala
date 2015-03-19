@@ -45,26 +45,7 @@ object Output {
     try {
       Display.setFullscreen(getFullscreen)
       Display.setDisplayMode(getDisplayMode)
-      Display.setTitle("Crusader" + " Version " + getVersion)
-      /** TODO
-      // Window's game icon is not loaded right.
-      //Display.setIcon(Array(ByteBuffer.allocate(0x4000).put(new ImageIOImageData().imageToByteBuffer(ImageIO.read(new File("data/icon.png")), false, false, null))))
-
-      var bitit = Files.readAllBytes((new File("data/UI/icon.png")).toPath)
-      var buffis = ByteBuffer.allocate(bitit.length).put(bitit)
-      var buffis2 = new ImageIOImageData.imageToByteBuffer()
-      var arr = (Array(buffis))
-      Display.setIcon(arr)
-      
-      //var test = ByteBuffer.wrap(getBytesFromFile())
-      //var test = new ImageIOImageData.imageToByteBuffer(ImageIO.read(new File("data/UI/icon.png")), false, false, null)
-
-      Display.setIcon(new ByteBuffer {
-        new Array(2)
-        new ImageIOImageData
-        new ImageIOImageData
-      })
-      */
+      Display.setTitle("Crusader version " + getVersion)
       Display.create()
       Display.setVSyncEnabled(vSync)
     } catch {
@@ -103,24 +84,6 @@ object Output {
     } catch {
       case e: Throwable => e.printStackTrace()
     }
-    
-    buttonContinue = new Button(905, 200, 256, 64, continue, continue2)
-    buttonNewGameMenu = new Button(905, 280, 256, 64, newgame, newgame2)
-    buttonOptions = new Button(905, 360, 256, 64, options, options)
-    buttonCredits = new Button(905, 440, 256, 64, credits, credits)
-    buttonExit = new Button(905, 520, 256, 64, exit, exit)
-    buttonNewGameChar = new Button(799, 600, 256, 64, newgame, newgame2)
-    buttonBackChar = new Button(257, 600, 256, 64, back, back)
-    buttonXP = new Button(1070, 242, 200, 64, XPButton, XPButton2)
-    buttonQuit = new Button(1070, 640, 200, 64, quit, quit)
-    buttonBackLVL = new Button(149, 606, 256, 64, back, back)
-    buttonCharity = new Button(149, 117, 256, 64, charity, charity2)
-    buttonDiligence = new Button(149, 187, 256, 64, diligence, diligence2)
-    buttonHumility = new Button(149, 257, 256, 64, humility, humility2)
-    buttonKindness = new Button(149, 327, 256, 64, kindness, kindness2)
-    buttonPatience = new Button(149, 397, 256, 64, patience, patience2)
-    buttonTemperance = new Button(149, 467, 256, 64, temperance, temperance2)
-    buttonZeal = new Button(149, 537, 256, 64, zeal, zeal2)
     
     org.lwjgl.input.Keyboard.enableRepeatEvents(true)
     addLog("Your holy mission is to purify the world from evil.")
@@ -288,7 +251,7 @@ object Output {
     var XPWidth = getPlayer.experience*1.0 / getPlayer.smallestLevel
     if (XPWidth > 1) XPWidth = 1
     if (XPWidth < 0) XPWidth = 0
-    drawQuadTex(XPBar, middle-XP.getImageWidth/2+40, 186, 
+    drawQuadTex(XPBar, middle-XP.getImageWidth/2+40, 176, 
         ((XP.getImageWidth-80)*XPWidth).toInt, XP.getImageHeight-134)
     
     drawQuadTex(tempUIBackground, (getWidth-tempUIBackground.getImageWidth)/2, 
@@ -302,7 +265,7 @@ object Output {
     h -= 35
     drawQuadTex(heart, middle-heart.getImageWidth/2, h, heart.getImageWidth, heart.getImageHeight)
     
-    h += 115
+    h += 105
     val hptext = "HP: " + getPlayer.health.toInt + "/" + getPlayer.maxHealth
     font.drawString(middle-font.getWidth(hptext)/2, h, hptext, Color.black)
     
@@ -319,7 +282,7 @@ object Output {
     else drawQuadTex(buttonXP.tex2, buttonXP.getDrawX, buttonXP.getDrawY, 
         buttonXP.tex2.getImageWidth, buttonXP.tex2.getImageHeight)
         
-    h += 150
+    h += 130
     if (getPlayer.slotWeapon != null) drawQuadTex(getPlayer.slotWeapon.image, 
         middle-getPlayer.slotWeapon.image.getImageWidth*5/2, h, 
         getPlayer.slotWeapon.image.getImageWidth, getPlayer.slotWeapon.image.getImageHeight)
@@ -330,7 +293,7 @@ object Output {
         middle+getPlayer.slotShield.image.getImageWidth*3/2, h, 
         getPlayer.slotShield.image.getImageWidth, getPlayer.slotShield.image.getImageHeight)
     
-    h += 64
+    h += 54
     if (getPlayer.slotRing != null) drawQuadTex(getPlayer.slotRing.image, 
         middle-getPlayer.slotRing.image.getImageWidth*5/2, h, 
         getPlayer.slotRing.image.getImageWidth, getPlayer.slotRing.image.getImageHeight)
@@ -341,8 +304,49 @@ object Output {
         middle+getPlayer.slotUseable.imageEquipped.getImageWidth*3/2, h, 
         getPlayer.slotUseable.imageEquipped.getImageWidth, getPlayer.slotUseable.imageEquipped.getImageHeight)
     
-    h += 144
+    h += 55
+    drawQuadTex(XPBar, middle-100, h, 200, 200)
+    
+    h += 100
+    drawMinimap(middle, h)
+    
     drawQuadTex(buttonQuit.tex, buttonQuit.getDrawX, buttonQuit.getDrawY, buttonQuit.tex.getImageWidth, buttonQuit.tex.getImageHeight)
+  }
+  
+  /** Draw minimap */
+  def drawMinimap(middleX: Int, middleY: Int) {
+    
+    val mapSize = getGrid.getSize
+    for (i <- Range(0,mapSize)) {
+      for (j <- Range(0,mapSize)) {
+        getGrid.getTile(i, j) match {
+          
+          case t if (t.explored && t.getType == TileType.FLOOR) => {
+              var whatToDraw = ""
+              for (obj <- t.getObjectList) {
+                if (obj.isInstanceOf[Item]) whatToDraw = "item"
+                else if (obj.isInstanceOf[Monster]) whatToDraw = "monster"
+                else if (obj.blockMovement) whatToDraw = "wall"
+              }
+              if (whatToDraw == "monster") drawQuadTex(minimapEnemy, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
+              else if (whatToDraw == "item") drawQuadTex(minimapItem, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
+              else if (whatToDraw == "wall") drawQuadTex(minimapWall, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
+              else drawQuadTex(minimapFloor, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
+          }
+          case t if (t.explored && t.getType == TileType.WALL) => 
+            drawQuadTex(minimapWall, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
+          case t if (t.explored && (t.getType == TileType.DJINNDOORH || t.getType == TileType.DJINNDOORV || 
+              t.getType == TileType.DJINNFLOOR || t.getType == TileType.DJINNWALL)) => 
+            drawQuadTex(minimapDjinn, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
+          case t if (t.explored && t.getType == TileType.STAIRS) => 
+            drawQuadTex(minimapStairs, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
+          case t if (t.explored && getGrid.getAltar.getX == t.getX && getGrid.getAltar.getY == t.getY) => 
+            drawQuadTex(minimapAltar, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
+          case _ => drawQuadTex(minimapFog, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
+        }
+      }
+    }
+    
   }
   
   /** Draws Tiles */

@@ -133,6 +133,7 @@ object Main {
     grid = new Grid()
     grid.init
     grid.getTile(player.getX, player.getY).addObject(player)
+    saveGame
   }
   
   /** Follow user input when choosing new level */
@@ -401,6 +402,7 @@ object Main {
     for (monster <- monsterList) monster.turn
     turn += 1
     if (player.health <= 0) {
+      if (new File("save.dat").exists) new File("save.dat").delete
       addLog("You died! Score: " + getPlayer.gold.toInt + ".")
       addLog("Esc to quit and N to start new game.")
     }
@@ -465,8 +467,6 @@ object Main {
     } finally {
       file.close()
     }
-    
-    if (new File("save.dat").exists) new File("save.dat").delete
     
     clearLists
     for (obj <- list) obj match {

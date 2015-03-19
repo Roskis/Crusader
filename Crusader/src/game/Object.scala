@@ -124,7 +124,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   var slotShield: Equipment = null
   var slotRing: Equipment = null
   var slotAmulet: Equipment = null
-  var slotUseable: Useable = null
+  var slotUseable: Useable = new Useable(-100, -100, ItemType.RATMEAT, true)
   
   var effectList = Buffer[Effect]()
   
