@@ -58,8 +58,10 @@ object Prayers extends Enumeration {
   
   /** Stairs are moved to the player's location */
   def stairs = {
-    getGrid.moveStairsToPlayer
-    addLog("Stairs appear near you.")
+    if (getGrid.isWithinGrid(getGrid.getStairs.getX, getGrid.getStairs.getY)) {
+      getGrid.moveStairsToPlayer
+      addLog("Stairs appear near you.")
+    }
   }
   
   /** Smite the monster player is fighting with */
@@ -94,7 +96,7 @@ object Prayers extends Enumeration {
 }
 
 /** Temporary effects on characters */
-trait Effect {
+trait Effect extends Serializable {
   val name: String
   val target: Character
   var duration: Int
@@ -102,7 +104,7 @@ trait Effect {
 }
 
 /** Small heal heal over time */
-class smallHeal(dur: Int, tar: Character) extends Effect {
+class smallHeal(dur: Int, tar: Character) extends Effect with Serializable {
   val name = "healing salve"
   val target = tar
   var duration = dur
@@ -121,7 +123,7 @@ class smallHeal(dur: Int, tar: Character) extends Effect {
 }
 
 /** Poison hurts over time */
-class poison(dur: Int, tar: Character) extends Effect {
+class poison(dur: Int, tar: Character) extends Effect with Serializable {
   val name = "poison"
   val target = tar
   var duration = dur

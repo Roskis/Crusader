@@ -304,10 +304,7 @@ object Output {
         middle+getPlayer.slotUseable.imageEquipped.getImageWidth*3/2, h, 
         getPlayer.slotUseable.imageEquipped.getImageWidth, getPlayer.slotUseable.imageEquipped.getImageHeight)
     
-    h += 55
-    drawQuadTex(XPBar, middle-100, h, 200, 200)
-    
-    h += 100
+    h += 155
     drawMinimap(middle, h)
     
     drawQuadTex(buttonQuit.tex, buttonQuit.getDrawX, buttonQuit.getDrawY, buttonQuit.tex.getImageWidth, buttonQuit.tex.getImageHeight)
@@ -315,7 +312,6 @@ object Output {
   
   /** Draw minimap */
   def drawMinimap(middleX: Int, middleY: Int) {
-    
     val mapSize = getGrid.getSize
     for (i <- Range(0,mapSize)) {
       for (j <- Range(0,mapSize)) {

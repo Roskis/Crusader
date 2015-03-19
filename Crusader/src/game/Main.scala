@@ -51,7 +51,7 @@ object Main {
   displayModes = displayModes.sortWith(_.getBitsPerPixel > _.getBitsPerPixel)
   displayModes = displayModes :+ new DisplayMode(width, height)
   private var displayModeSelector: Int = 0
-  private var fullscreen = getDisplayMode.isFullscreenCapable
+  private var fullscreen = false //getDisplayMode.isFullscreenCapable
   
   var buttonContinue: Button = null
   var buttonNewGameMenu: Button = null
