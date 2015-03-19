@@ -328,7 +328,7 @@ object Output {
                 else if (obj.isInstanceOf[Monster]) whatToDraw = "monster"
                 else if (obj.blockMovement) whatToDraw = "wall"
               }
-              if (whatToDraw == "monster") drawQuadTex(minimapEnemy, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
+              if (whatToDraw == "monster" && t.visible) drawQuadTex(minimapEnemy, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
               else if (whatToDraw == "item") drawQuadTex(minimapItem, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
               else if (whatToDraw == "wall") drawQuadTex(minimapWall, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
               else drawQuadTex(minimapFloor, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
