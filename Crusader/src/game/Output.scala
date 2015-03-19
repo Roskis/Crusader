@@ -320,7 +320,6 @@ object Output {
     for (i <- Range(0,mapSize)) {
       for (j <- Range(0,mapSize)) {
         getGrid.getTile(i, j) match {
-          
           case t if (t.explored && t.getType == TileType.FLOOR) => {
               var whatToDraw = ""
               for (obj <- t.getObjectList) {
@@ -328,9 +327,14 @@ object Output {
                 else if (obj.isInstanceOf[Monster]) whatToDraw = "monster"
                 else if (obj.blockMovement) whatToDraw = "wall"
               }
-              if (whatToDraw == "monster" && t.visible) drawQuadTex(minimapEnemy, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
-              else if (whatToDraw == "item") drawQuadTex(minimapItem, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
-              else if (whatToDraw == "wall") drawQuadTex(minimapWall, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
+              if (getGrid.getAltar.getX == t.getX && getGrid.getAltar.getY == t.getY) 
+                drawQuadTex(minimapAltar, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
+              else if (whatToDraw == "monster" && t.visible) 
+                drawQuadTex(minimapEnemy, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
+              else if (whatToDraw == "item") 
+                drawQuadTex(minimapItem, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
+              else if (whatToDraw == "wall") 
+                drawQuadTex(minimapWall, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
               else drawQuadTex(minimapFloor, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
           }
           case t if (t.explored && t.getType == TileType.WALL) => 
@@ -340,8 +344,6 @@ object Output {
             drawQuadTex(minimapDjinn, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
           case t if (t.explored && t.getType == TileType.STAIRS) => 
             drawQuadTex(minimapStairs, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
-          case t if (t.explored && getGrid.getAltar.getX == t.getX && getGrid.getAltar.getY == t.getY) => 
-            drawQuadTex(minimapAltar, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
           case _ => drawQuadTex(minimapFog, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
         }
       }
