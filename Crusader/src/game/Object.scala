@@ -357,7 +357,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   var description = MonsterType.description(mType)
   var x = startX * 32
   var y = startY * 32
-  def image = MonsterType.image(mType)
+  def image = MonsterType.image(mType, if (mode == "passive") true else false)
   var blockMovement = true
   var blockVision = false
   var mode = "passive"
@@ -541,19 +541,19 @@ object MonsterType extends Enumeration with Serializable {
   }
   
   /** returns texture of the given monster */
-  def image(MonsterType: Monster): Texture = {
+  def image(MonsterType: Monster, isPassive: Boolean): Texture = {
     MonsterType match {
-      case t if (t == RAT) => rat
-      case t if (t == BAT) => bat
-      case t if (t == SNAKE) => snake
-      case t if (t == SPIDER) => spider
-      case t if (t == GOBLINA) => goblina
-      case t if (t == GOBLINB) => goblinb
-      case t if (t == HOUND) => hound
-      case t if (t == LIZARDA) => lizarda
-      case t if (t == LIZARDB) => lizardb
-      case t if (t == LIZARDC) => lizardc
-      case t if (t == CROCODILE) => crocodile
+      case t if (t == RAT) => if (isPassive) rat2 else rat1
+      case t if (t == BAT) => if (isPassive) bat2 else bat1
+      case t if (t == SNAKE) => if (isPassive) snake2 else snake1
+      case t if (t == SPIDER) => if (isPassive) spider2 else spider1
+      case t if (t == GOBLINA) => if (isPassive) goblina2 else goblina1
+      case t if (t == GOBLINB) => if (isPassive) goblinb2 else goblinb1
+      case t if (t == HOUND) => if (isPassive) hound2 else hound1
+      case t if (t == LIZARDA) => if (isPassive) lizarda2 else lizarda1
+      case t if (t == LIZARDB) => if (isPassive) lizardb2 else lizardb1
+      case t if (t == LIZARDC) => if (isPassive) lizardc2 else lizardc1
+      case t if (t == CROCODILE) => if (isPassive) crocodile2 else crocodile1
       case _ => missing
     }
   }
