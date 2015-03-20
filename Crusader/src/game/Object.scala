@@ -105,7 +105,6 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   var blockMovement = true
   var blockVision = false
   
-  var viewRadius = 10
   var health: Double = 20
   var experience: Double = 0
   var gold: Double = 0
@@ -127,6 +126,14 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   var slotUseable: Useable = null
   
   var effectList = Buffer[Effect]()
+  
+  /** Amount of piety defines view range */
+  def viewRadius: Int = {
+    var d = (piety/100).toInt
+    if (d > 5) d = 5
+    else if (d < - 2) d = -2
+    5 + d
+  }
   
   /** When player succeeds praying one random prayer is selected */
   def pray = {
@@ -1149,20 +1156,20 @@ object ItemType extends Enumeration with Serializable {
   /** returns price of the given equipment */
   def price(ItemType: Item): Int = {
     ItemType match {
-      case t if (t == KNIFE) => 20
-      case t if (t == ROBES) => 10
-      case t if (t == IRONARMOR) => 250
-      case t if (t == STEELSWORD) => 400
-      case t if (t == WOODENSHIELD) => 50
-      case t if (t == SMALLHEALPOTION) => 50
-      case t if (t == BATTLEAXE) => 250
-      case t if (t == CLOTH1) => 25
-      case t if (t == CLOTH2) => 25
-      case t if (t == IRONSHIELD) => 300
-      case t if (t == LARGESHIELD) => 400
-      case t if (t == SHORTSWORD) => 100
-      case t if (t == SMALLSHIELD) => 100
-      case t if (t == STEELARMOR) => 400
+      case t if (t == KNIFE) => 4
+      case t if (t == ROBES) => 2
+      case t if (t == IRONARMOR) => 50
+      case t if (t == STEELSWORD) => 80
+      case t if (t == WOODENSHIELD) => 10
+      case t if (t == SMALLHEALPOTION) => 10
+      case t if (t == BATTLEAXE) => 50
+      case t if (t == CLOTH1) => 5
+      case t if (t == CLOTH2) => 5
+      case t if (t == IRONSHIELD) => 60
+      case t if (t == LARGESHIELD) => 80
+      case t if (t == SHORTSWORD) => 20
+      case t if (t == SMALLSHIELD) => 20
+      case t if (t == STEELARMOR) => 80
       case _ => 0
     }
   }
