@@ -32,6 +32,7 @@ object Main {
   private var prevMouseState: Boolean = false
   private var monsterChances = Map[MonsterType.Monster, Int]()
   private var itemChances = Map[ItemType.Item, Int]()
+  private var shopChances = Map[ItemType.Item, Int]()
   private var shopVisited = false
   private var player: Player = null
   private var grid: Grid = null
@@ -130,6 +131,7 @@ object Main {
     level += 1
     updateItemChances
     updateMonsterChances
+    updateShopChances
     grid = new Grid()
     grid.init
     grid.getTile(player.getX, player.getY).addObject(player)
@@ -480,6 +482,7 @@ object Main {
           }
     updateMonsterChances
     updateItemChances
+    updateShopChances
     lastMonster = null
     
     boo
@@ -488,6 +491,7 @@ object Main {
   /** Updaters */
   def updateMonsterChances = monsterChances = MonsterType.levelChance(level)
   def updateItemChances = itemChances = ItemType.levelChance(level)
+  def updateShopChances = shopChances = ItemType.shopChance(level)
   def updateLastMonster(monster: Monster) = lastMonster = monster
   def visitShop = shopVisited = true 
   
@@ -529,6 +533,7 @@ object Main {
   def getLastWheel() = lastWheel
   def getMonsterChances() = monsterChances
   def getItemChances() = itemChances
+  def getShopChances() = shopChances
   def getLastMonster() = lastMonster
   def getShopVisited() = shopVisited
   def getDisplayMode() = displayModes(displayModeSelector)

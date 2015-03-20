@@ -319,11 +319,12 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   override def draw = {
     if (health > 0) {
       drawQuadTex(image, 16 * 32, 8 * 32, image.getImageWidth, image.getImageHeight)
-      if (slotWeapon != null) drawQuadTex(slotWeapon.imageEquipped, 16 * 32, 8 * 32, slotWeapon.imageEquipped.getImageWidth, slotWeapon.imageEquipped.getImageHeight)
-      if (slotArmor != null) drawQuadTex(slotArmor.imageEquipped, 16 * 32, 8 * 32, slotArmor.imageEquipped.getImageWidth, slotArmor.imageEquipped.getImageHeight)
-      if (slotShield != null) drawQuadTex(slotShield.imageEquipped, 16 * 32, 8 * 32, slotShield.imageEquipped.getImageWidth, slotShield.imageEquipped.getImageHeight)
-      if (slotRing != null) drawQuadTex(slotRing.imageEquipped, 16 * 32, 8 * 32, slotRing.imageEquipped.getImageWidth, slotRing.imageEquipped.getImageHeight)
-      if (slotAmulet != null) drawQuadTex(slotAmulet.imageEquipped, 16 * 32, 8 * 32, slotAmulet.imageEquipped.getImageWidth, slotAmulet.imageEquipped.getImageHeight)
+      for (slot <- List(slotWeapon, slotArmor, slotShield)) {
+        if (slot != null && slot.imageEquipped.getImageHeight.toInt == 32 && slot.imageEquipped.getImageWidth.toInt == 32) 
+          drawQuadTex(slot.imageEquipped, 16 * 32, 8 * 32, slot.imageEquipped.getImageWidth, slot.imageEquipped.getImageHeight)
+        else if (slot != null && slot.imageEquipped.getImageHeight == 64 && slot.imageEquipped.getImageWidth == 64)
+          drawQuadTex(slot.imageEquipped, 16 * 32 - 16, 7 * 32, slot.imageEquipped.getImageWidth, slot.imageEquipped.getImageHeight)
+        }
     }
     else drawQuadTex(playerGrave, 16 * 32, 8 * 32, playerGrave.getImageWidth, playerGrave.getImageHeight)
   }
@@ -887,22 +888,41 @@ class Equipment(startX: Int, startY: Int, equipmentType: ItemType.Value, isEquip
 object ItemType extends Enumeration with Serializable {
 
   type Item = Value
-  val KNIFE, ROBES, IRONARMOR, STEELSWORD, WOODENSHIELD, RATMEAT, SMALLHEALPOTION = Value
+  val KNIFE, ROBES, IRONARMOR, STEELSWORD, WOODENSHIELD, RATMEAT, SMALLHEALPOTION, BATTLEAXE, 
+  CLOTH1, CLOTH2, IRONSHIELD, KATANA, LARGESHIELD, SHORTSWORD, SMALLSHIELD, STEELARMOR = Value
   
   /** return chances how items occur in game */
   def levelChance(level: Int): Map[Item, Int] = {
     var chances = Map[Item, Int]()
     level match {
       case l if (l == 1) => chances = 
-        Map(KNIFE -> 1, ROBES -> 1, WOODENSHIELD -> 2, STEELSWORD -> 1, IRONARMOR -> 1, 
-            SMALLHEALPOTION -> 2)
+        Map(WOODENSHIELD -> 2, IRONARMOR -> 1, SMALLHEALPOTION -> 4, SHORTSWORD -> 2, 
+            SMALLSHIELD -> 1)
       case l if (l == 2) => chances = 
-        Map(KNIFE -> 1, ROBES -> 1, WOODENSHIELD -> 2, STEELSWORD -> 1, IRONARMOR -> 1, 
-            SMALLHEALPOTION -> 2)
+        Map(WOODENSHIELD -> 1, IRONARMOR -> 2, SMALLHEALPOTION -> 4, IRONSHIELD -> 1, 
+            SHORTSWORD -> 1, SMALLSHIELD -> 1)
       case l if (l == 3) => chances = 
-        Map(WOODENSHIELD -> 2, STEELSWORD -> 2, IRONARMOR -> 2, SMALLHEALPOTION -> 2)
+        Map(WOODENSHIELD -> 1, STEELSWORD -> 1, IRONARMOR -> 1, SMALLHEALPOTION -> 4, 
+            BATTLEAXE -> 2, IRONSHIELD -> 1, LARGESHIELD -> 1, SHORTSWORD -> 1, SMALLSHIELD -> 2, 
+            STEELARMOR -> 1)
       case l if (l == 4) => chances = 
-        Map(WOODENSHIELD -> 1, STEELSWORD -> 2, IRONARMOR -> 2, SMALLHEALPOTION -> 2)
+        Map(STEELSWORD -> 2, IRONARMOR -> 1, SMALLHEALPOTION -> 4, BATTLEAXE -> 1, IRONSHIELD -> 2, 
+            LARGESHIELD -> 1, SHORTSWORD -> 1, SMALLSHIELD -> 1, STEELARMOR -> 2)
+      case _ => {chances = Map(KNIFE -> 100)}
+    }
+    chances
+  }
+  
+  //BATTLEAXE -> , IRONSHIELD -> , LARGESHIELD -> , SHORTSWORD -> , SMALLSHIELD -> , STEELARMOR -> 
+  
+  /** return chances how items occur in game */
+  def shopChance(level: Int): Map[Item, Int] = {
+    var chances = levelChance(level)
+    level match {
+      case l if (l == 1) => chances += (CLOTH1 -> 2, CLOTH2 -> 2)
+      case l if (l == 2) => chances += (CLOTH1 -> 2, CLOTH2 -> 1)
+      case l if (l == 3) => chances += (CLOTH1 -> 1, CLOTH2 -> 1)
+      case l if (l == 4) => chances += (CLOTH1 -> 1)
       case _ => {chances = Map(KNIFE -> 100)}
     }
     chances
@@ -918,6 +938,15 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == WOODENSHIELD) => "shield"
       case t if (t == RATMEAT) => "item"
       case t if (t == SMALLHEALPOTION) => "item"
+      case t if (t == BATTLEAXE) => "weapon"
+      case t if (t == CLOTH1) => "armor"
+      case t if (t == CLOTH2) => "armor"
+      case t if (t == IRONSHIELD) => "shield"
+      case t if (t == KATANA) => "weapon"
+      case t if (t == LARGESHIELD) => "shield"
+      case t if (t == SHORTSWORD) => "weapon"
+      case t if (t == SMALLSHIELD) => "shield"
+      case t if (t == STEELARMOR) => "armor"
       case _ => ""
     }
   }
@@ -932,6 +961,15 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == WOODENSHIELD) => woodenShieldG
       case t if (t == RATMEAT) => ratG
       case t if (t == SMALLHEALPOTION) => smallhealpotion
+      case t if (t == BATTLEAXE) => battleAxeG
+      case t if (t == CLOTH1) => cloth1G
+      case t if (t == CLOTH2) => cloth2G
+      case t if (t == IRONSHIELD) => ironShieldG
+      case t if (t == KATANA) => katanaG
+      case t if (t == LARGESHIELD) => largeShieldG
+      case t if (t == SHORTSWORD) => shortSwordG
+      case t if (t == SMALLSHIELD) => smallShieldG
+      case t if (t == STEELARMOR) => steelArmorG
       case _ => missing
     }
   }
@@ -946,6 +984,15 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == WOODENSHIELD) => woodenShieldE
       case t if (t == RATMEAT) => ratE
       case t if (t == SMALLHEALPOTION) => smallhealpotion
+      case t if (t == BATTLEAXE) => battleAxeE
+      case t if (t == CLOTH1) => cloth1E
+      case t if (t == CLOTH2) => cloth2E
+      case t if (t == IRONSHIELD) => ironShieldE
+      case t if (t == KATANA) => katanaE
+      case t if (t == LARGESHIELD) => largeShieldE
+      case t if (t == SHORTSWORD) => shortSwordE
+      case t if (t == SMALLSHIELD) => smallShieldE
+      case t if (t == STEELARMOR) => steelArmorE
       case _ => missing
     }
   }
@@ -953,11 +1000,15 @@ object ItemType extends Enumeration with Serializable {
   /** returns armor of the given equipment */
   def armor(ItemType: Item): Double = {
     ItemType match {
-      case t if (t == KNIFE) => 0
       case t if (t == ROBES) => 0
       case t if (t == IRONARMOR) => 1
-      case t if (t == STEELSWORD) => 0
       case t if (t == WOODENSHIELD) => 0.5
+      case t if (t == CLOTH1) => 0
+      case t if (t == CLOTH2) => 0
+      case t if (t == IRONSHIELD) => 1
+      case t if (t == LARGESHIELD) => 1.5
+      case t if (t == SMALLSHIELD) => 1
+      case t if (t == STEELARMOR) => 1.5
       case _ => 0
     }
   }
@@ -966,12 +1017,21 @@ object ItemType extends Enumeration with Serializable {
   def weight(ItemType: Item): Int = {
     ItemType match {
       case t if (t == KNIFE) => 2
-      case t if (t == ROBES) => 0
+      case t if (t == ROBES) => 2
       case t if (t == IRONARMOR) => 25
       case t if (t == STEELSWORD) => 12
       case t if (t == WOODENSHIELD) => 5
       case t if (t == RATMEAT) => 3
       case t if (t == SMALLHEALPOTION) => 2
+      case t if (t == BATTLEAXE) => 15
+      case t if (t == CLOTH1) => 2
+      case t if (t == CLOTH2) => 2
+      case t if (t == IRONSHIELD) => 10
+      case t if (t == KATANA) => 10
+      case t if (t == LARGESHIELD) => 15
+      case t if (t == SHORTSWORD) => 8
+      case t if (t == SMALLSHIELD) => 5
+      case t if (t == STEELARMOR) => 25
       case _ => 0
     }
   }
@@ -979,11 +1039,10 @@ object ItemType extends Enumeration with Serializable {
   /** returns block chance of the given equipment */
   def blockChance(ItemType: Item): Int = {
     ItemType match {
-      case t if (t == KNIFE) => 0
-      case t if (t == ROBES) => 0
-      case t if (t == IRONARMOR) => 0
-      case t if (t == STEELSWORD) => 0
       case t if (t == WOODENSHIELD) => 10
+      case t if (t == IRONSHIELD) => 15
+      case t if (t == LARGESHIELD) => 15
+      case t if (t == SMALLSHIELD) => 10
       case _ => 0
     }
   }
@@ -996,11 +1055,11 @@ object ItemType extends Enumeration with Serializable {
   def damage(ItemType: Item): Tuple3[Int, Int, Int] = {
     ItemType match {
       case t if (t == KNIFE) => (1, 2, 0)
-      case t if (t == ROBES) => (0, 0, 0)
-      case t if (t == IRONARMOR) => (0, 0, 0)
       case t if (t == STEELSWORD) => (1, 6, 0)
-      case t if (t == WOODENSHIELD) => (0, 0, 0)
-      case _ => (0, 0, 0)
+      case t if (t == BATTLEAXE) => (1, 5, 0)
+      case t if (t == KATANA) => (1, 6, 1)
+      case t if (t == SHORTSWORD) => (1, 4, 0)
+      case _ => (1, 1, 0)
     }
   }
   
@@ -1008,10 +1067,10 @@ object ItemType extends Enumeration with Serializable {
   def armorPiercing(ItemType: Item): Int = {
     ItemType match {
       case t if (t == KNIFE) => 0
-      case t if (t == ROBES) => 0
-      case t if (t == IRONARMOR) => 0
       case t if (t == STEELSWORD) => 1
-      case t if (t == WOODENSHIELD) => 0
+      case t if (t == BATTLEAXE) => 2
+      case t if (t == KATANA) => 1
+      case t if (t == SHORTSWORD) => 1
       case _ => 0
     }
   }
@@ -1020,10 +1079,10 @@ object ItemType extends Enumeration with Serializable {
   def accuracy(ItemType: Item): Int = {
     ItemType match {
       case t if (t == KNIFE) => 100
-      case t if (t == ROBES) => 0
-      case t if (t == IRONARMOR) => 0
       case t if (t == STEELSWORD) => 90
-      case t if (t == WOODENSHIELD) => 0
+      case t if (t == BATTLEAXE) => 80
+      case t if (t == KATANA) => 90
+      case t if (t == SHORTSWORD) => 90
       case _ => 0
     }
   }
@@ -1032,10 +1091,10 @@ object ItemType extends Enumeration with Serializable {
   def critChance(ItemType: Item): Int = {
     ItemType match {
       case t if (t == KNIFE) => 4
-      case t if (t == ROBES) => 0
-      case t if (t == IRONARMOR) => 0
       case t if (t == STEELSWORD) => 5
-      case t if (t == WOODENSHIELD) => 0
+      case t if (t == BATTLEAXE) => 6
+      case t if (t == KATANA) => 5
+      case t if (t == SHORTSWORD) => 4
       case _ => 0
     }
   }
@@ -1048,8 +1107,15 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == IRONARMOR) => 250
       case t if (t == STEELSWORD) => 400
       case t if (t == WOODENSHIELD) => 50
-      case t if (t == RATMEAT) => 25
       case t if (t == SMALLHEALPOTION) => 50
+      case t if (t == BATTLEAXE) => 250
+      case t if (t == CLOTH1) => 25
+      case t if (t == CLOTH2) => 25
+      case t if (t == IRONSHIELD) => 300
+      case t if (t == LARGESHIELD) => 400
+      case t if (t == SHORTSWORD) => 100
+      case t if (t == SMALLSHIELD) => 100
+      case t if (t == STEELARMOR) => 400
       case _ => 0
     }
   }
@@ -1064,6 +1130,15 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == WOODENSHIELD) => "wooden shield"
       case t if (t == RATMEAT) => "rat meat"
       case t if (t == SMALLHEALPOTION) => "small healing salve"
+      case t if (t == BATTLEAXE) => "battle axe"
+      case t if (t == CLOTH1) => "clothes"
+      case t if (t == CLOTH2) => "clothes"
+      case t if (t == IRONSHIELD) => "iron shield"
+      case t if (t == KATANA) => "katana"
+      case t if (t == LARGESHIELD) => "large shield"
+      case t if (t == SHORTSWORD) => "steel sword"
+      case t if (t == SMALLSHIELD) => "small shield"
+      case t if (t == STEELARMOR) => "steel armor"
       case _ => "Unknown item name"
     }
   }
@@ -1078,6 +1153,15 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == WOODENSHIELD) => "TODO"
       case t if (t == RATMEAT) => "TODO"
       case t if (t == SMALLHEALPOTION) => "TODO"
+      case t if (t == BATTLEAXE) => "TODO"
+      case t if (t == CLOTH1) => "TODO"
+      case t if (t == CLOTH2) => "TODO"
+      case t if (t == IRONSHIELD) => "TODO"
+      case t if (t == KATANA) => "TODO"
+      case t if (t == LARGESHIELD) => "TODO"
+      case t if (t == SHORTSWORD) => "TODO"
+      case t if (t == SMALLSHIELD) => "TODO"
+      case t if (t == STEELARMOR) => "TODO"
       case _ => "Unknown item description"
     }
   }

@@ -224,7 +224,7 @@ class Grid() extends Serializable {
       }
     }
     for (tile <- slotList) {
-      addItem(new Coordinate(tile.getX, tile.getY)).inShop=true
+      addShopItem(new Coordinate(tile.getX, tile.getY)).inShop=true
     }
     setTile(new Tile(door.getX, door.getY, 
         if(direction == E || direction == W) TileType.DJINNDOORH else TileType.DJINNDOORV))
@@ -291,12 +291,21 @@ class Grid() extends Serializable {
     item
   }
   
+  /** Add random item */
+  def addShopItem(coord: Coordinate) = {
+    val itemType = chooseRandomItem(getShopChances)
+    var item: Item = null
+    if (ItemType.slot(itemType) == "item") item = new Useable(coord.getX, coord.getY, itemType, false)
+    else item = new Equipment(coord.getX, coord.getY, itemType, false)
+    item
+  }
+  
   /** getter for stairs */
   def getStairs() = stairs
   
   /** Add player to the map */
   def movePlayerEp1() = {
-    val startTile = getTile(1, rnd.nextInt(size))
+    val startTile = getTile(1, rnd.nextInt(size-10)+5)
     var boo = true
     val tunnel = line(startTile, getTile(size/2, size/2))
     var n = 0
