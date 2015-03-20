@@ -319,7 +319,7 @@ class Grid() extends Serializable {
       next = getTile(tunnel(n))
       neigh = neighbors(next, 8)
       neigh -= current
-      for (ne <- neigh) if (!ne.blockMovement) boo = false
+      for (ne <- neigh) if (ne.getType == TileType.FLOOR) boo = false
     }
     while (boo)
     getPlayer.setX(next.getX)

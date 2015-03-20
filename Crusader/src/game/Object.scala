@@ -1137,7 +1137,7 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == IRONSHIELD) => "iron shield"
       case t if (t == KATANA) => "katana"
       case t if (t == LARGESHIELD) => "large shield"
-      case t if (t == SHORTSWORD) => "steel sword"
+      case t if (t == SHORTSWORD) => "short sword"
       case t if (t == SMALLSHIELD) => "small shield"
       case t if (t == STEELARMOR) => "steel armor"
       case _ => "Unknown item name"

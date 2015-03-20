@@ -207,7 +207,8 @@ object Output {
       drawQuadTex(blackBorder, 33*32/2-204, 31, 408, 4)
       drawQuadTex(blackBorder, 33*32/2-204, 2, 4, 33)
       drawQuadTex(blackBorder, 33*32/2+200, 2, 4, 33)
-      val monsterStatus = getLastMonster.name + " " + getLastMonster.health.toInt + "/" + MonsterType.maxHP(getLastMonster.mType)
+      val monsterStatus = getLastMonster.name.toUpperCase.head + getLastMonster.name.toLowerCase.tail + 
+      " " + getLastMonster.health.toInt + "/" + MonsterType.maxHP(getLastMonster.mType)
       var HPWidth = getLastMonster.health / MonsterType.maxHP(getLastMonster.mType)
       if (HPWidth > 1) HPWidth = 1
       if (HPWidth < 0) HPWidth = 0
