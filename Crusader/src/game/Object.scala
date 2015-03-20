@@ -143,6 +143,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
         case p if (p == GOLDGAIN) => goldGain
         case p if (p == EXPERIENCEGAIN) => experienceGain
         case p if (p == CLAIRVOYANCE) => clairvoyance
+        case p if (p == ITEM) => item
         case _ => {println("prayer not found")}
       }
     }

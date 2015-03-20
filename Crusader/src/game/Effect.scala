@@ -8,7 +8,7 @@ object Prayers extends Enumeration {
   
   type Prayer = Value
   val PARTIALRESTORATION, FULLRESTORATION, LIGHTNINGBOLT, GOLDLOSS, EXPERIENCELOSS, DEMENTIA, 
-    STAIRS, SMITE, GOLDGAIN, EXPERIENCEGAIN, CLAIRVOYANCE = Value
+    STAIRS, SMITE, GOLDGAIN, EXPERIENCEGAIN, CLAIRVOYANCE, ITEM = Value
   val rnd = getRnd
   
   /** Player regains part of maximum health */
@@ -88,11 +88,18 @@ object Prayers extends Enumeration {
     addLog("You gain " + toAdd.toInt + " experience.")
   }
   
-  /** reveal whole map */
+  /** Reveal whole map */
   def clairvoyance = {
     getGrid.exploreAll
     addLog("Whole map is revealed to you.")
   }
+  
+  /** Give player item */
+  def item = {
+    new Equipment(getPlayer.getX, getPlayer.getY, ItemType.KATANA, false)
+    addLog("Weapon appears under your feet.")
+  }
+  
 }
 
 /** Temporary effects on characters */
