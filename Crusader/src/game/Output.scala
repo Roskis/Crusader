@@ -200,7 +200,7 @@ object Output {
     font.drawString(1046-font.getWidth(gold), 2, gold, Color.white)
     val piety = "Piety: " + getPlayer.piety.toInt
     font.drawString(1046-font.getWidth(piety), 22, piety, Color.white)
-    if (Mouse.getX < 1057 && (getHeight - Mouse.getY) < 545) drawInfoBox
+    drawObjectsUnderMouse
     if (getGameState == GameState.LEVEL) drawLevel
     if (getLastMonster != null) {
       drawQuadTex(blackBorder, 33*32/2-204, 2, 408, 4)
@@ -383,9 +383,11 @@ object Output {
   }
   
   /** Draw info box about objects under mouse */
-  def drawInfoBox() {
-    // TODO
-    //for (obj <- getGrid.getTile(mouseXCoord, mouseYCoord).getObjectList) println(obj.name)
+  def drawObjectsUnderMouse() {
+    val tile = getGrid.getTile(mouseXCoord, mouseYCoord)
+    if (Mouse.getX < 1057 && (getHeight - Mouse.getY) < 545 && tile != null && tile.visible && 
+        !tile.getObjectList.isEmpty) font.drawString(Mouse.getX + 20, getHeight - Mouse.getY - 5, 
+            tile.getObjectList.head.name.toUpperCase.head + tile.getObjectList.head.name.toLowerCase.tail, Color.white)
   }
   
   /** Draw the character level up screen */

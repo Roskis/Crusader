@@ -30,8 +30,8 @@ class Grid() extends Serializable {
         makeMap1(45, 4, 4)
       }
       while (!mapIsContinuous)
-      getTile(altar.getX, altar.getY).addObject(altar)
-      getTile(djinn.getX, djinn.getY).addObject(djinn)
+      if (getTile(altar.getX, altar.getY) != null) getTile(altar.getX, altar.getY).addObject(altar)
+      if (getTile(djinn.getX, djinn.getY) != null) getTile(djinn.getX, djinn.getY).addObject(djinn)
     }
     else if (getLevel == 5) {
       size = 21
@@ -426,7 +426,7 @@ class Grid() extends Serializable {
   def setTile(tile: Tile) = map(tile.getX)(tile.getY) = tile
   
   /** Getter to handle the map, note that will return (x = 1, y = 1) if tile at the given location doesn't exist */
-  def getTile(x: Int, y: Int): Tile = if (isWithinGrid(x, y)) map(x)(y) else map(1)(1)
+  def getTile(x: Int, y: Int): Tile = if (isWithinGrid(x, y)) map(x)(y) else null
   
   /** Getter to handle the map, note that will return (x = 1, y = 1) if tile at the given location doesn't exist */
   def getTile(coord: Coordinate): Tile = getTile(coord.getX, coord.getY)
