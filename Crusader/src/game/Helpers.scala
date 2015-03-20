@@ -226,6 +226,7 @@ object Helpers {
   private val iminimapFloor = loadTexture("UI/minimapFloor")
   private val iminimapFog = loadTexture("UI/minimapFog")
   private val iminimapItem = loadTexture("UI/minimapItem")
+  private val iminimapPlayer = loadTexture("UI/minimapPlayer")
   private val iminimapStairs = loadTexture("UI/minimapStairs")
   private val iminimapWall = loadTexture("UI/minimapWall")
   private val iblackBorder = loadTexture("UI/BlackBorder")
@@ -338,6 +339,7 @@ object Helpers {
   def minimapFloor = iminimapFloor
   def minimapFog = iminimapFog
   def minimapItem = iminimapItem
+  def minimapPlayer = iminimapPlayer
   def minimapStairs = iminimapStairs
   def minimapWall = iminimapWall
   def blackBorder = iblackBorder

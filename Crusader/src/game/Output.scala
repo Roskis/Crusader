@@ -316,16 +316,20 @@ object Output {
     for (i <- Range(0,mapSize)) {
       for (j <- Range(0,mapSize)) {
         getGrid.getTile(i, j) match {
-          case t if (t.explored && t.getType == TileType.FLOOR) => {
+          case t if (t.explored && t.getType == TileType.FLOOR && 
+              getPlayer.getX == t.getX && getPlayer.getY == t.getY) => 
+            drawQuadTex(minimapPlayer, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
+          case t if (t.explored && t.getType == TileType.FLOOR && 
+              getGrid.getAltar.getX == t.getX && getGrid.getAltar.getY == t.getY) => 
+                drawQuadTex(minimapAltar, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
+          case t if (t.explored && t.visible && t.getType == TileType.FLOOR) => {
               var whatToDraw = ""
               for (obj <- t.getObjectList) {
                 if (obj.isInstanceOf[Item]) whatToDraw = "item"
                 else if (obj.isInstanceOf[Monster]) whatToDraw = "monster"
                 else if (obj.blockMovement) whatToDraw = "wall"
               }
-              if (getGrid.getAltar.getX == t.getX && getGrid.getAltar.getY == t.getY) 
-                drawQuadTex(minimapAltar, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
-              else if (whatToDraw == "monster" && t.visible) 
+              if (whatToDraw == "monster" && t.visible) 
                 drawQuadTex(minimapEnemy, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
               else if (whatToDraw == "item") 
                 drawQuadTex(minimapItem, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
@@ -340,7 +344,8 @@ object Output {
             drawQuadTex(minimapDjinn, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
           case t if (t.explored && t.getType == TileType.STAIRS) => 
             drawQuadTex(minimapStairs, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
-          case _ => drawQuadTex(minimapFog, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
+          case t if (t.explored) => drawQuadTex(minimapFog, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
+          case _ => {}
         }
       }
     }
