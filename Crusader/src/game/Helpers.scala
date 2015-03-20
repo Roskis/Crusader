@@ -249,6 +249,11 @@ object Helpers {
   private val itempUIBackground = loadTexture("tempUIBackground")
   private val itempUIBackground2 = loadTexture("tempUIBackground2")
   private val itempLevelBackground = loadTexture("tempLevelBackground")
+  private val ifireballch1 = loadTexture("Effects/fireballch1")
+  private val ifireballch2 = loadTexture("Effects/fireballch2")
+  private val ifireballch3 = loadTexture("Effects/fireballch3")
+  private val ifireballch4 = loadTexture("Effects/fireballch4")
+  private val ifireballch5 = loadTexture("Effects/fireballch5")
   
   /** Return textures */
   def playerImage = iplayerImage
@@ -362,6 +367,11 @@ object Helpers {
   def tempUIBackground = itempUIBackground
   def tempUIBackground2 = itempUIBackground2
   def tempLevelBackground = itempLevelBackground
+  def fireballch1 = ifireballch1
+  def fireballch2 = ifireballch2
+  def fireballch3 = ifireballch3
+  def fireballch4 = ifireballch4
+  def fireballch5 = ifireballch5
   
   buttonContinue = new Button(905, 200, 256, 64, continue, continue2)
   buttonNewGameMenu = new Button(905, 280, 256, 64, newgame, newgame2)

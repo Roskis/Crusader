@@ -129,9 +129,7 @@ object Main {
     shopVisited = false
     clearLists
     level += 1
-    updateItemChances
-    updateMonsterChances
-    updateShopChances
+    updateChances
     grid = new Grid()
     grid.init
     grid.getTile(player.getX, player.getY).addObject(player)
@@ -410,6 +408,12 @@ object Main {
     }
   }
   
+  def updateChances() {
+    updateMonsterChances
+    updateItemChances
+    updateShopChances
+  }
+  
   def clearLists() {
     monsterList.clear
     passiveObjectList.clear
@@ -480,9 +484,7 @@ object Main {
             case o: Useable => useableList.append(o)
             case _ => {}
           }
-    updateMonsterChances
-    updateItemChances
-    updateShopChances
+    updateChances
     lastMonster = null
     
     boo

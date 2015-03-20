@@ -229,7 +229,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
     if (effectiveDamage < 0) effectiveDamage = 0
     health -= effectiveDamage
     addLog(attacker.name.toUpperCase.head + attacker.name.tail + " deals " + 
-        effectiveDamage.toInt.toString + " damage to " + name.toUpperCase.head + name.tail + ".")
+        effectiveDamage.toInt.toString + " damage to " + name + ".")
   }
   
   def armor: Double = {
@@ -377,6 +377,9 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   var shieldArmor = 0
   var usedAbility = false
   var effectList = Buffer[Effect]()
+  var spellcd = 1
+  var spellchannel = 0
+  var extraToDraw = List[Texture]()
   
   init
   getMonsterList.append(this)
@@ -439,6 +442,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
       case m if (m == MonsterType.BAT) => batAI
       case m if (m == MonsterType.RAT) => ratAI
       case m if (m == MonsterType.SNAKE) => snakeAI
+      case m if (m == MonsterType.LIZARDC) => lizardMageAI
       case _ => basicAI
     }
   }
@@ -467,13 +471,46 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     }
     else if (distance(getPlayer) < 2 && !usedAbility) {
       usedAbility = true
-      addLog(name.toUpperCase.head + name.tail + " bites " + getPlayer.name.toUpperCase.head + 
-          getPlayer.name.tail + " with its poisonous fangs.")
+      addLog(name.toUpperCase.head + name.tail + " bites " + getPlayer.name + " with its poisonous fangs.")
       getPlayer.effectList = getPlayer.effectList :+ new poison(roll(5)+5, getPlayer)
     }
     else {
       mode = "aggressive"
       tryAttack
+    }
+  }
+  
+  /** AI for lizard mages */
+  def lizardMageAI = {
+    if (distance(getPlayer) > 7 && mode == "passive") {}
+    else if (getGrid.getTile(getX, getY).visible && distance(getPlayer) <= 4 && spellcd <= 0) {
+      if (spellchannel <= 0) {
+        spellcd = 5
+        val dmg = roll(6)
+        addLog(name.toUpperCase.head + name.toLowerCase.tail + " Casts fireball dealing " + dmg + 
+            " damage to " + getPlayer.name + ".")
+        getPlayer.health -= dmg
+        extraToDraw = List()
+        }
+      else {
+      spellchannel -= 1
+      if (spellchannel == 4) extraToDraw = List(fireballch5)
+      else if (spellchannel == 3) extraToDraw = List(fireballch4)
+      else if (spellchannel == 2) extraToDraw = List(fireballch3)
+      else if (spellchannel == 1) extraToDraw = List(fireballch2)
+      else if (spellchannel == 0) extraToDraw = List(fireballch1)
+      }
+    }
+    else {
+      if (mode == "passive") {
+        mode == "aggressive"
+        spellcd = 1
+      }
+      if (distance(getPlayer) > 4) move(getGrid.line(getX, getY, getPlayer.getX, getPlayer.getY)(1))
+      else if (distance(getPlayer) < 4) move(getCoordinates(getDirection(getPlayer.getCoordinate, getCoordinate), this))
+      extraToDraw = List()
+      spellchannel = 5
+      spellcd -= 1
     }
   }
   
@@ -510,9 +547,18 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   
   /** Draw the object to the screen */
   override def draw = {
-    if (getGrid.getTile(getX, getY).visible && getGrid.getTile(getX, getY).explored) 
+    if (getGrid.getTile(getX, getY).visible && getGrid.getTile(getX, getY).explored) {
       drawQuadTex(image, x - (getPlayer.getX - 16) * 32, 
           y - (getPlayer.getY - 8) * 32, image.getImageWidth, image.getImageHeight)
+      for (extra <- extraToDraw) {
+        if (extra.getImageHeight.toInt == 32 && extra.getImageWidth.toInt == 32) 
+          drawQuadTex(extra, x - (getPlayer.getX - 16) * 32, y - (getPlayer.getY - 8) * 32, 
+              extra.getImageWidth, extra.getImageHeight)
+        else if (extra.getImageHeight.toInt == 64 && extra.getImageWidth.toInt == 64) 
+          drawQuadTex(extra, x - (getPlayer.getX - 16) * 32 - 16, y - (getPlayer.getY - 7) * 32, 
+              extra.getImageWidth, extra.getImageHeight)
+      }
+    }
   }
 }
 
