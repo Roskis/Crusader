@@ -128,13 +128,17 @@ class Grid() extends Serializable {
     addStairsEp1
     addTrees(16)
     addRocks(4)
+    
+    do {movePlayerEp1}
+    while (!(getTile(getPlayer.getX, getPlayer.getY)).getObjectList.isEmpty || 
+        !(getTile(getPlayer.getX, getPlayer.getY).tileType == TileType.WALL || 
+            getTile(getPlayer.getX, getPlayer.getY).tileType == TileType.FLOOR))
+    setTile(new Tile(getPlayer.getX, getPlayer.getY, TileType.FLOOR))
+    map(getPlayer.getX)(getPlayer.getY).explored = true
+    
     addMonsters(20)
     makeSecret
     
-    do {movePlayerEp1}
-    while (!(getTile(getPlayer.getX, getPlayer.getY)).getObjectList.isEmpty)
-    setTile(new Tile(getPlayer.getX, getPlayer.getY, TileType.FLOOR))
-    map(getPlayer.getX)(getPlayer.getY).explored = true
   }
   
   /** cellular automata function to round map a bit */
@@ -299,8 +303,9 @@ class Grid() extends Serializable {
     var coord: Coordinate = null
     for (n <- Range(0, num)) {
       do coord = giveRandomNonBlockingCoordinates
-      while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || 
-          !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
+      while (getTile(coord.getX, coord.getY).getType != TileType.FLOOR || 
+          !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty || 
+          getPlayer.distance(coord) < 5)
       new Monster(coord.getX, coord.getY, chooseRandomMonster(getMonsterChances))
     }
   }

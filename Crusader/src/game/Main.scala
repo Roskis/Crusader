@@ -401,7 +401,14 @@ object Main {
     player.effectList.filter(_.duration <= 0) foreach {player.effectList -= _}
     for (monster <- monsterList) monster.turn
     turn += 1
-    if (player.health <= 0) {
+    if (player.health <= 0 && player.piety >= 500) {
+      player.piety = player.piety/2 - 500
+      if (player.piety < 0) player.piety = 0
+      player.experience = 0
+      player.health = player.maxHealth
+      addLog("You died, but you were resurrected!")
+    }
+    else if (player.health <= 0) {
       if (new File("save.dat").exists) new File("save.dat").delete
       addLog("You died! Score: " + getPlayer.gold.toInt + ".")
       addLog("Esc to quit and N to start new game.")
