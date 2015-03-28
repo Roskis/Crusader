@@ -101,6 +101,21 @@ object Direction extends Enumeration {
     dir
   }
   
+  /** Method to get adjacent directions */
+  def getAdjacentDirections(dir: Direction): Tuple2[Direction, Direction] = {
+    dir match {
+      case d if (d == N) => (NW, NE)
+      case d if (d == NE) => (N, E)
+      case d if (d == E) => (NE, SE)
+      case d if (d == SE) => (E, S)
+      case d if (d == S) => (SE, SW)
+      case d if (d == SW) => (S, W)
+      case d if (d == W) => (SW, NW)
+      case d if (d == NW) => (W, N)
+      case _ => (N, N)
+    }
+  }
+  
   /** Return random direction. Insert 4 if you want to move only with main directions and 8 if you 
    *  want to allow intermediate directions.
    *
@@ -119,7 +134,6 @@ object Direction extends Enumeration {
       case r if (r == 7) => SE
     }
   }
-  
 }
 
 /** Methods that don't anywhere but are needed everywhere */
@@ -132,27 +146,29 @@ object Helpers {
   private val iplayerImage =  loadTexture("Player/humanBase")
   private val iplayerGrave =  loadTexture("Environment/grave")
   private val irat1 = loadTexture("Monsters/rat1")
-  private val ibat1 = loadTexture("Monsters/bat1")
-  private val isnake1 = loadTexture("Monsters/snake1")
-  private val ispider1 = loadTexture("Monsters/spider1")
-  private val igoblina1 = loadTexture("Monsters/goblina1")
-  private val igoblinb1 = loadTexture("Monsters/goblinb1")
-  private val ihound1 = loadTexture("Monsters/hound1")
-  private val ilizarda1 = loadTexture("Monsters/lizarda1")
-  private val ilizardb1 = loadTexture("Monsters/lizardb1")
-  private val ilizardc1 = loadTexture("Monsters/lizardc1")
-  private val icrocodile1 = loadTexture("Monsters/crocodile1")
   private val irat2 = loadTexture("Monsters/rat2")
+  private val ibat1 = loadTexture("Monsters/bat1")
   private val ibat2 = loadTexture("Monsters/bat2")
+  private val isnake1 = loadTexture("Monsters/snake1")
   private val isnake2 = loadTexture("Monsters/snake2")
+  private val ispider1 = loadTexture("Monsters/spider1")
   private val ispider2 = loadTexture("Monsters/spider2")
+  private val igoblina1 = loadTexture("Monsters/goblina1")
   private val igoblina2 = loadTexture("Monsters/goblina2")
+  private val igoblinb1 = loadTexture("Monsters/goblinb1")
   private val igoblinb2 = loadTexture("Monsters/goblinb2")
+  private val ihound1 = loadTexture("Monsters/hound1")
   private val ihound2 = loadTexture("Monsters/hound2")
+  private val ilizarda1 = loadTexture("Monsters/lizarda1")
   private val ilizarda2 = loadTexture("Monsters/lizarda2")
+  private val ilizardb1 = loadTexture("Monsters/lizardb1")
   private val ilizardb2 = loadTexture("Monsters/lizardb2")
+  private val ilizardc1 = loadTexture("Monsters/lizardc1")
   private val ilizardc2 = loadTexture("Monsters/lizardc2")
+  private val icrocodile1 = loadTexture("Monsters/crocodile1")
   private val icrocodile2 = loadTexture("Monsters/crocodile2")
+  private val isloth1 = loadTexture("tempSloth")
+  private val isloth2 = loadTexture("tempSloth")
   private val iknifeG = loadTexture("Items/knifeG")
   private val iknifeE = loadTexture("Player/knifeE")
   private val irobesG = loadTexture("Items/robesG")
@@ -260,27 +276,29 @@ object Helpers {
   def playerGrave = iplayerGrave
   def missing = imissing
   def rat1 = irat1
-  def bat1 = ibat1
-  def snake1 = isnake1
-  def spider1 = ispider1
-  def goblina1 = igoblina1
-  def goblinb1 = igoblinb1
-  def hound1 = ihound1
-  def lizarda1 = ilizarda1
-  def lizardb1 = ilizardb1
-  def lizardc1 = ilizardc1
-  def crocodile1 = icrocodile1
   def rat2 = irat2
+  def bat1 = ibat1
   def bat2 = ibat2
+  def snake1 = isnake1
   def snake2 = isnake2
+  def spider1 = ispider1
   def spider2 = ispider2
+  def goblina1 = igoblina1
   def goblina2 = igoblina2
+  def goblinb1 = igoblinb1
   def goblinb2 = igoblinb2
+  def hound1 = ihound1
   def hound2 = ihound2
+  def lizarda1 = ilizarda1
   def lizarda2 = ilizarda2
+  def lizardb1 = ilizardb1
   def lizardb2 = ilizardb2
+  def lizardc1 = ilizardc1
   def lizardc2 = ilizardc2
+  def crocodile1 = icrocodile1
   def crocodile2 = icrocodile2
+  def sloth1 = isloth1
+  def sloth2 = isloth2
   def knifeG = iknifeG
   def knifeE = iknifeE
   def robesG = irobesG

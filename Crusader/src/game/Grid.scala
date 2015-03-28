@@ -30,18 +30,16 @@ class Grid() extends Serializable {
         makeMap1(45, 4, 4)
       }
       while (!mapIsContinuous)
-      if (getTile(altar.getX, altar.getY) != null) getTile(altar.getX, altar.getY).addObject(altar)
-      if (getTile(djinn.getX, djinn.getY) != null) getTile(djinn.getX, djinn.getY).addObject(djinn)
     }
     else if (getLevel == 5) {
-      size = 21
+      size = 27
       map = Array.ofDim[Tile](size, size)
-      altar = new PassiveObject("Altar", " TODO ", -100, -100, "Environment/altar1")
+      altar = new PassiveObject("Altar", " TODO ", -100, -100, "Environment/altar2")
       djinn = new PassiveObject("Djinn", " TODO ", -100, -100, "tempDjinn")
       makeBoss1
     }
     else {
-      size = 10
+      size = 40
       map = Array.ofDim[Tile](size, size)
       altar = new PassiveObject("Altar", " TODO ", -100, -100, "Environment/altar1")
       djinn = new PassiveObject("Djinn", " TODO ", -100, -100, "tempDjinn")
@@ -51,17 +49,44 @@ class Grid() extends Serializable {
 
   /** Temporary bossmap */
   def makeBoss1() {
-    map(size/2)(size/2) = new Tile(size/2, size/2, TileType.FLOOR)
+    map(size/2+3)(size/2) = new Tile(size/2+3, size/2, TileType.FLOOR)
     for (i <- Range(0,size)) {
       for (j <- Range(0,size)) {
-        map(i)(j) = new Tile(i, j, TileType.FLOOR)
-        map(i)(j) = new Tile(i, j, if (map(i)(j).distance(map(size/2)(size/2)) <= 9) TileType.FLOOR
-        else TileType.WALL)
+        setTile(new Tile(i, j, if (map(size/2+3)(size/2).distance(new Coordinate(i, j)) <= 9 || 
+            (i > 0 && i < 6 && j > size/2-3 && j < size/2+1)) TileType.FLOOR else TileType.WALL)
+        )
       }
     }
-  getPlayer.setX(size/8)
-  getPlayer.setY(size/2)
+  map(6)(13).tileType = TileType.FLOOR
+  map(7)(13).tileType = TileType.BOSSDOOR
+    
+  map(1)(11).tileType = TileType.WALL
+  map(5)(11).tileType = TileType.WALL
+  map(3)(10).tileType = TileType.FLOOR
+  altar.setX(3)
+  altar.setY(11)
+  getTile(3, 11).addObject(altar)
+  
+  for (x <- Range(1,6)) {
+    for (y <- Range(14,19)) {
+      map(x)(y).tileType = TileType.DJINNFLOOR
+      if (((x == 1 || x == 5) && y > 14 && y < 18) || (y == 18 && x < 5 && x > 1)) addShopItem(new Coordinate(x, y)).inShop=true
+    }
+  }
+  map(1)(14).tileType = TileType.FLOOR
+  map(5)(14).tileType = TileType.FLOOR
+  map(1)(18).tileType = TileType.WALL
+  map(5)(18).tileType = TileType.WALL
+  djinn.setX(3)
+  djinn.setY(16)
+  getTile(3, 16).addObject(djinn)
+  
+  getPlayer.setX(1)
+  getPlayer.setY(13)
   map(getPlayer.getX)(getPlayer.getY).explored = true
+  
+  new Monster(15, 13, MonsterType.SLOTH)
+  
   }
   
   /** Make first episode map.
@@ -72,10 +97,11 @@ class Grid() extends Serializable {
   def makeMap1(startProcent: Int, birthlimit: Int, deathlimit: Int) = {
     for (i <- Range(0,size)) {
       for (j <- Range(0,size)) {
-        map(i)(j) = new Tile(i, j, 
+        setTile(new Tile(i, j, 
             if (rnd.nextInt(100) < startProcent) TileType.WALL 
             else if (i == 0 || j == 0 || i + 1 == size || j + 1 == size) TileType.WALL 
             else TileType.FLOOR)
+        )
       }
     }
     roundEdges(birthlimit, deathlimit)
@@ -83,12 +109,18 @@ class Grid() extends Serializable {
     roundEdges(birthlimit, deathlimit)
     roundEdges(birthlimit, deathlimit)
     
-    if (rnd.nextInt(4) != 0) addShop
+    if (rnd.nextInt(4) != 0) {
+      addShop
+      getTile(djinn.getX, djinn.getY).addObject(djinn)
+    }
     else {
       djinn.setX(-100)
       djinn.setY(-100)
     }
-    if (rnd.nextInt(5) != 0) addAltar
+    if (rnd.nextInt(5) != 0) {
+      addAltar
+      getTile(altar.getX, altar.getY).addObject(altar)
+    }
     else {
       altar.setX(-100)
       altar.setY(-100)
@@ -147,13 +179,15 @@ class Grid() extends Serializable {
   def testMap() {
     for (i <- Range(0,size)) {
       for (j <- Range(0,size)) {
-        map(i)(j) = new Tile(i, j, 
+        setTile(new Tile(i, j, 
             if (rnd.nextInt(100) < 10) TileType.WALL 
             else if (i == 0 || j == 0 || i + 1 == size || j + 1 == size) TileType.WALL 
             else TileType.FLOOR)
+        )
       }
     }
     addStairsEp1
+    addMonsters(400)
     getPlayer.setX(size/2)
     getPlayer.setY(size/2)
   }
@@ -178,8 +212,9 @@ class Grid() extends Serializable {
       
     for (x <- Range(coord.getX-3, coord.getX+4)) {
       for (y <- Range(coord.getY-3, coord.getY+4)) {
-        if (map(x)(y).distance(coord.getX, coord.getY) > 2 && map(x)(y).distance(coord.getX, coord.getY) < 3.5) map(x)(y) = new Tile(x, y, TileType.DJINNWALL)
-        else if (map(x)(y).distance(coord.getX, coord.getY) <= 2) map(x)(y) = new Tile(x, y, TileType.DJINNFLOOR)
+        if (map(x)(y).distance(coord.getX, coord.getY) > 2 && 
+            map(x)(y).distance(coord.getX, coord.getY) < 3.5) setTile(new Tile(x, y, TileType.DJINNWALL))
+        else if (map(x)(y).distance(coord.getX, coord.getY) <= 2) setTile(new Tile(x, y, TileType.DJINNFLOOR))
       }
     }
     
@@ -238,7 +273,7 @@ class Grid() extends Serializable {
       do coord = giveRandomNonBlockingCoordinates
       while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || 
           !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
-      if (rnd.nextInt(2) == 0 ) {
+      if (rnd.nextBoolean) {
         tree = new PassiveObject("Tree", "TODO", coord.getX, coord.getY, "Environment/bigTree1")
         tree.blockMovement = true
       }
@@ -255,7 +290,7 @@ class Grid() extends Serializable {
       do coord = giveRandomNonBlockingCoordinates
       while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || 
           !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
-      rock = new PassiveObject("Rock", "TODO", coord.getX, coord.getY, if (rnd.nextInt(2) == 0) "Environment/rock1" else "Environment/rock2")
+      rock = new PassiveObject("Rock", "TODO", coord.getX, coord.getY, if (rnd.nextBoolean) "Environment/rock1" else "Environment/rock2")
     }
   }
   
@@ -356,7 +391,7 @@ class Grid() extends Serializable {
     val tile = giveTileNearPlayer(5)
     stairs.objectList = Buffer[Object]()
     for (obj <- getTile(tile.getX, tile.getY).getObjectList) stairs.addObject(obj)
-    map(stairs.getX)(stairs.getY) = new Tile(stairs.getX, stairs.getY, TileType.FLOOR)
+    setTile(new Tile(stairs.getX, stairs.getY, TileType.FLOOR))
     for (obj <- tempList) getTile(stairs.getX, stairs.getY).addObject(obj)
     stairs.setX(tile.getX)
     stairs.setY(tile.getY)
@@ -384,7 +419,7 @@ class Grid() extends Serializable {
     do {
       boo = true
       current = next
-      map(current.getX)(current.getY) = new Tile(current.getX, current.getY, TileType.FLOOR)
+      setTile(new Tile(current.getX, current.getY, TileType.FLOOR))
       n+= 1
       next = getTile(tunnel(n))
       neigh = neighbors(next, 8)
@@ -392,7 +427,7 @@ class Grid() extends Serializable {
       for (ne <- neigh) if (!ne.blockMovement) boo = false
     }
     while (boo)
-    map(next.getX)(next.getY) = new Tile(next.getX, next.getY, TileType.SECRETDOOR)
+    setTile(new Tile(next.getX, next.getY, TileType.SECRETDOOR))
     addItem(new Coordinate(secretTile.getX, secretTile.getY))
   }
   

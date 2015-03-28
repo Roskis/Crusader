@@ -6,7 +6,7 @@ import scala.collection.mutable.Buffer
 
 import org.newdawn.slick.opengl.Texture
 
-import Main.{getPlayer, getShopVisited, nextMap}
+import Main.{getPlayer, getShopVisited, nextMap, getLevel, getGrid}
 import Output.drawQuadTex
 
 import Helpers._
@@ -49,6 +49,11 @@ class Tile(Xcoord: Int, Ycoord: Int, var tileType: TileType.Value) extends Seria
     else if (obj.isInstanceOf[Player] && tileType == TileType.STAIRS) nextMap
     else if (obj.isInstanceOf[Player] && tileType == TileType.SECRETDOOR) {
       addLog("You have found a secret!")
+      tileType = TileType.FLOOR
+    }
+    else if (obj.isInstanceOf[Player] && tileType == TileType.BOSSDOOR) {
+      if (getLevel == 5) getGrid.getTile(6, 13).tileType = TileType.WALL
+      getGrid.unexploreAll
       tileType = TileType.FLOOR
     }
   }
@@ -107,7 +112,7 @@ class Tile(Xcoord: Int, Ycoord: Int, var tileType: TileType.Value) extends Seria
 object TileType extends Enumeration {
 
   type Type = Value
-  val FLOOR, WALL, STAIRS, DJINNDOORH, DJINNDOORV, DJINNFLOOR, DJINNWALL, SECRETDOOR = Value
+  val FLOOR, WALL, STAIRS, DJINNDOORH, DJINNDOORV, DJINNFLOOR, DJINNWALL, SECRETDOOR, BOSSDOOR = Value
   private val rnd = Main.getRnd
   
   /** returns texture of the given tile type */
@@ -121,6 +126,7 @@ object TileType extends Enumeration {
       case t if (t == DJINNFLOOR) => tempDjinnFloor
       case t if (t == DJINNWALL) => tempDjinnWall
       case t if (t == SECRETDOOR) => wall1
+      case t if (t == BOSSDOOR) => grass1
       case _ => missing
     }
   }
@@ -136,6 +142,7 @@ object TileType extends Enumeration {
       case t if (t == DJINNFLOOR) => false
       case t if (t == DJINNWALL) => true
       case t if (t == SECRETDOOR) => false
+      case t if (t == BOSSDOOR) => false
       case _ => true
     }
   }
@@ -151,6 +158,7 @@ object TileType extends Enumeration {
       case t if (t == DJINNFLOOR) => false
       case t if (t == DJINNWALL) => true
       case t if (t == SECRETDOOR) => true
+      case t if (t == BOSSDOOR) => false
       case _ => true
     }
   }

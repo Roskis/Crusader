@@ -159,17 +159,20 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
     else getPlayer.piety -= rnd.nextInt(5)+6
   }
   
-  /** modifier applied to prays */
+  /** Modifier applied to prays */
   def prayChance = 10 + (charity*2.5) + 
-  (if (getX == getGrid.getAltar.getX && getY == getGrid.getAltar.getY) 20 else 0)
+  (if (getX == getGrid.getAltar.getX && getY == getGrid.getAltar.getY && getLevel%5 == 0) 40
+  else if (getX == getGrid.getAltar.getX && getY == getGrid.getAltar.getY) 20
+  else if (getLevel%5 == 0) 10
+  else 0)
   
-  /** modifier applied to all expirience gained */
+  /** Modifier applied to all expirience gained */
   def giveXP(amount: Double) = experience += amount * (1+0.1*diligence)
   
-  /** modifier applied to all gold gained */
+  /** Modifier applied to all gold gained */
   def giveGold(amount: Double) = gold += amount * (1+0.1*diligence)
   
-  /** modifier applied to all piety gained */
+  /** Modifier applied to all piety gained */
   def givePiety(amount: Double) = piety += amount * (1+0.1*charity)
   
   /** Player's maximum health */
@@ -250,6 +253,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
     slotArmor.armor + patienceBonus
   }
   
+  /** Armor poercing of weapon used */
   def ap: Double = if (slotWeapon != null) slotWeapon.armorPiercing else 0
   
   /** Critical chance of weapon used */
@@ -403,6 +407,9 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     getPlayer.giveXP(experience)
     getPlayer.giveGold(gold)
     getPlayer.givePiety(piety)
+    if (mType == MonsterType.SLOTH) addLog(getPlayer.name.toUpperCase.head + getPlayer.name.tail + 
+        " slained the first boss! Unfortunately demo ends here. Your Score is " + 
+        getPlayer.gold.toInt + ".")
   }
   
   /** Takes damage from attack */
@@ -450,6 +457,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
       case m if (m == MonsterType.RAT) => ratAI
       case m if (m == MonsterType.SNAKE) => snakeAI
       case m if (m == MonsterType.LIZARDC) => lizardMageAI
+      case m if (m == MonsterType.SLOTH) => slothAI
       case _ => basicAI
     }
   }
@@ -464,7 +472,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   def ratAI = {
     if (mode == "passive" && distance(getPlayer) <= 4) mode = "flee"
     else if (mode == "flee") {
-      if (rnd.nextInt(2) == 0) move(getCoordinates(getDirection(getPlayer.getCoordinate, getCoordinate), this))
+      if (rnd.nextBoolean) move(getCoordinates(getDirection(getPlayer.getCoordinate, getCoordinate), this))
       else if (rnd.nextInt(5) == 0) addLog(name.toUpperCase.head + name.tail + " squeaks.")
     }
     else if (mode == "aggressive") tryAttack
@@ -521,6 +529,19 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     }
   }
   
+  /** AI for sloth demon */
+  def slothAI = {
+    if (distance(getPlayer) > 6 && mode == "aggressive") {mode = "passive"}
+    else if (distance(getPlayer) > 6 && mode == "passive") {
+      if (rnd.nextInt(5) == 0) health += 1
+      if (health > MonsterType.maxHP(mType)) health = MonsterType.maxHP(mType)
+    }
+    else if (rnd.nextInt(4) != 0) {
+      mode = "aggressive"
+      tryAttack
+    }
+  }
+  
   /** Simple ai for most of the monsters */
   def basicAI = {
     if (distance(getPlayer) > 7 && mode == "passive") {}
@@ -533,7 +554,14 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   /** Either move towards player or attack player */
   def tryAttack() = {
     if (distance(getPlayer) < 2) attack(getPlayer)
-    else move(getGrid.line(getX, getY, getPlayer.getX, getPlayer.getY)(1))
+    else {
+      val goto = getDirection(new Coordinate(this.getX, this.getY), new Coordinate(getPlayer.getX, getPlayer.getY))
+      if (getGrid.getTile(getCoordinates(goto, getX, getY)).blockMovement) {
+        if (rnd.nextBoolean) move(getAdjacentDirections(goto)._1)
+        else move(getAdjacentDirections(goto)._2)
+      }
+      else move(goto)
+      }
   }
   
   /** Move monster to given coordinate */
@@ -572,7 +600,8 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
 object MonsterType extends Enumeration with Serializable {
 
   type Monster = Value
-  val RAT, BAT, SNAKE, SPIDER, GOBLINA, GOBLINB, HOUND, LIZARDA, LIZARDB, LIZARDC, CROCODILE = Value
+  val RAT, BAT, SNAKE, SPIDER, GOBLINA, GOBLINB, HOUND, LIZARDA, LIZARDB, LIZARDC, CROCODILE, 
+  SLOTH = Value
   
   /** return chances how monsters occur in game */
   def levelChance(level: Int): Map[Monster, Int] = {
@@ -609,6 +638,7 @@ object MonsterType extends Enumeration with Serializable {
       case t if (t == LIZARDB) => if (isPassive) lizardb2 else lizardb1
       case t if (t == LIZARDC) => if (isPassive) lizardc2 else lizardc1
       case t if (t == CROCODILE) => if (isPassive) crocodile2 else crocodile1
+      case t if (t == SLOTH) => if (isPassive) sloth2 else sloth1
       case _ => missing
     }
   }
@@ -627,6 +657,7 @@ object MonsterType extends Enumeration with Serializable {
       case t if (t == LIZARDB) => 15
       case t if (t == LIZARDC) => 15
       case t if (t == CROCODILE) => 20
+      case t if (t == SLOTH) => 50
       case _ => 0
     }
   }
@@ -649,6 +680,7 @@ object MonsterType extends Enumeration with Serializable {
       case t if (t == LIZARDB) => (1, 4, 0)
       case t if (t == LIZARDC) => (1, 4, 0)
       case t if (t == CROCODILE) => (1, 5, 0)
+      case t if (t == SLOTH) => (3, 3, 1)
       case _ => (0, 0, 0)
     }
   }
@@ -667,6 +699,7 @@ object MonsterType extends Enumeration with Serializable {
       case t if (t == LIZARDB) => 1
       case t if (t == LIZARDC) => 0
       case t if (t == CROCODILE) => 2
+      case t if (t == SLOTH) => 2
       case _ => 0
     }
   }
@@ -685,6 +718,7 @@ object MonsterType extends Enumeration with Serializable {
       case t if (t == LIZARDB) => 85
       case t if (t == LIZARDC) => 75
       case t if (t == CROCODILE) => 80
+      case t if (t == SLOTH) => 50
       case _ => 0
     }
   }
@@ -701,8 +735,9 @@ object MonsterType extends Enumeration with Serializable {
       case t if (t == HOUND) => 6
       case t if (t == LIZARDA) => 5
       case t if (t == LIZARDB) => 5
-      case t if (t == LIZARDC) => 10
+      case t if (t == LIZARDC) => 5
       case t if (t == CROCODILE) => 2
+      case t if (t == SLOTH) => 10
       case _ => 0
     }
   }
@@ -721,6 +756,7 @@ object MonsterType extends Enumeration with Serializable {
       case t if (t == LIZARDB) => 8
       case t if (t == LIZARDC) => 10
       case t if (t == CROCODILE) => 0
+      case t if (t == SLOTH) => 0
       case _ => 0
     }
   }
@@ -739,6 +775,7 @@ object MonsterType extends Enumeration with Serializable {
       case t if (t == LIZARDB) => 1
       case t if (t == LIZARDC) => 0
       case t if (t == CROCODILE) => 2
+      case t if (t == SLOTH) => 2
       case _ => 0
     }
   }
@@ -757,6 +794,7 @@ object MonsterType extends Enumeration with Serializable {
       case t if (t == LIZARDB) => 10
       case t if (t == LIZARDC) => 10
       case t if (t == CROCODILE) => 20
+      case t if (t == SLOTH) => 200
       case _ => 0
     }
   }
@@ -775,6 +813,7 @@ object MonsterType extends Enumeration with Serializable {
       case t if (t == LIZARDB) => 15
       case t if (t == LIZARDC) => 15
       case t if (t == CROCODILE) => 20
+      case t if (t == SLOTH) => 200
       case _ => 0
     }
   }
@@ -793,6 +832,7 @@ object MonsterType extends Enumeration with Serializable {
       case t if (t == LIZARDB) => 15
       case t if (t == LIZARDC) => 15
       case t if (t == CROCODILE) => 0
+      case t if (t == SLOTH) => 200
       case _ => 0
     }
   }
@@ -811,6 +851,7 @@ object MonsterType extends Enumeration with Serializable {
       case t if (t == LIZARDB) => "lizard"
       case t if (t == LIZARDC) => "lizard"
       case t if (t == CROCODILE) => "crocodile"
+      case t if (t == SLOTH) => "sloth demon"
       case _ => "Unknown monster name"
     }
   }
@@ -829,6 +870,7 @@ object MonsterType extends Enumeration with Serializable {
       case t if (t == LIZARDB) => "TODO"
       case t if (t == LIZARDC) => "TODO"
       case t if (t == CROCODILE) => "TODO"
+      case t if (t == SLOTH) => "TODO"
       case _ => "Unknown monster name"
     }
   }
@@ -962,6 +1004,9 @@ object ItemType extends Enumeration with Serializable {
       case l if (l == 4) => chances = 
         Map(STEELSWORD -> 2, IRONARMOR -> 1, SMALLHEALPOTION -> 4, BATTLEAXE -> 1, IRONSHIELD -> 2, 
             LARGESHIELD -> 1, SHORTSWORD -> 1, SMALLSHIELD -> 1, STEELARMOR -> 2)
+      case l if (l == 5) => chances = 
+        Map(STEELSWORD -> 2, IRONARMOR -> 1, SMALLHEALPOTION -> 4, BATTLEAXE -> 1, IRONSHIELD -> 2, 
+            LARGESHIELD -> 1, STEELARMOR -> 2)
       case _ => {chances = Map(KNIFE -> 100)}
     }
     chances
@@ -977,6 +1022,7 @@ object ItemType extends Enumeration with Serializable {
       case l if (l == 2) => chances += (CLOTH1 -> 2, CLOTH2 -> 1)
       case l if (l == 3) => chances += (CLOTH1 -> 1, CLOTH2 -> 1)
       case l if (l == 4) => chances += (CLOTH1 -> 1)
+      case l if (l == 5) => {}
       case _ => {chances = Map(KNIFE -> 100)}
     }
     chances
