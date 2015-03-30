@@ -183,6 +183,7 @@ object Output {
     glClear(GL_COLOR_BUFFER_BIT)
     drawQuadTex(tempUIBackground2, (getWidth-tempUIBackground2.getImageWidth)/2, 
         (getHeight-tempUIBackground2.getImageHeight)/2, tempUIBackground2.getImageWidth, tempUIBackground2.getImageHeight)
+    getGrid.FOV
     drawTiles
     drawSideBar
     drawLog
@@ -196,10 +197,12 @@ object Output {
     font.drawString(1046-font.getWidth(level), getHeight - 205, level, Color.white)
     val name = getPlayer.name + " " + getPlayer.title
     font.drawString(2, 2, name, Color.white)
+    val heroLevel = "Hero level: " + getPlayer.totalLevel
+    font.drawString(1046-font.getWidth(heroLevel), 2, heroLevel, Color.white)
     val gold = "Gold: " + getPlayer.gold.toInt
-    font.drawString(1046-font.getWidth(gold), 2, gold, Color.white)
+    font.drawString(1046-font.getWidth(gold), 22, gold, Color.white)
     val piety = "Piety: " + getPlayer.piety.toInt
-    font.drawString(1046-font.getWidth(piety), 22, piety, Color.white)
+    font.drawString(1046-font.getWidth(piety), 42, piety, Color.white)
     drawObjectsUnderMouse
     if (getGameState == GameState.LEVEL) drawLevel
     if (getLastMonster != null) {
@@ -242,38 +245,25 @@ object Output {
     val middle = 33*32 + (getWidth - 33*32)/2
     var h = 0
     
-    
     var HPHeight = getPlayer.health / getPlayer.maxHealth
     if (HPHeight > 1) HPHeight = 1
     if (HPHeight < 0) HPHeight = 0
-    drawQuadTex(HPBar, middle-heart.getImageWidth/2+52, 46 + ((heart.getImageHeight-140) * (1-HPHeight)).toInt, 
-        heart.getImageWidth-104, ((heart.getImageHeight-140) * HPHeight).toInt)
+    drawQuadTex(HPBar, middle-256/2+52, 46 + (116 * (1-HPHeight)).toInt, 152, (116 * HPHeight).toInt)
     
     var XPWidth = getPlayer.experience*1.0 / getPlayer.smallestLevel
     if (XPWidth > 1) XPWidth = 1
     if (XPWidth < 0) XPWidth = 0
-    drawQuadTex(XPBar, middle-XP.getImageWidth/2+40, 176, 
-        ((XP.getImageWidth-80)*XPWidth).toInt, XP.getImageHeight-134)
+    drawQuadTex(XPBar, middle-256/2+40, 176, (176*XPWidth).toInt, 122)
     
     drawQuadTex(tempUIBackground, (getWidth-tempUIBackground.getImageWidth)/2, 
         (getHeight-tempUIBackground.getImageHeight)/2, tempUIBackground.getImageWidth, 
         tempUIBackground.getImageHeight)
-    
-    h += 10
-    val heroLevel = "Hero level: " + getPlayer.totalLevel
-    font.drawString(middle-font.getWidth(heroLevel)/2, h, heroLevel, Color.black)
         
-    h -= 35
-    drawQuadTex(heart, middle-heart.getImageWidth/2, h, heart.getImageWidth, heart.getImageHeight)
-    
-    h += 105
+    h += 80
     val hptext = "HP: " + getPlayer.health.toInt + "/" + getPlayer.maxHealth
     font.drawString(middle-font.getWidth(hptext)/2, h, hptext, Color.black)
     
-    h -= 16
-    drawQuadTex(XP, middle-XP.getImageWidth/2, h, XP.getImageWidth, XP.getImageHeight)
-    
-    h += 112
+    h += 96
     val xptext = "XP: " + getPlayer.experience.toInt + "/" + getPlayer.smallestLevel
     font.drawString(middle-font.getWidth(xptext)/2, h, xptext, Color.black)
     
@@ -375,7 +365,6 @@ object Output {
   
   /** Draw fog */
   def drawFog() {
-    getGrid.FOV
     for (i <- Range(0, getGrid.getSize())) {
       for (j <- Range(0, getGrid.getSize())) {
         if (getPlayer.xDif(i) <= 16 && getPlayer.yDif(j) <= 8) getGrid.getTile(i, j).drawFog

@@ -67,10 +67,11 @@ object Prayers extends Enumeration {
   /** Smite the monster player is fighting with */
   def smite = {
     if (getLastMonster != null) {
-      val damage = roll(getPlayer.zeal, 6)
-      getLastMonster.health -= damage
-      if (getLastMonster.health <= 0) getLastMonster.kill
-      addLog(getLastMonster.name.toUpperCase.head + getLastMonster.name.tail + " takes " + damage.toInt +  " damage.")
+      val mon = getLastMonster
+      val damage = roll(getPlayer.zeal + 1, 3)
+      mon.health -= damage
+      if (mon.health <= 0) mon.kill
+      addLog(mon.name.toUpperCase.head + mon.name.tail + " takes " + damage.toInt +  " damage.")
     }
   }
   

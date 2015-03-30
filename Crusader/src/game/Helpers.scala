@@ -229,8 +229,6 @@ object Helpers {
   private val iexit = loadTexture("UI/Exit")
   private val iback = loadTexture("UI/Back")
   private val iunseen = loadTexture("Tiles/unseen")
-  private val iheart = loadTexture("UI/Heart")
-  private val iXP = loadTexture("UI/XP")
   private val iXPButton = loadTexture("UI/XPButton")
   private val iXPButton2 = loadTexture("UI/XPButton2")
   private val iquit = loadTexture("UI/Quit")
@@ -349,8 +347,6 @@ object Helpers {
   def exit = iexit
   def back = iback
   def unseen = iunseen
-  def heart = iheart
-  def XP = iXP
   def XPButton = iXPButton
   def XPButton2 = iXPButton2
   def quit = iquit
