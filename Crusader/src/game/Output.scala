@@ -375,9 +375,33 @@ object Output {
   /** Draw info box about objects under mouse */
   def drawObjectsUnderMouse() {
     val tile = getGrid.getTile(mouseXCoord, mouseYCoord)
+    var left = true
+    var text = ""
     if (Mouse.getX < 1057 && (getHeight - Mouse.getY) < 545 && tile != null && tile.visible && 
-        !tile.getObjectList.isEmpty) font.drawString(Mouse.getX + 20, getHeight - Mouse.getY - 5, 
-            tile.getObjectList.head.name.toUpperCase.head + tile.getObjectList.head.name.toLowerCase.tail, Color.white)
+        !tile.getObjectList.isEmpty) {
+      left = false
+      text = tile.getObjectList.head.name.toUpperCase.head + tile.getObjectList.head.name.toLowerCase.tail
+    }
+    else if (Mouse.getX > 1088 && Mouse.getX < 1120 && (getHeight - Mouse.getY) > 308 && 
+        (getHeight - Mouse.getY) < 338 && getPlayer.slotWeapon != null) 
+      text = getPlayer.slotWeapon.name.toUpperCase.head + getPlayer.slotWeapon.name.toLowerCase.tail
+    else if (Mouse.getX > 1152 && Mouse.getX < 1182 && (getHeight - Mouse.getY) > 308 && 
+        (getHeight - Mouse.getY) < 338 && getPlayer.slotArmor != null) 
+      text = getPlayer.slotArmor.name.toUpperCase.head + getPlayer.slotArmor.name.toLowerCase.tail
+    else if (Mouse.getX > 1216 && Mouse.getX < 1248 && (getHeight - Mouse.getY) > 308 && 
+        (getHeight - Mouse.getY) < 338 && getPlayer.slotShield != null) 
+      text = getPlayer.slotShield.name.toUpperCase.head + getPlayer.slotShield.name.toLowerCase.tail
+    else if (Mouse.getX > 1088 && Mouse.getX < 1120 && (getHeight - Mouse.getY) > 361 && 
+        (getHeight - Mouse.getY) < 391 && getPlayer.slotRing != null) 
+      text = getPlayer.slotRing.name.toUpperCase.head + getPlayer.slotRing.name.toLowerCase.tail
+    else if (Mouse.getX > 1152 && Mouse.getX < 1182 && (getHeight - Mouse.getY) > 361 && 
+        (getHeight - Mouse.getY) < 391 && getPlayer.slotAmulet != null) 
+      text = getPlayer.slotAmulet.name.toUpperCase.head + getPlayer.slotAmulet.name.toLowerCase.tail
+    else if (Mouse.getX > 1216 && Mouse.getX < 1248 && (getHeight - Mouse.getY) > 361 && 
+        (getHeight - Mouse.getY) < 391 && getPlayer.slotUseable != null) 
+      text = getPlayer.slotUseable.name.toUpperCase.head + getPlayer.slotUseable.name.toLowerCase.tail
+    if (left) font.drawString(Mouse.getX - 10 - font.getWidth(text), getHeight - Mouse.getY - 10, text, Color.white)
+    else font.drawString(Mouse.getX + 20, getHeight - Mouse.getY - 5, text, Color.white)
   }
   
   /** Draw the character level up screen */
