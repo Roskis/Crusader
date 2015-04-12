@@ -108,6 +108,7 @@ trait Effect extends Serializable {
   val name: String
   val target: Character
   var duration: Int
+  def caster: String
   def turn: Unit
 }
 
@@ -116,6 +117,7 @@ class smallHeal(dur: Int, tar: Character) extends Effect with Serializable {
   val name = "healing salve"
   val target = tar
   var duration = dur
+  def caster = name
   def turn {
     val toAdd = roll(2)
     target.health += toAdd
@@ -131,16 +133,29 @@ class smallHeal(dur: Int, tar: Character) extends Effect with Serializable {
 }
 
 /** Poison hurts over time */
-class poison(dur: Int, tar: Character) extends Effect with Serializable {
+class poison(dur: Int, tar: Character, cas: Character) extends Effect with Serializable {
   val name = "poison"
   val target = tar
   var duration = dur
+  def caster = cas.name
   def turn {
     val toRemove = roll(2)-1
     if (toRemove != 0) {
       target.health -= toRemove
       addLog(target.name.toUpperCase.head + target.name.tail + " loses " + toRemove + " health from " + name + ".")
     }
+    duration -= 1
+    if (duration == 0) addLog("Effect of " + name + " has ended.")
+  }
+}
+
+/** Bind entangles its target */
+class bind(dur: Int, tar: Character, cas: Character) extends Effect with Serializable {
+  val name = "Bind"
+  val target = tar
+  var duration = dur
+  def caster = cas.name
+  def turn {
     duration -= 1
     if (duration == 0) addLog("Effect of " + name + " has ended.")
   }

@@ -40,7 +40,7 @@ class Grid() extends Serializable {
       makeBoss1
     }
     else {
-      size = 40
+      size = 10
       map = Array.ofDim[Tile](size, size)
       altar = new PassiveObject("Altar", " TODO ", -100, -100, ALTAR1)
       djinn = new PassiveObject("Djinn", " TODO ", -100, -100, DJINN)
@@ -434,6 +434,8 @@ class Grid() extends Serializable {
     }
     while (boo)
     setTile(new Tile(next.getX, next.getY, TileType.SECRETDOOR))
+    for (tile <- neighbors(next, 8)) if (tile.getX != secretTile.getX && 
+        tile.getY != secretTile.getY && tile.tileType == TileType.FLOOR) tile.tileType = TileType.WALL
     addItem(new Coordinate(secretTile.getX, secretTile.getY))
   }
   

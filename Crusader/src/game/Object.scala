@@ -284,7 +284,13 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   def accuracy: Int = if (slotWeapon != null) slotWeapon.accuracy + temperance*2 else 100 + temperance*2
   
   /** Move to given coordinates or go to next map */
-  def move(coord: Coordinate) = changePosition(coord.getX, coord.getY)
+  def move(coord: Coordinate) = {
+    var cannotMove: Effect = null
+    for (effect <- effectList) if (effect.isInstanceOf[bind]) cannotMove = effect
+    if (cannotMove != null) {addLog(name.toUpperCase.head + name.tail + " is binded by " + 
+        cannotMove.caster.toUpperCase.head + cannotMove.caster.tail + ".")}
+    else changePosition(coord.getX, coord.getY)
+  }
   
   /** Wait one turn, pick up item or equip item */
   def waitTurn {
@@ -479,6 +485,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
       case m if (m == MonsterType.SNAKE) => snakeAI
       case m if (m == MonsterType.LIZARDC) => lizardMageAI
       case m if (m == MonsterType.SLOTH) => slothAI
+      case m if (m == MonsterType.SPIDER) => spiderAI
       case _ => basicAI
     }
   }
@@ -500,6 +507,19 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     else mode = "passive"
   }
   
+  /** AI for spider */
+  def spiderAI = {
+    if (distance(getPlayer) > 6 && mode == "passive") {}
+    else if (distance(getPlayer) < 2 && rnd.nextInt(6) == 0) {
+      addLog(name.toUpperCase.head + name.tail + " binds " + getPlayer.name + " with its sticky web.")
+      getPlayer.effectList = getPlayer.effectList :+ new bind(roll(1)+1, getPlayer, this)
+    }
+    else {
+      mode = "aggressive"
+      tryAttack
+    }
+  }
+  
   /** AI for snake */
   def snakeAI = {
     if (distance(getPlayer) > 3 && mode == "passive") {
@@ -509,7 +529,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     else if (distance(getPlayer) < 2 && !usedAbility) {
       usedAbility = true
       addLog(name.toUpperCase.head + name.tail + " bites " + getPlayer.name + " with its poisonous fangs.")
-      getPlayer.effectList = getPlayer.effectList :+ new poison(roll(5)+5, getPlayer)
+      getPlayer.effectList = getPlayer.effectList :+ new poison(roll(5)+5, getPlayer, this)
     }
     else {
       mode = "aggressive"
