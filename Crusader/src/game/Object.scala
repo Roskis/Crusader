@@ -105,7 +105,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   var blockMovement = true
   var blockVision = false
   
-  var health: Double = 200000
+  var health: Double = 20
   var experience: Double = 0
   var gold: Double = 0
   var piety: Double = 0
@@ -492,11 +492,12 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   /** AI for rat */
   def ratAI = {
     if (mode == "passive" && distance(getPlayer) <= 4) mode = "flee"
-    else if (mode == "flee") {
+    else if (mode == "flee" && distance(getPlayer) < 7) {
       if (rnd.nextBoolean) move(getCoordinates(getDirection(getPlayer.getCoordinate, getCoordinate), this))
       else if (rnd.nextInt(5) == 0) addLog(name.toUpperCase.head + name.tail + " squeaks.")
     }
     else if (mode == "aggressive") tryAttack
+    else mode = "passive"
   }
   
   /** AI for snake */
