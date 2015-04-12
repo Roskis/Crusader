@@ -268,6 +268,13 @@ object Helpers {
   private val ifireballch3 = loadTexture("Effects/fireballch3")
   private val ifireballch4 = loadTexture("Effects/fireballch4")
   private val ifireballch5 = loadTexture("Effects/fireballch5")
+  private val ialtar1 = loadTexture("Environment/altar1")
+  private val ialtar2 = loadTexture("Environment/altar2")
+  private val idjinn = loadTexture("tempDjinn")
+  private val ibigTree1 = loadTexture("Environment/bigTree1")
+  private val itree1 = loadTexture("Environment/tree1")
+  private val irock1 = loadTexture("Environment/rock1")
+  private val irock2 = loadTexture("Environment/rock2")
   
   /** Return textures */
   def playerImage = iplayerImage
@@ -386,6 +393,13 @@ object Helpers {
   def fireballch3 = ifireballch3
   def fireballch4 = ifireballch4
   def fireballch5 = ifireballch5
+  def altar1 = ialtar1
+  def altar2 = ialtar2
+  def djinn = idjinn
+  def bigTree1 = ibigTree1
+  def tree1 = itree1
+  def rock1 = irock1
+  def rock2 = irock2
   
   buttonContinue = new Button(905, 200, 256, 64, continue, continue2)
   buttonNewGameMenu = new Button(905, 280, 256, 64, newgame, newgame2)

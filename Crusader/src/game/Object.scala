@@ -105,7 +105,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   var blockMovement = true
   var blockVision = false
   
-  var health: Double = 20
+  var health: Double = 200000
   var experience: Double = 0
   var gold: Double = 0
   var piety: Double = 0
@@ -345,20 +345,41 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
 
 /** Passive objects are mostly decorative, but might also block some movement */
 class PassiveObject(objectName: String, objectDescription: String, startX: Int, startY: Int, 
-    objectImage: String) extends Object with Serializable {
+    passiveType: PassiveType.Value) extends Object with Serializable {
   
   val rnd = getRnd
   var name = objectName
   var description = objectDescription
   var x = startX * 32
   var y = startY * 32
-  def image = loadTexture(objectImage)
+  def image = PassiveType.image(passiveType)
   var blockMovement = false
   var blockVision = false
   
   init
   getPassiveObjectList.append(this)
   
+}
+
+/** TODO */
+object PassiveType extends Enumeration with Serializable {
+
+  type Passive = Value
+  val ALTAR1, ALTAR2, DJINN, BIGTREE1, TREE1, ROCK1, ROCK2 = Value
+
+  /** returns texture of the given monster */
+  def image(PassiveType: Passive): Texture = {
+    PassiveType match {
+      case t if (t == ALTAR1) => altar1
+      case t if (t == ALTAR2) => altar2
+      case t if (t == DJINN) => djinn
+      case t if (t == BIGTREE1) => bigTree1
+      case t if (t == TREE1) => tree1
+      case t if (t == ROCK1) => rock1
+      case t if (t == ROCK2) => rock2
+      case _ => missing
+    }
+  }
 }
 
 /** All of monsters and npc will be under this class */
@@ -597,6 +618,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   }
 }
 
+/** TODO */
 object MonsterType extends Enumeration with Serializable {
 
   type Monster = Value
@@ -981,6 +1003,7 @@ class Equipment(startX: Int, startY: Int, equipmentType: ItemType.Value, isEquip
   }
 }
 
+/** TODO */
 object ItemType extends Enumeration with Serializable {
 
   type Item = Value

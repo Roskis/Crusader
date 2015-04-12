@@ -8,6 +8,7 @@ import scala.collection.mutable.Buffer
 import Direction._
 import Main._
 import Helpers._
+import PassiveType._
 
 /** Grid is reponsible for handling the map */
 class Grid() extends Serializable {
@@ -25,8 +26,8 @@ class Grid() extends Serializable {
       map = Array.ofDim[Tile](size, size)
       do {
         clearLists
-        altar = new PassiveObject("Altar", " TODO ", -100, -100, "Environment/altar1")
-        djinn = new PassiveObject(djinnName, " TODO ", -100, -100, "tempDjinn")
+        altar = new PassiveObject("Altar", " TODO ", -100, -100, ALTAR1)
+        djinn = new PassiveObject(djinnName, " TODO ", -100, -100, DJINN)
         makeMap1(45, 4, 4)
       }
       while (!mapIsContinuous)
@@ -34,15 +35,15 @@ class Grid() extends Serializable {
     else if (getLevel == 5) {
       size = 27
       map = Array.ofDim[Tile](size, size)
-      altar = new PassiveObject("Altar", " TODO ", -100, -100, "Environment/altar2")
-      djinn = new PassiveObject("Djinn", " TODO ", -100, -100, "tempDjinn")
+      altar = new PassiveObject("Altar", " TODO ", -100, -100, ALTAR2)
+      djinn = new PassiveObject("Djinn", " TODO ", -100, -100, DJINN)
       makeBoss1
     }
     else {
       size = 40
       map = Array.ofDim[Tile](size, size)
-      altar = new PassiveObject("Altar", " TODO ", -100, -100, "Environment/altar1")
-      djinn = new PassiveObject("Djinn", " TODO ", -100, -100, "tempDjinn")
+      altar = new PassiveObject("Altar", " TODO ", -100, -100, ALTAR1)
+      djinn = new PassiveObject("Djinn", " TODO ", -100, -100, DJINN)
       testMap
     }
   }
@@ -278,10 +279,10 @@ class Grid() extends Serializable {
       while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || 
           !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
       if (rnd.nextBoolean) {
-        tree = new PassiveObject("Tree", "TODO", coord.getX, coord.getY, "Environment/bigTree1")
+        tree = new PassiveObject("Tree", "TODO", coord.getX, coord.getY, BIGTREE1)
         tree.blockMovement = true
       }
-      else tree = new PassiveObject("Tree", "TODO", coord.getX, coord.getY, "Environment/tree1")
+      else tree = new PassiveObject("Tree", "TODO", coord.getX, coord.getY, TREE1)
       tree.blockVision = true
     }
   }
@@ -294,7 +295,7 @@ class Grid() extends Serializable {
       do coord = giveRandomNonBlockingCoordinates
       while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || 
           !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
-      rock = new PassiveObject("Rock", "TODO", coord.getX, coord.getY, if (rnd.nextBoolean) "Environment/rock1" else "Environment/rock2")
+      rock = new PassiveObject("Rock", "TODO", coord.getX, coord.getY, if (rnd.nextBoolean) ROCK1 else ROCK2)
     }
   }
   

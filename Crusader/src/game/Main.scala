@@ -44,7 +44,7 @@ object Main {
   private val frameRate: Int = 60
   private val height: Int = 720
   private val width: Int = 1280
-  private val version: Double = 0.1
+  private val version: String = "0.1"
   private var displayModes = Array[DisplayMode]()
   for (mode <- Display.getAvailableDisplayModes) 
     if (mode.isFullscreenCapable && mode.getWidth == width && mode.getHeight == height && mode.getFrequency == frameRate)
@@ -432,7 +432,7 @@ object Main {
   def saveGame = {
     val file = new ObjectOutputStream(new FileOutputStream("save.dat"))
     try {
-      file.writeDouble(version)
+      file.writeUTF(version)
       
       file.writeInt(turn)
       file.writeInt(level)
@@ -463,7 +463,7 @@ object Main {
     val file = new ObjectInputStream(new FileInputStream("save.dat"))
     var toRead: Int = 0
     try {
-      if (file.readDouble == version) {
+      if (file.readUTF == version) {
         turn = file.readInt
         level = file.readInt
         episode = file.readInt
