@@ -12,7 +12,7 @@ object Prayers extends Enumeration {
   type Prayer = Value
   val PARTIALRESTORATION, FULLRESTORATION, LIGHTNINGBOLT, GOLDLOSS, EXPERIENCELOSS, DEMENTIA, 
     STAIRS, SMITE, GOLDGAIN, EXPERIENCEGAIN, CLAIRVOYANCE, ITEM, FEAR, AOEDAMAGE, BLINDINGLIGHT, 
-    REVEALSECRET, IMMUNITY = Value
+    REVEALSECRET, IMMUNITY, BUFF, VISION, LEVELUP = Value
   val rnd = getRnd
   
   /** Player regains part of maximum health */
@@ -143,6 +143,52 @@ object Prayers extends Enumeration {
     addLog("Mystical forces protect you for a short duration.")
   }
   
+  /** General buff */
+  def buff = {
+    getPlayer.effectList = getPlayer.effectList :+ new buff(roll(5)+5, getPlayer)
+    addLog("You feel great temporary increase in your physical abilities.")
+  }
+  
+  /** Increased range of vision */
+  def vision = {
+    getPlayer.effectList = getPlayer.effectList :+ new vision(roll(10)+10, getPlayer)
+    addLog("Your eyes glow heavenly light allowing you to see farther for a while.")
+  }
+
+  /** Level up a random skill */
+  def levelUp = {
+    rnd.nextInt(7) match {
+      case n if (n == 0) => {
+        getPlayer.zeal += 1
+        addLog("Your Zeal is permanently increased by one.")
+      }
+      case n if (n == 1) => {
+        getPlayer.humility += 1
+        addLog("Your Humility is permanently increased by one.")
+        }
+      case n if (n == 2) => {
+        getPlayer.temperance += 1
+        addLog("Your Temperance is permanently increased by one.")
+        }
+      case n if (n == 3) => {
+        getPlayer.kindness += 1
+        addLog("Your Kindness is permanently increased by one.")
+        }
+      case n if (n == 4) => {
+        getPlayer.patience += 1
+        addLog("Your Patience is permanently increased by one.")
+        }
+      case n if (n == 5) => {
+        getPlayer.charity += 1
+        addLog("Your Charity is permanently increased by one.")
+        }
+      case n if (n == 6) => {
+        getPlayer.diligence += 1
+        addLog("Your Diligence is permanently increased by one.")
+        }
+    }
+  }
+  
 }
 
 /** Temporary effects on characters */
@@ -231,6 +277,30 @@ class blind(dur: Int, tar: Character, cas: Character) extends Effect with Serial
 /** Immunity from attacks */
 class immunity(dur: Int, tar: Character) extends Effect with Serializable {
   val name = "Immunity"
+  val target = tar
+  var duration = dur
+  def caster = null
+  def turn = {
+    duration -= 1
+    if (duration == 0) addLog("Effect of " + name + " has ended.")
+  }
+}
+
+/** General buff */
+class buff(dur: Int, tar: Character) extends Effect with Serializable {
+  val name = "General buff"
+  val target = tar
+  var duration = dur
+  def caster = null
+  def turn = {
+    duration -= 1
+    if (duration == 0) addLog("Effect of " + name + " has ended.")
+  }
+}
+
+/** Increased range of vision */
+class vision(dur: Int, tar: Character) extends Effect with Serializable {
+  val name = "Increased vision"
   val target = tar
   var duration = dur
   def caster = null

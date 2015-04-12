@@ -521,7 +521,7 @@ object Helpers {
       case l if (l == 8) => 8000
       case l if (l == 9) => 15000
       case l if (l == 10) => 45000
-      case _ => 10
+      case _ => 1000000
     }
   }
   

@@ -130,10 +130,14 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   
   /** Amount of piety defines view range */
   def viewRadius: Int = {
-    var d = (piety/100).toInt
-    if (d > 5) d = 5
-    else if (d < - 2) d = -2
-    5 + d
+    var radius = (piety/100).toInt
+    if (radius > 5) radius = 5
+    else if (radius < - 2) radius = -2
+    radius += 5
+    var visionBuff = false
+    for (effect <- effectList) if (effect.isInstanceOf[vision]) visionBuff = true
+    if (visionBuff) radius += 3
+    radius
   }
   
   /** When player succeeds praying one random prayer is selected */
@@ -157,6 +161,9 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
         case p if (p == BLINDINGLIGHT) => blindingLight
         case p if (p == REVEALSECRET) => revealSecret
         case p if (p == IMMUNITY) => immunity
+        case p if (p == BUFF) => buff
+        case p if (p == VISION) => vision
+        case p if (p == LEVELUP) => levelUp
         case _ => {println("prayer not found")}
       }
     }
@@ -166,11 +173,17 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   }
   
   /** Modifier applied to prays */
-  def prayChance = 10 + (charity*2.5) + (if (getX == getGrid.getAltar.getX && 
-      getY == getGrid.getAltar.getY && getLevel%5 == 0) 40
-  else if (getX == getGrid.getAltar.getX && getY == getGrid.getAltar.getY) 20
-  else if (getLevel%5 == 0) 10
-  else 0)
+  def prayChance = {
+    var chance:Double = 10
+    chance += charity*2.5
+    if (getX == getGrid.getAltar.getX && getY == getGrid.getAltar.getY && getLevel%5 == 0) chance += 40
+    else if (getX == getGrid.getAltar.getX && getY == getGrid.getAltar.getY) chance += 20
+    else if (getLevel%5 == 0) chance += 10
+    var isBuffed = false
+    for (effect <- effectList) if (effect.isInstanceOf[buff]) isBuffed = true
+    if (isBuffed) chance += 20
+    chance
+  }
   
   /** Modifier applied to all expirience gained */
   def giveXP(amount: Double) = experience += amount * (1+0.1*diligence)
@@ -223,9 +236,13 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   
   /** Damage is based on player's weapon */
   def damage(crit: Boolean): Int = {
-    val weapondmg = roll(slotWeapon.damage._1, slotWeapon.damage._2) + slotWeapon.damage._3
-    if (crit) weapondmg + roll(zeal+2) + roll(zeal+2)
-    else weapondmg + roll(zeal+2)
+    var weapondmg = roll(slotWeapon.damage._1, slotWeapon.damage._2) + slotWeapon.damage._3
+    var isBuffed = false
+    for (effect <- effectList) if (effect.isInstanceOf[buff]) isBuffed = true
+    if (isBuffed) weapondmg += roll(3)
+    if (crit) weapondmg += (zeal+2) + roll(zeal+2)
+    else weapondmg += roll(zeal+2)
+    weapondmg
   }
   
   /** Return small damage */
@@ -263,7 +280,10 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
       else if (patience > 1) 0.5
       else 0
     }
-    slotArmor.armor + patienceBonus
+    var isBuffed = false
+    for (effect <- effectList) if (effect.isInstanceOf[buff]) isBuffed = true
+    if (isBuffed) slotArmor.armor + patienceBonus + 1
+    else slotArmor.armor + patienceBonus
   }
   
   /** Armor poercing of weapon used */
@@ -291,7 +311,12 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   }
   
   /** Return dodge of player */
-  def dodge: Int = 100 - totalWeight + humility*2
+  def dodge: Int = {
+    var isBuffed = false
+    for (effect <- effectList) if (effect.isInstanceOf[buff]) isBuffed = true
+    if (isBuffed) 100 - totalWeight + (humility+2)*2
+    else 100 - totalWeight + humility*2
+  }
   
   /** Return accuracy of player */
   def accuracy: Int = {

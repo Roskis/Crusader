@@ -91,6 +91,10 @@ object Main {
           optionKeys
           drawOptions
         }
+        case g if (g == CREDITS) => {
+          creditsKeys
+          drawCredits
+        }
         case g if (g == GAME) => {
           gameKeys
           drawGame
@@ -253,6 +257,19 @@ object Main {
   }
   
   /** Follow user input in options */
+  def creditsKeys {
+    while (Keyboard.next) {
+      Keyboard.getEventKey match {
+        case k if (k == Keyboard.KEY_ESCAPE && Keyboard.getEventKeyState) => {
+          gameState = MAIN_MENU
+          while (Keyboard.next) {}
+        }
+        case _ => {}
+      }
+    }
+  }
+  
+  /** Follow user input in options */
   def optionKeys {
     while (Keyboard.next) {
       Keyboard.getEventKey match {
@@ -289,7 +306,8 @@ object Main {
       gameState = OPTIONS
       while (Keyboard.next) {}
     } else if ((Mouse.isButtonDown(0) && buttonCredits.isMouseWithin(Mouse.getX, Mouse.getY))) {
-      println("Credits: Antti (Roskis) Karkinen")
+      gameState = CREDITS
+      while (Keyboard.next) {}
     } else {
       while (Keyboard.next) {
         Keyboard.getEventKey match {
@@ -512,7 +530,8 @@ object Main {
   def getPrayerChances() = {
     var chances = Map(PARTIALRESTORATION -> 80, FULLRESTORATION -> 20, STAIRS -> 10, SMITE -> 10, 
         GOLDGAIN -> 10, EXPERIENCEGAIN -> 10, CLAIRVOYANCE -> 10, ITEM -> 1, FEAR -> 5, 
-        AOEDAMAGE -> 5, BLINDINGLIGHT -> 5, REVEALSECRET -> 10, IMMUNITY -> 5)
+        AOEDAMAGE -> 5, BLINDINGLIGHT -> 5, REVEALSECRET -> 10, IMMUNITY -> 5, BUFF -> 20, 
+        VISION -> 10, LEVELUP -> 2)
     if (player.piety < 0) {
       chances += (DEMENTIA -> 100)
       chances += (EXPERIENCELOSS -> 100)
