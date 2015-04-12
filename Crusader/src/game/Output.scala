@@ -188,10 +188,11 @@ object Output {
     drawSideBar
     drawLog
     drawFog
-    font.drawString(2, getHeight - 245, "Mouse X: " + mouseXCoord.toString, Color.red)
-    font.drawString(130, getHeight - 245, "Y: " + mouseYCoord.toString, Color.red)
-    font.drawString(2, getHeight - 225, "Mouse X: " + Mouse.getX.toString, Color.red)
-    font.drawString(130, getHeight - 225, "Y: " + (getHeight - Mouse.getY).toString, Color.red)
+    font.drawString(2, getHeight - 225, "X: " + getPlayer.getX.toString + " Y: " + getPlayer.getY.toString, Color.white)
+    //font.drawString(2, getHeight - 245, "Mouse X: " + mouseXCoord.toString, Color.red)
+    //font.drawString(130, getHeight - 245, "Y: " + mouseYCoord.toString, Color.red)
+    //font.drawString(2, getHeight - 225, "Mouse X: " + Mouse.getX.toString, Color.red)
+    //font.drawString(130, getHeight - 225, "Y: " + (getHeight - Mouse.getY).toString, Color.red)
     font.drawString(2, getHeight - 205, "Turn: " + getTurn, Color.white)
     val level = "Episode: " + getEpisode + " Level: " + getLevel
     font.drawString(1046-font.getWidth(level), getHeight - 205, level, Color.white)

@@ -1,14 +1,18 @@
 package game
 
+import scala.collection.mutable.Buffer
+
 import Main._
 import Helpers._
+import Direction._
 
 /** Player used prayers */
 object Prayers extends Enumeration {
   
   type Prayer = Value
   val PARTIALRESTORATION, FULLRESTORATION, LIGHTNINGBOLT, GOLDLOSS, EXPERIENCELOSS, DEMENTIA, 
-    STAIRS, SMITE, GOLDGAIN, EXPERIENCEGAIN, CLAIRVOYANCE, ITEM = Value
+    STAIRS, SMITE, GOLDGAIN, EXPERIENCEGAIN, CLAIRVOYANCE, ITEM, FEAR, AOEDAMAGE, BLINDINGLIGHT, 
+    REVEALSECRET, IMMUNITY = Value
   val rnd = getRnd
   
   /** Player regains part of maximum health */
@@ -101,6 +105,44 @@ object Prayers extends Enumeration {
     addLog("Weapon appears under your feet.")
   }
   
+  /** Casts fear to nearby enemies */
+  def fear = {
+    for (monster <- getMonsterList) if (monster.distance(getPlayer) < 5) 
+      monster.effectList = monster.effectList :+ new fear(roll(3)+3, monster, getPlayer)
+    addLog("Divine light surrounds you scaring nearby monsters for a while.")
+  }
+  
+  /** Damages nearby enemies */
+  def aoeDamage = {
+    var monstersToDamage = Buffer[Monster]()
+    for (monster <- getMonsterList) if (monster.distance(getPlayer) < 5) monstersToDamage.append(monster)
+    for (monster <- monstersToDamage) {
+      monster.health -= roll(getPlayer.zeal + 1, 3)
+      if (monster.health <= 0) monster.kill
+    }
+    addLog("Burning light surrounds you damaging nearby monsters.")
+  }
+  
+  /** Blind nearby enemies */
+  def blindingLight = {
+    for (monster <- getMonsterList) if (monster.distance(getPlayer) < 5) 
+      monster.effectList = monster.effectList :+ new blind(roll(3)+3, monster, getPlayer)
+    addLog("Bright light surrounds you blinding nearby monsters for a while.")
+  }
+  
+  /** Reveal location of secret */
+  def revealSecret = {
+    if (getGrid.secretTile != null) addLog(
+        "You hear wishpers about long forgotten hidden place in coordinates of X: " + 
+        getGrid.secretTile.getX + " and Y: " + getGrid.secretTile.getY + ".")
+  }
+  
+  /** Immunity from enemy attacks */
+  def immunity = {
+    getPlayer.effectList = getPlayer.effectList :+ new immunity(roll(3)+3, getPlayer)
+    addLog("Mystical forces protect you for a short duration.")
+  }
+  
 }
 
 /** Temporary effects on characters */
@@ -108,7 +150,7 @@ trait Effect extends Serializable {
   val name: String
   val target: Character
   var duration: Int
-  def caster: String
+  def caster: Character
   def turn: Unit
 }
 
@@ -117,7 +159,7 @@ class smallHeal(dur: Int, tar: Character) extends Effect with Serializable {
   val name = "healing salve"
   val target = tar
   var duration = dur
-  def caster = name
+  def caster = null
   def turn {
     val toAdd = roll(2)
     target.health += toAdd
@@ -137,7 +179,7 @@ class poison(dur: Int, tar: Character, cas: Character) extends Effect with Seria
   val name = "poison"
   val target = tar
   var duration = dur
-  def caster = cas.name
+  def caster = cas
   def turn {
     val toRemove = roll(2)-1
     if (toRemove != 0) {
@@ -154,8 +196,45 @@ class bind(dur: Int, tar: Character, cas: Character) extends Effect with Seriali
   val name = "Bind"
   val target = tar
   var duration = dur
-  def caster = cas.name
+  def caster = cas
   def turn {
+    duration -= 1
+    if (duration == 0) addLog("Effect of " + name + " has ended.")
+  }
+}
+
+/** Fear spell's effect */
+class fear(dur: Int, tar: Character, cas: Character) extends Effect with Serializable {
+  val name = "Fear"
+  val target = tar
+  var duration = dur
+  def caster = cas
+  def turn {
+    tar.move(getCoordinates(getDirection(caster.getCoordinate, tar.getCoordinate), tar))
+    duration -= 1
+    if (duration == 0) addLog("Effect of " + name + " has ended.")
+  }
+}
+
+/** Miss spell's effect */
+class blind(dur: Int, tar: Character, cas: Character) extends Effect with Serializable {
+  val name = "Miss"
+  val target = tar
+  var duration = dur
+  def caster = cas
+  def turn {
+    duration -= 1
+    if (duration == 0) addLog("Effect of " + name + " has ended.")
+  }
+}
+
+/** Immunity from attacks */
+class immunity(dur: Int, tar: Character) extends Effect with Serializable {
+  val name = "Immunity"
+  val target = tar
+  var duration = dur
+  def caster = null
+  def turn = {
     duration -= 1
     if (duration == 0) addLog("Effect of " + name + " has ended.")
   }

@@ -511,7 +511,8 @@ object Main {
   /** Get more good effects when piety is higher and more bad ones with negative piety */
   def getPrayerChances() = {
     var chances = Map(PARTIALRESTORATION -> 80, FULLRESTORATION -> 20, STAIRS -> 10, SMITE -> 10, 
-        GOLDGAIN -> 10, EXPERIENCEGAIN -> 10, CLAIRVOYANCE -> 10, ITEM -> 1)
+        GOLDGAIN -> 10, EXPERIENCEGAIN -> 10, CLAIRVOYANCE -> 10, ITEM -> 1, FEAR -> 5, 
+        AOEDAMAGE -> 5, BLINDINGLIGHT -> 5, REVEALSECRET -> 10, IMMUNITY -> 5)
     if (player.piety < 0) {
       chances += (DEMENTIA -> 100)
       chances += (EXPERIENCELOSS -> 100)

@@ -18,6 +18,7 @@ class Grid() extends Serializable {
   private var stairs: Tile = new Tile(-100, -100, TileType.STAIRS)
   private var altar: PassiveObject = null
   private var djinn: PassiveObject = null
+  var secretTile: Tile = null
   
   /** Different levels make different maps */
   def init() {
@@ -408,7 +409,7 @@ class Grid() extends Serializable {
   /** Add secret to the level */
   def makeSecret {
     var boo = false
-    var secretTile = getTile(randomX, randomY)
+    secretTile = getTile(randomX, randomY)
     var neigh = neighbors(secretTile, 8)
     do {
       boo = false
@@ -434,7 +435,7 @@ class Grid() extends Serializable {
     }
     while (boo)
     setTile(new Tile(next.getX, next.getY, TileType.SECRETDOOR))
-    for (tile <- neighbors(next, 8)) if (tile.getX != secretTile.getX && 
+    for (tile <- neighbors(secretTile, 8)) if (tile.getX != secretTile.getX && 
         tile.getY != secretTile.getY && tile.tileType == TileType.FLOOR) tile.tileType = TileType.WALL
     addItem(new Coordinate(secretTile.getX, secretTile.getY))
   }

@@ -90,6 +90,7 @@ trait Character extends Object with Serializable {
   def accuracy: Int
   def ap: Double
   def crit: Int
+  def move(coord: Coordinate): Unit
   
 }
 
@@ -151,6 +152,11 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
         case p if (p == EXPERIENCEGAIN) => experienceGain
         case p if (p == CLAIRVOYANCE) => clairvoyance
         case p if (p == ITEM) => item
+        case p if (p == FEAR) => fear
+        case p if (p == AOEDAMAGE) => aoeDamage
+        case p if (p == BLINDINGLIGHT) => blindingLight
+        case p if (p == REVEALSECRET) => revealSecret
+        case p if (p == IMMUNITY) => immunity
         case _ => {println("prayer not found")}
       }
     }
@@ -160,8 +166,8 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   }
   
   /** Modifier applied to prays */
-  def prayChance = 10 + (charity*2.5) + 
-  (if (getX == getGrid.getAltar.getX && getY == getGrid.getAltar.getY && getLevel%5 == 0) 40
+  def prayChance = 10 + (charity*2.5) + (if (getX == getGrid.getAltar.getX && 
+      getY == getGrid.getAltar.getY && getLevel%5 == 0) 40
   else if (getX == getGrid.getAltar.getX && getY == getGrid.getAltar.getY) 20
   else if (getLevel%5 == 0) 10
   else 0)
@@ -232,14 +238,21 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   }
   
   def takeDamage(damage: Int, armorPierce: Double, attacker: Object) = {
+    var isImmune = false
+    for (effect <- effectList) if (effect.isInstanceOf[immunity]) isImmune = true
     var effectiveArmor = armor
     if (rnd.nextInt(100) <= blockChance) effectiveArmor += shieldArmor
     if (effectiveArmor < 0) effectiveArmor = 0
     var effectiveDamage = (damage - effectiveArmor)
     if (effectiveDamage < 0) effectiveDamage = 0
-    health -= effectiveDamage
-    addLog(attacker.name.toUpperCase.head + attacker.name.tail + " deals " + 
-        effectiveDamage.toInt.toString + " damage to " + name + ".")
+    if (!isImmune) {
+      health -= effectiveDamage
+      addLog(attacker.name.toUpperCase.head + attacker.name.tail + " deals " + 
+          effectiveDamage.toInt.toString + " damage to " + name + ".")
+    }
+    else {
+      addLog(name.toUpperCase.head + name.tail + " is immune to attacks.")
+    }
   }
   
   def armor: Double = {
@@ -281,14 +294,20 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   def dodge: Int = 100 - totalWeight + humility*2
   
   /** Return accuracy of player */
-  def accuracy: Int = if (slotWeapon != null) slotWeapon.accuracy + temperance*2 else 100 + temperance*2
+  def accuracy: Int = {
+    var blinded = false
+    for (effect <- effectList) if (effect.isInstanceOf[blind]) blinded = true
+    if (slotWeapon != null && !blinded) slotWeapon.accuracy + temperance*2
+    else if (blinded) 10 + temperance*2
+    else 100 + temperance*2
+  }
   
   /** Move to given coordinates or go to next map */
   def move(coord: Coordinate) = {
     var cannotMove: Effect = null
     for (effect <- effectList) if (effect.isInstanceOf[bind]) cannotMove = effect
-    if (cannotMove != null) {addLog(name.toUpperCase.head + name.tail + " is binded by " + 
-        cannotMove.caster.toUpperCase.head + cannotMove.caster.tail + ".")}
+    if (cannotMove != null) addLog(name.toUpperCase.head + name.tail + " is binded by " + 
+        cannotMove.caster.name.toUpperCase.head + cannotMove.caster.name.tail + ".")
     else changePosition(coord.getX, coord.getY)
   }
   
@@ -404,7 +423,6 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   var health: Double = MonsterType.maxHP(mType)
   def armor: Double = MonsterType.armor(mType)
   def damage = MonsterType.damage(mType)
-  def accuracy = MonsterType.accuracy(mType)
   def ap: Double = MonsterType.armorPierce(mType)
   def crit = MonsterType.criticalChance(mType)
   var experience = MonsterType.experience(mType).toDouble
@@ -421,6 +439,14 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   
   init
   getMonsterList.append(this)
+  
+  /** Accuracy of the monster */
+  def accuracy = {
+    var blinded = false
+    for (effect <- effectList) if (effect.isInstanceOf[blind]) blinded = true
+    if (!blinded) MonsterType.accuracy(mType)
+    else 10
+  }
   
   /** When monster dies this method is called */
   def kill() {
@@ -477,16 +503,22 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   
   /** Monster's turn depends on it's ai */
   def turn() {
-    for (effect <- effectList) effect.turn
-    effectList = effectList.filter(_.duration <= 0)
-    monsterType match {
-      case m if (m == MonsterType.BAT) => batAI
-      case m if (m == MonsterType.RAT) => ratAI
-      case m if (m == MonsterType.SNAKE) => snakeAI
-      case m if (m == MonsterType.LIZARDC) => lizardMageAI
-      case m if (m == MonsterType.SLOTH) => slothAI
-      case m if (m == MonsterType.SPIDER) => spiderAI
-      case _ => basicAI
+    var canMove = true
+    for (effect <- effectList) {
+      effect.turn
+      if (effect.isInstanceOf[fear]) canMove = false
+    }
+    effectList.filter(_.duration <= 0) foreach {effectList -= _}
+    if (canMove) {
+      monsterType match {
+        case m if (m == MonsterType.BAT) => batAI
+        case m if (m == MonsterType.RAT) => ratAI
+        case m if (m == MonsterType.SNAKE) => snakeAI
+        case m if (m == MonsterType.LIZARDC) => lizardMageAI
+        case m if (m == MonsterType.SLOTH) => slothAI
+        case m if (m == MonsterType.SPIDER) => spiderAI
+        case _ => basicAI
+      }
     }
   }
   
@@ -605,14 +637,18 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
       else move(goto)
       }
   }
-  
+
   /** Move monster to given coordinate */
   def move(coord: Coordinate): Unit = {
+    var cannotMove: Effect = null
+    for (effect <- effectList) if (effect.isInstanceOf[bind]) cannotMove = effect
     if (getGrid.isWithinGrid(coord.getX, coord.getY)) {
       var boo = true
       for (obj <- getGrid.getTile(coord.getX, coord.getY).getObjectList) 
         if (obj.isInstanceOf[Monster]) boo = false
-      if (distance(coord) < 2 && !getGrid.getTile(coord.getX, coord.getY).blockMovement && boo) {
+      if (cannotMove != null) addLog(name.toUpperCase.head + name.tail + " is binded by " + 
+        cannotMove.caster.name.toUpperCase.head + cannotMove.caster.name.tail + ".")
+      else if (distance(coord) < 2 && !getGrid.getTile(coord.getX, coord.getY).blockMovement && boo) {
         changePosition(coord.getX, coord.getY)
       }
     }
