@@ -128,7 +128,7 @@ object Output {
     glClear(GL_COLOR_BUFFER_BIT)
     drawQuadTex(emptyBackground, (getWidth-emptyBackground.getImageWidth)/2, 
         (getHeight-emptyBackground.getImageHeight)/2, emptyBackground.getImageWidth, emptyBackground.getImageHeight)
-    if (font.getWidth(getPlayer.name) >= 200) {
+    if (font.getWidth(getPlayer.name) >= 700) {
       font.drawString(getWidth/2-font.getWidth("Name is too long")/2, getHeight*5/9, "Name is too long", Color.red)
       drawQuadTex(buttonNewGameChar.tex2, buttonNewGameChar.getDrawX, buttonNewGameChar.getDrawY, buttonNewGameChar.tex2.getImageWidth, buttonNewGameChar.tex2.getImageHeight)
     }
@@ -226,17 +226,17 @@ object Output {
     drawObjectsUnderMouse
     if (getGameState == GameState.LEVEL) drawLevel
     if (getLastMonster != null) {
-      drawQuadTex(blackBorder, 33*32/2-204, 2, 408, 4)
-      drawQuadTex(blackBorder, 33*32/2-204, 31, 408, 4)
-      drawQuadTex(blackBorder, 33*32/2-204, 2, 4, 33)
-      drawQuadTex(blackBorder, 33*32/2+200, 2, 4, 33)
-      val monsterStatus = getLastMonster.name.toUpperCase.head + getLastMonster.name.toLowerCase.tail + 
+      drawQuadTex(blackBorder, 33*32/2-204, 34, 408, 4)
+      drawQuadTex(blackBorder, 33*32/2-204, 63, 408, 4)
+      drawQuadTex(blackBorder, 33*32/2-204, 34, 4, 33)
+      drawQuadTex(blackBorder, 33*32/2+200, 34, 4, 33)
+      val monsterStatus = getLastMonster.name.toUpperCase.head + getLastMonster.name.tail + 
       " " + getLastMonster.health.toInt + "/" + MonsterType.maxHP(getLastMonster.mType)
       var HPWidth = getLastMonster.health / MonsterType.maxHP(getLastMonster.mType)
       if (HPWidth > 1) HPWidth = 1
       if (HPWidth < 0) HPWidth = 0
-      drawQuadTex(HPBar, 33*32/2-200, 6, (400*HPWidth).toInt, 25)
-      font.drawString((33*32 - font.getWidth(monsterStatus))/2, 2, monsterStatus)
+      drawQuadTex(HPBar, 33*32/2-200, 38, (400*HPWidth).toInt, 25)
+      font.drawString((33*32 - font.getWidth(monsterStatus))/2, 34, monsterStatus)
     }
   }
   
@@ -400,26 +400,26 @@ object Output {
     if (Mouse.getX < 1057 && (getHeight - Mouse.getY) < 545 && tile != null && tile.visible && 
         !tile.getObjectList.isEmpty) {
       left = false
-      text = tile.getObjectList.head.name.toUpperCase.head + tile.getObjectList.head.name.toLowerCase.tail
+      text = tile.getObjectList.head.name.toUpperCase.head + tile.getObjectList.head.name.tail
     }
     else if (Mouse.getX > 1088 && Mouse.getX < 1120 && (getHeight - Mouse.getY) > 308 && 
         (getHeight - Mouse.getY) < 338 && getPlayer.slotWeapon != null) 
-      text = getPlayer.slotWeapon.name.toUpperCase.head + getPlayer.slotWeapon.name.toLowerCase.tail
+      text = getPlayer.slotWeapon.name.toUpperCase.head + getPlayer.slotWeapon.name.tail
     else if (Mouse.getX > 1152 && Mouse.getX < 1182 && (getHeight - Mouse.getY) > 308 && 
         (getHeight - Mouse.getY) < 338 && getPlayer.slotArmor != null) 
-      text = getPlayer.slotArmor.name.toUpperCase.head + getPlayer.slotArmor.name.toLowerCase.tail
+      text = getPlayer.slotArmor.name.toUpperCase.head + getPlayer.slotArmor.name.tail
     else if (Mouse.getX > 1216 && Mouse.getX < 1248 && (getHeight - Mouse.getY) > 308 && 
         (getHeight - Mouse.getY) < 338 && getPlayer.slotShield != null) 
-      text = getPlayer.slotShield.name.toUpperCase.head + getPlayer.slotShield.name.toLowerCase.tail
+      text = getPlayer.slotShield.name.toUpperCase.head + getPlayer.slotShield.name.tail
     else if (Mouse.getX > 1088 && Mouse.getX < 1120 && (getHeight - Mouse.getY) > 361 && 
         (getHeight - Mouse.getY) < 391 && getPlayer.slotRing != null) 
-      text = getPlayer.slotRing.name.toUpperCase.head + getPlayer.slotRing.name.toLowerCase.tail
+      text = getPlayer.slotRing.name.toUpperCase.head + getPlayer.slotRing.name.tail
     else if (Mouse.getX > 1152 && Mouse.getX < 1182 && (getHeight - Mouse.getY) > 361 && 
         (getHeight - Mouse.getY) < 391 && getPlayer.slotAmulet != null) 
-      text = getPlayer.slotAmulet.name.toUpperCase.head + getPlayer.slotAmulet.name.toLowerCase.tail
+      text = getPlayer.slotAmulet.name.toUpperCase.head + getPlayer.slotAmulet.name.tail
     else if (Mouse.getX > 1216 && Mouse.getX < 1248 && (getHeight - Mouse.getY) > 361 && 
         (getHeight - Mouse.getY) < 391 && getPlayer.slotUseable != null) 
-      text = getPlayer.slotUseable.name.toUpperCase.head + getPlayer.slotUseable.name.toLowerCase.tail
+      text = getPlayer.slotUseable.name.toUpperCase.head + getPlayer.slotUseable.name.tail
     if (left) font.drawString(Mouse.getX - 10 - font.getWidth(text), getHeight - Mouse.getY - 10, text, Color.white)
     else font.drawString(Mouse.getX + 20, getHeight - Mouse.getY - 5, text, Color.white)
   }

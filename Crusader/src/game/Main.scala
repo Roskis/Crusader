@@ -227,7 +227,7 @@ object Main {
   /** Follow user input when creating new character */
   def characterKeys {
     if (Mouse.isButtonDown(0) && buttonNewGameChar.isMouseWithin(Mouse.getX, Mouse.getY) && player.name != "" && 
-        Output.font.getWidth(getPlayer.name) < 200) {
+        Output.font.getWidth(getPlayer.name) < 700) {
           gameState = GAME
           while (Keyboard.next) {}
           newGame
@@ -242,7 +242,7 @@ object Main {
     else while (Keyboard.next) {
       Keyboard.getEventKey match {
         case k if (k == Keyboard.KEY_ESCAPE) => gameState = MAIN_MENU
-        case k if (k == Keyboard.KEY_RETURN && Keyboard.getEventKeyState && player.name != "" && Output.font.getWidth(getPlayer.name) < 200) => {
+        case k if (k == Keyboard.KEY_RETURN && Keyboard.getEventKeyState && player.name != "" && Output.font.getWidth(getPlayer.name) < 700) => {
           gameState = GAME
           while (Keyboard.next) {}
           newGame

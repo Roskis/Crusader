@@ -601,7 +601,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
       if (spellchannel <= 0) {
         spellcd = 5
         val dmg = roll(6)
-        addLog(name.toUpperCase.head + name.toLowerCase.tail + " Casts fireball dealing " + dmg + 
+        addLog(name.toUpperCase.head + name.tail + " Casts fireball dealing " + dmg + 
             " damage to " + getPlayer.name + ".")
         getPlayer.health -= dmg
         extraToDraw = List()
