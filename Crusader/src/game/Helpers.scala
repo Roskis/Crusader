@@ -228,6 +228,7 @@ object Helpers {
   private val icredits = loadTexture("UI/Credits")
   private val iexit = loadTexture("UI/Exit")
   private val iback = loadTexture("UI/Back")
+  private val irandom = loadTexture("UI/Random")
   private val iunseen = loadTexture("Tiles/unseen")
   private val iXPButton = loadTexture("UI/XPButton")
   private val iXPButton2 = loadTexture("UI/XPButton2")
@@ -353,6 +354,7 @@ object Helpers {
   def credits = icredits
   def exit = iexit
   def back = iback
+  def random = irandom
   def unseen = iunseen
   def XPButton = iXPButton
   def XPButton2 = iXPButton2
@@ -408,6 +410,7 @@ object Helpers {
   buttonExit = new Button(905, 520, 256, 64, exit, exit)
   buttonNewGameChar = new Button(799, 600, 256, 64, newgame, newgame2)
   buttonBackChar = new Button(257, 600, 256, 64, back, back)
+  buttonRandom = new Button(528, 600, 256, 64, random, random)
   buttonXP = new Button(1070, 222, 200, 64, XPButton, XPButton2)
   buttonQuit = new Button(1070, 640, 200, 64, quit, quit)
   buttonBackLVL = new Button(149, 606, 256, 64, back, back)
@@ -569,6 +572,86 @@ object Helpers {
     for (line <- wordWrap(text, 1030)) {
       getGameLog.append(line)
       Output.mouseScrollBonus += 1
+    }
+  }
+
+  private val firstname = List("John", "Oliver", "Alexander", "Bertrand", "William", "Jean", 
+      "Peter", "Walter", "Eustace", "Raymond", "Adhemar", "Girard", "Berenguer", "Robert", "Ralph", 
+      "Geoffrey", "Thomas", "Guglielmo", "Guy", "Alan", "Robert", "Raoul", "Louis", "Roger", 
+      "Henry", "Renaut", "Amadeus", "Frederick", "Otto", "Philip", "Humphrey", "Walter", "Stephen", 
+      "Amalric", "Gerard", "Miles", "Bertrand", "Andronikos", "Richard", "André", "Hubert", 
+      "Ranulf", "Alberic", "Conon", "Floris", "Rudolf", "Depolt", "Sibylla", "Eraclius", "Balian", 
+      "Reginald", "Gerard", "Humphrey", "Conrad", "Wolfger", "Boniface", "Enrico", "Leopold", 
+      "Hugh", "Pelagio", "Pedro", "Guérin", "Andrew", "Alamanno", "Amaury", "Balian", "Simon", 
+      "Alfonso", "Charles", "Guillaume", "Renaud", "Edward", "Leo")
+
+  private val lastname = List("Hawkwood", "Hugh", "Baldwin", "Nevsky", "Marshal", "Godfrey", 
+      "Boucicaut", "Bohemond", "Tancred", "Herman", "Richard", "Eustace", "Gervaise", 
+      "Fulcher", "Fulk", "Grenier", "Warner", "William-Jordan", "Gaston", "Centule", "Guinard", 
+      "Aicard", "Ramon", "Bartholomew", "Raymond", "Raimbaut", "Roman", "William", "Curthose", 
+      "Arnulf", "Rotrou", "Jordan", "Enguerrand", "Embriaco", "Montlhéry", "Gouffier", "Leopold", 
+      "Eudes", "Anselm", "Welf", "Ekkehard", "Joscelin", "Dagobert", "Arpin", "Clement", "Theobald", 
+      "Ghibbelin", "Hugues", "Humphrey", "Bertrand", "Bures", "Fulk", "Barisan", "Thierry", 
+      "Alphonse", "Enguerrand", "Eleanor", "Ottokar", "Amalric", "Melisende", "Manasses", "Galeran", 
+      "Grenier", "Barisan", "Balian", "Héribrand", "Gilbert", "Kontostephanos", "Walchelin", 
+      "Dandolo", "Galvani", "Kaykaus", "Briwere")
+
+  private val longerLastname = List("de Clisson", "de le Bourg", "de Saint-Gilles", "de Monteil", 
+      "de Guader", "de Payens", "de Warenne", "de Beaumont", "de Provence", "de la Roche", 
+      "de Blanchefort", " de Chauvigny", "de Ferrers", "de Ferriers", "de Preaux", "de Plessis", 
+      "de Glanvill", "de Vesci", "de Béthune", "de Ridefort", "de Sbalé", "de Montaigu", 
+      "de Montfort", "de Sonnac", "de Vichiers", "du Guesclin", "des Roches", "von Erla", 
+      "von Salza")
+
+  private val places = List("Bouillon", "Hauteville", "Boulogne", "Salerno", "St. Omer", "Bazoches", 
+      "Chartres", "Guines", "Grez", "Béarn", "Bigorre", "Lusignan", "Aguilers", "Le Puy", 
+      "Montpellier", "Bayeux", "Chocques", "Hierges", "Vermandois", "Lastours", "St. Gilles", 
+      "Nevers", "Aquitaine", "Aura", "Courtenay", "Pisa", "Bourges", "Hestrut", "Arles", "Le Puiset", 
+      "Jaffa", "Champagne", "Toron", "Toulouse", "Anjou", "Ibelin", "France", "Dreux", "Courtenay", 
+      "Vermandois", "Alsace", "Trencavel", "Châtillon", "Aquitaine", "Lusignan", "Bar", "Savoy", 
+      "Montferrat", "Auvergne", "Deuil", "Germany", "Freising", "Styria", "Austria", "Jerusalem", 
+      "Milly", "Hierges", "Craon", "Ibelin", "Sancerre", "Montferrat", "Bures", "Plancy", "Milly", 
+      "Assailly", "England", "Chauvigny", "Exeter", "Burgundy", "Beaumont", "Bazoches", "Plessis", 
+      "Preaux", "Hoveden", "France", "Dreux", "Alsace", "Sancerre", "Courtenay", "Kalden", 
+      "Zähringen", "Guelders", "Bohemia", "Sicily", "Sidon", "Châtillon", "Wittelsbach", 
+      "Montferrat", "Constantinople", "Antioch", "Cyprus", "Hungary", "Rodez", "Soissons", "Arsuf", 
+      "Sidon", "Montbéliard", "Anjou", "Artois")
+
+  private val title = List("Prince of Taranto", "Count of Cerdagne and Berga", "Duke of Normandy", 
+      "Lord of Coucy", "Archbishop of Milan", "Earl of Leicester", "Duke of Lower Lorraine", 
+      "founder of the County of Edessa", "Prince of Galilee", "Count of Saint-Pol", 
+      "Count of Hainaut", "Count of Toulouse", "founder of the County of Tripoli", 
+      "Bishop of Le Puy", "Count of Cerdagne", "Count of Berga", "Count of Roussillon", 
+      "Archbishop of Arles", "Count of Barcelona", "Count of Orange", "Bishop of Orange", 
+      "Patriarch of Jerusalem", "Count of Perche", "Count of Flanders", "Count of Vendôme", 
+      "Count of Blois", "Count of Burgundy", "Duke of Burgundy", "Duke of Bavaria", "Lord of Coucy", 
+      "Duke of Swabia", "Margrave of Baden", "Earl of Warwick", "Count of Jaffa", 
+      "Bishop of Beauvais", "Lord of Béthune", "Holy Roman Emperor", "Count of Holland", 
+      "Duke of Austria", "Margrave of Lusatia", "Duke of Brabant", "Count of Holland", 
+      "King of Navarre", "Duke of Brittany", "Count of Bar", "Lord of Jaffa", "Count of Brienne", 
+      "Earl of Cornwall", "Earl of Leicester", "Count of Poitou", "King of Armenia")
+
+  private val romanNumber = List("I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", 
+      "XII", "XIII", "XIV", "XV", "XVI", "I", "II", "III", "IV", "I", "II", "III", "IV", "I", "II", 
+      "III", "I", "II", "III", "I", "II", "III", "I", "II", "III", "I", "II", "I", "II", "I", "II")
+  
+  /** Name generator */
+  def randomName: String = {
+    rnd.nextInt(100) match {
+      case r if (r < 20) => {firstname(rnd.nextInt(firstname.size)) + " " + 
+        (lastname ::: longerLastname)(rnd.nextInt((lastname ::: longerLastname).size))}
+      case r if (r < 60) => {
+        if (rnd.nextInt(5) == 0) 
+          (firstname ::: lastname)(rnd.nextInt((firstname ::: lastname).size)) + " " + 
+        romanNumber(rnd.nextInt(romanNumber.size)) + " of " + places(rnd.nextInt(places.size))
+        else lastname(rnd.nextInt(lastname.size)) + " of " + places(rnd.nextInt(places.size))
+        }
+      case _ => {
+        if (rnd.nextInt(2) == 0) 
+          (firstname ::: lastname)(rnd.nextInt((firstname ::: lastname).size)) + " " + 
+        romanNumber(rnd.nextInt(romanNumber.size)) + " " + title(rnd.nextInt(title.size))
+        else lastname(rnd.nextInt(lastname.size)) + " " + title(rnd.nextInt(title.size))
+        }
     }
   }
   

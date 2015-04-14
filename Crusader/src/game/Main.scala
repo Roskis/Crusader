@@ -61,6 +61,7 @@ object Main {
   var buttonExit: Button = null
   var buttonNewGameChar: Button = null
   var buttonBackChar: Button = null
+  var buttonRandom: Button = null
   var buttonXP: Button = null
   var buttonQuit: Button = null
   var buttonBackLVL: Button = null
@@ -234,6 +235,9 @@ object Main {
     else if (Mouse.isButtonDown(0) && buttonBackChar.isMouseWithin(Mouse.getX, Mouse.getY)) {
       gameState = MAIN_MENU
       while (Keyboard.next) {}
+    }
+    else if (Mouse.isButtonDown(0) && buttonRandom.isMouseWithin(Mouse.getX, Mouse.getY)) {
+      player.name = randomName
     }
     else while (Keyboard.next) {
       Keyboard.getEventKey match {

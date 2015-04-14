@@ -134,6 +134,7 @@ object Output {
     }
     else drawQuadTex(buttonNewGameChar.tex, buttonNewGameChar.getDrawX, buttonNewGameChar.getDrawY, buttonNewGameChar.tex.getImageWidth, buttonNewGameChar.tex.getImageHeight)
     drawQuadTex(buttonBackChar.tex, buttonBackChar.getDrawX, buttonBackChar.getDrawY, buttonBackChar.tex.getImageWidth, buttonBackChar.tex.getImageHeight)
+    drawQuadTex(buttonRandom.tex, buttonRandom.getDrawX, buttonRandom.getDrawY, buttonRandom.tex.getImageWidth, buttonRandom.tex.getImageHeight)
     fontMenu.drawString(getWidth/2-fontMenu.getWidth("Enter name:")/2, getHeight*3/9, "Enter name:", Color.black)
     font.drawString(getWidth/2-font.getWidth(getPlayer.name)/2, getHeight*4/9, getPlayer.name, Color.black)
     font.drawString(2, getHeight - 24, "Mouse X: " + Mouse.getX.toString, Color.red)
