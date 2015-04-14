@@ -406,6 +406,7 @@ object Main {
             player = new Player(player.name, 0, 0)
             newGame
           }
+          case k if (k == 13 && Keyboard.getEventKeyState) => addLog("Game keys: Numpad/arrow keys = Movement, Esc = Save&Quit, Q = Level up, W = Wait, E = Use item and R = Pray.")
           case _ => {}
         }
       }
