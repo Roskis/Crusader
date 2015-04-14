@@ -111,22 +111,10 @@ class Grid() extends Serializable {
     roundEdges(birthlimit, deathlimit)
     roundEdges(birthlimit, deathlimit)
     
-    if (rnd.nextInt(4) != 0) {
-      addShop
-      getTile(djinn.getX, djinn.getY).addObject(djinn)
-    }
-    else {
-      djinn.setX(-100)
-      djinn.setY(-100)
-    }
-    if (rnd.nextInt(5) != 0) {
-      addAltar
-      getTile(altar.getX, altar.getY).addObject(altar)
-    }
-    else {
-      altar.setX(-100)
-      altar.setY(-100)
-    }
+    addShop
+    getTile(djinn.getX, djinn.getY).addObject(djinn)
+    addAltar
+    getTile(altar.getX, altar.getY).addObject(altar)
     addStairsEp1
     addTrees(16)
     addRocks(4)

@@ -74,8 +74,9 @@ class Tile(Xcoord: Int, Ycoord: Int, var tileType: TileType.Value) extends Seria
   /** Draw Fog */
   def drawFog = {
     if (!visible && explored)
-      drawQuadTex(TileType.getFog, x - (getPlayer.getX - 16) * 32, 
-          y - (getPlayer.getY - 8) * 32, image.getImageWidth, image.getImageHeight)
+      drawQuadTex(if (tileType == TileType.DJINNFLOOR || tileType == TileType.DJINNWALL) tempDjinnWall 
+      else TileType.getFog, x - (getPlayer.getX - 16) * 32, y - (getPlayer.getY - 8) * 32, 
+      image.getImageWidth, image.getImageHeight)
   }
   
   /** x and y setters */
