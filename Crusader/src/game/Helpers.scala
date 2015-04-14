@@ -631,9 +631,9 @@ object Helpers {
       "King of Navarre", "Duke of Brittany", "Count of Bar", "Lord of Jaffa", "Count of Brienne", 
       "Earl of Cornwall", "Earl of Leicester", "Count of Poitou", "King of Armenia")
 
-  private val romanNumber = List("I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", 
-      "XII", "XIII", "XIV", "XV", "XVI", "I", "II", "III", "IV", "I", "II", "III", "IV", "I", "II", 
-      "III", "I", "II", "III", "I", "II", "III", "I", "II", "III", "I", "II", "I", "II", "I", "II")
+  private val romanNumber = List("II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", 
+      "XIII", "XIV", "XV", "XVI", "II", "III", "IV", "II", "III", "IV", "II", "III", "II", "III", 
+      "II", "III", "II", "III", "II", "II", "II")
   
   /** Name generator */
   def randomName: String = {

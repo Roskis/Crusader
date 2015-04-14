@@ -80,7 +80,7 @@ object Main {
     */
   def main(args:Array[String]) {
     startDisplay()
-    player = new Player("Player", 0, 0)
+    player = new Player("", 0, 0)
     /** Gameloop */
     while (!Display.isCloseRequested) {
       gameState match {
