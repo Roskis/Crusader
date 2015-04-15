@@ -478,15 +478,22 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     getMonsterList.filter(_ == this) foreach {getMonsterList -= _}
     updateLastMonster(null)
     getGrid.getTile(getX, getY).removeObject(this)
-    if (this.monsterType == MonsterType.RAT) new Useable(getX, getY, ItemType.RATMEAT, false)
+    MonsterType.drop(monsterType, getX, getY)
+    if (distance(getGrid.getAltar) <= 2) {
+      getPlayer.giveXP(2 * experience)
+      getPlayer.givePiety(2 * piety)
+    }
+    else {
+      getPlayer.giveXP(experience)
+      getPlayer.giveGold(gold)
+      getPlayer.givePiety(piety)
+    }
     x = -100
     y = -100
     addLog(name.toUpperCase.head + name.tail + " dies.")
-    getPlayer.giveXP(experience)
-    getPlayer.giveGold(gold)
-    getPlayer.givePiety(piety)
+
     if (mType == MonsterType.SLOTH) addLog(getPlayer.name.toUpperCase.head + getPlayer.name.tail + 
-        " slained the first boss! Unfortunately demo ends here. Your Score is " + 
+        " killed the first boss! Unfortunately demo ends here. Your Score is " + 
         getPlayer.gold.toInt + ".")
   }
   
@@ -938,6 +945,14 @@ object MonsterType extends Enumeration with Serializable {
       case t if (t == CROCODILE) => 0
       case t if (t == SLOTH) => 200
       case _ => 0
+    }
+  }
+  
+  /** monsters might give item drops when dying */
+  def drop(MonsterType: Monster, x: Int, y: Int) {
+    MonsterType match {
+      case t if (t == RAT) => {new Useable(x, y, ItemType.RATMEAT, false)}
+      case _ => {}
     }
   }
   
@@ -1395,7 +1410,6 @@ class Useable(startX: Int, startY: Int, val itemType: ItemType.Value, isEquipped
     getUseableList.append(this)
   }
 
-  
   /** Unequip item */
   def unequip {
     if (getPlayer.slotUseable != null) getPlayer.slotUseable = null
