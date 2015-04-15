@@ -227,8 +227,8 @@ class poison(dur: Int, tar: Character, cas: Character) extends Effect with Seria
   var duration = dur
   def caster = cas
   def turn {
-    val toRemove = roll(2)-1
-    if (toRemove != 0) {
+    val toRemove = roll(2)
+    if (roll(3) == 1) {
       target.health -= toRemove
       addLog(target.name.toUpperCase.head + target.name.tail + " loses " + toRemove + " health from " + name + ".")
     }

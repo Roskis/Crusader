@@ -338,6 +338,10 @@ object Main {
       gameState = MAIN_MENU
       while (Keyboard.next) {}
     }
+    else if (Mouse.isButtonDown(0) && Mouse.getX >= 1216 && getHeight - Mouse.getY >= 362 && 
+        Mouse.getX <= 1246 && getHeight - Mouse.getY <= 392 && player.slotUseable != null) {
+      player.slotUseable.use
+    }
     else {
       while (Keyboard.next) {
         Keyboard.getEventKey match {

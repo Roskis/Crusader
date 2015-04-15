@@ -586,7 +586,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     else if (distance(getPlayer) < 2 && !usedAbility) {
       usedAbility = true
       addLog(name.toUpperCase.head + name.tail + " bites " + getPlayer.name + " with its poisonous fangs.")
-      getPlayer.effectList = getPlayer.effectList :+ new poison(roll(5)+5, getPlayer, this)
+      getPlayer.effectList = getPlayer.effectList :+ new poison(roll(8), getPlayer, this)
     }
     else {
       mode = "aggressive"

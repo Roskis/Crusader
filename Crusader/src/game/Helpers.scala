@@ -218,6 +218,7 @@ object Helpers {
     else if (ran == 1 ) loadTexture("Tiles/djinnWall2")
     else loadTexture("Tiles/djinnWall3")
   }
+  private val imouseSelector = loadTexture("UI/mouseSelector")
   private val ibackground = loadTexture("tempBackground")
   private val iemptyBackground = loadTexture("tempEmptyBackground")
   private val icontinue = loadTexture("UI/Continue")
@@ -387,6 +388,7 @@ object Helpers {
   def diligence2 = idiligence2
   def level = ilevel
   def level2 = ilevel2
+  def mouseSelector = imouseSelector
   def tempUIBackground = itempUIBackground
   def tempUIBackground2 = itempUIBackground2
   def tempLevelBackground = itempLevelBackground

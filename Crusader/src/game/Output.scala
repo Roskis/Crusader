@@ -397,6 +397,9 @@ object Output {
     val tile = getGrid.getTile(mouseXCoord, mouseYCoord)
     var left = true
     var text = ""
+    if (Mouse.getX < 1057 && (getHeight - Mouse.getY) < 545) drawQuadTex(mouseSelector, 
+        (Mouse.getX * 1.0 / 32).toInt * 32, ((getHeight - Mouse.getY) * 1.0 / 32).toInt * 32, 
+        mouseSelector.getImageWidth, mouseSelector.getImageHeight)
     if (Mouse.getX < 1057 && (getHeight - Mouse.getY) < 545 && tile != null && tile.visible && 
         !tile.getObjectList.isEmpty) {
       left = false
