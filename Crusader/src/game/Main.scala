@@ -342,6 +342,12 @@ object Main {
         Mouse.getX <= 1246 && getHeight - Mouse.getY <= 392 && player.slotUseable != null) {
       player.slotUseable.use
     }
+    else if (Mouse.isButtonDown(0) && Mouse.getX < 1057 && (getHeight - Mouse.getY) < 545 && getPlayer.health > 0) {
+      player.moveOrAttack(getDirection(new Coordinate(getPlayer.getX, getPlayer.getY), 
+          new Coordinate((Mouse.getX * 1.0 / 32 + getPlayer.getX - 16).toInt, 
+              ((getHeight - Mouse.getY) * 1.0 / 32 + getPlayer.getY - 8).toInt)))
+      playTurn
+    }
     else {
       while (Keyboard.next) {
         Keyboard.getEventKey match {
