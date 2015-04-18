@@ -327,8 +327,8 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   def dodge: Int = {
     var isBuffed = false
     for (effect <- effectList) if (effect.isInstanceOf[buff]) isBuffed = true
-    if (isBuffed) 100 - totalWeight + (humility+2)*2
-    else 100 - totalWeight + humility*2
+    if (isBuffed) (humility+2)*2 - totalWeight
+    else humility*2 - totalWeight
   }
   
   /** Return accuracy of player */
@@ -971,7 +971,8 @@ object MonsterType extends Enumeration with Serializable {
   /** monsters might give item drops when dying */
   def drop(MonsterType: Monster, x: Int, y: Int) {
     MonsterType match {
-      case t if (t == RAT) => {new Useable(x, y, ItemType.RATMEAT, false)}
+      case t if (t == RAT) => new Useable(x, y, ItemType.RATMEAT, false)
+      case t if (t == GOBLINA || t == GOBLINB) => new Useable(x, y, ItemType.SMALLHEALPOTION, false)
       case _ => {}
     }
   }
@@ -1280,14 +1281,14 @@ object ItemType extends Enumeration with Serializable {
   /** returns armor of the given equipment */
   def armor(ItemType: Item): Double = {
     ItemType match {
-      case t if (t == IRONARMOR) => 0.5
-      case t if (t == WOODENSHIELD) => 0.25
-      case t if (t == IRONSHIELD) => 0.5
-      case t if (t == LARGESHIELD) => 0.75
-      case t if (t == SMALLSHIELD) => 0.5
-      case t if (t == STEELARMOR) => 0.75
-      case t if (t == GOLDARMOR) => 1
-      case t if (t == VIKINGARMOR) => 0.5
+      case t if (t == IRONARMOR) => 1
+      case t if (t == WOODENSHIELD) => 0.5
+      case t if (t == IRONSHIELD) => 1
+      case t if (t == LARGESHIELD) => 1.5
+      case t if (t == SMALLSHIELD) => 1
+      case t if (t == STEELARMOR) => 1.5
+      case t if (t == GOLDARMOR) => 2
+      case t if (t == VIKINGARMOR) => 1
       case _ => 0
     }
   }

@@ -407,7 +407,7 @@ object Main {
             player.moveOrAttack(SW)
             playTurn
             }
-          case k if ((k == Keyboard.KEY_R) && Keyboard.getEventKeyState && getPlayer.health > 0) => {
+          case k if ((k == Keyboard.KEY_R || k == 82) && Keyboard.getEventKeyState && getPlayer.health > 0) => {
             player.pray
             playTurn
           }
@@ -416,7 +416,7 @@ object Main {
             player.waitTurn
             playTurn
           }
-          case k if (k == Keyboard.KEY_E && Keyboard.getEventKeyState && getPlayer.health > 0 && 
+          case k if ((k == Keyboard.KEY_E || k == 78) && Keyboard.getEventKeyState && getPlayer.health > 0 && 
               player.slotUseable != null) => {
             player.slotUseable.use
             playTurn

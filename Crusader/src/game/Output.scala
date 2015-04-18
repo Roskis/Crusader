@@ -429,11 +429,11 @@ object Output {
     drawQuadTex(LevelBackground, (getWidth-LevelBackground.getImageWidth)/2, 
         (getHeight-LevelBackground.getImageHeight)/2, LevelBackground.getImageWidth, 
         LevelBackground.getImageHeight)
-    val title = "Choose level:"
     var h = 20
     var v = 150
     
-    fontMenu.drawString(v, 35, title, Color.black)
+    fontMenu.drawString(v, 35, "Choose level:", Color.black)
+    font.drawString(v+440, h+35, "Experience: " + getPlayer.experience.toInt, Color.black)
     if (getPlayer.experience >= xpNeededForLevel(getPlayer.charity)) 
       drawQuadTex(buttonCharity.tex, buttonCharity.getDrawX, buttonCharity.getDrawY, 
           buttonCharity.tex.getImageWidth, buttonCharity.tex.getImageHeight)
