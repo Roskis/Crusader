@@ -206,18 +206,12 @@ object Helpers {
   private val iStairs = loadTexture("tempStairs")
   private val iDjinnDoorH = loadTexture("Tiles/djinnDoorH")
   private val iDjinnDoorV = loadTexture("Tiles/djinnDoorV")
-  private val iDjinnFloor = {
-    val ran = rnd.nextInt(3)
-    if (ran == 0) loadTexture("Tiles/djinnFloor1")
-    else if (ran == 1 ) loadTexture("Tiles/djinnFloor2")
-    else loadTexture("Tiles/djinnFloor3")
-  }
-  private val iDjinnWall = {
-    val ran = rnd.nextInt(3)
-    if (ran == 0) loadTexture("Tiles/djinnWall1")
-    else if (ran == 1 ) loadTexture("Tiles/djinnWall2")
-    else loadTexture("Tiles/djinnWall3")
-  }
+  private val iDjinnFloor1 = loadTexture("Tiles/djinnFloor1")
+  private val iDjinnFloor2 = loadTexture("Tiles/djinnFloor2")
+  private val iDjinnFloor3 = loadTexture("Tiles/djinnFloor3")
+  private val iDjinnWall1 = loadTexture("Tiles/djinnWall1")
+  private val iDjinnWall2 = loadTexture("Tiles/djinnWall2")
+  private val iDjinnWall3 = loadTexture("Tiles/djinnWall3")
   private val imouseSelector = loadTexture("UI/mouseSelector")
   private val ibackground = loadTexture("UI/Background")
   private val iemptyBackground = loadTexture("UI/EmptyBackground")
@@ -345,8 +339,12 @@ object Helpers {
   def Stairs = iStairs
   def DjinnDoorH = iDjinnDoorH
   def DjinnDoorV = iDjinnDoorV
-  def DjinnFloor = iDjinnFloor
-  def DjinnWall = iDjinnWall
+  def DjinnFloor1 = iDjinnFloor1
+  def DjinnFloor2 = iDjinnFloor2
+  def DjinnFloor3 = iDjinnFloor3
+  def DjinnWall1 = iDjinnWall1
+  def DjinnWall2 = iDjinnWall2
+  def DjinnWall3 = iDjinnWall3
   def background = ibackground
   def emptyBackground = iemptyBackground
   def continue = icontinue

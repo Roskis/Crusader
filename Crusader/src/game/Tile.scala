@@ -74,7 +74,11 @@ class Tile(Xcoord: Int, Ycoord: Int, var tileType: TileType.Value) extends Seria
   /** Draw Fog */
   def drawFog = {
     if (!visible && explored)
-      drawQuadTex(if (tileType == TileType.DJINNFLOOR || tileType == TileType.DJINNWALL) DjinnWall 
+      drawQuadTex(if (tileType == TileType.DJINNFLOOR || tileType == TileType.DJINNWALL) (
+        if (getGrid.shopImageNumbers._2 == 1) DjinnWall1
+        else if (getGrid.shopImageNumbers._2 == 2) DjinnWall2
+        else DjinnWall3
+        ) 
       else TileType.getFog, x - (getPlayer.getX - 16) * 32, y - (getPlayer.getY - 8) * 32, 
       image.getImageWidth, image.getImageHeight)
   }
@@ -124,8 +128,16 @@ object TileType extends Enumeration {
       case t if (t == STAIRS) => Stairs
       case t if (t == DJINNDOORH) => DjinnDoorH
       case t if (t == DJINNDOORV) => DjinnDoorV
-      case t if (t == DJINNFLOOR) => DjinnFloor
-      case t if (t == DJINNWALL) => DjinnWall
+      case t if (t == DJINNFLOOR) => {
+        if (getGrid.shopImageNumbers._3 == 1) DjinnFloor1
+        else if (getGrid.shopImageNumbers._3 == 2) DjinnFloor2
+        else DjinnFloor3
+      }
+      case t if (t == DJINNWALL) => {
+        if (getGrid.shopImageNumbers._2 == 1) DjinnWall1
+        else if (getGrid.shopImageNumbers._2 == 2) DjinnWall2
+        else DjinnWall3
+      }
       case t if (t == SECRETDOOR) => wall1
       case t if (t == BOSSDOOR) => grass1
       case _ => missing

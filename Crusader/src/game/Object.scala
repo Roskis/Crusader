@@ -428,7 +428,11 @@ object PassiveType extends Enumeration with Serializable {
     PassiveType match {
       case t if (t == ALTAR1) => altar1
       case t if (t == ALTAR2) => altar2
-      case t if (t == DJINN) => djinn1
+      case t if (t == DJINN) => {
+        if (getGrid.shopImageNumbers._1 == 1) djinn1
+        else if (getGrid.shopImageNumbers._1 == 2) djinn2
+        else djinn3
+      }
       case t if (t == BIGTREE1) => bigTree1
       case t if (t == TREE1) => tree1
       case t if (t == ROCK1) => rock1

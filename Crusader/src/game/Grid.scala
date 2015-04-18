@@ -19,6 +19,7 @@ class Grid() extends Serializable {
   private var altar: PassiveObject = null
   private var djinn: PassiveObject = null
   var secretTile: Tile = null
+  val shopImageNumbers = (rnd.nextInt(3)+1, rnd.nextInt(3)+1, rnd.nextInt(3)+1) //first is shopkeeper, second is walls and third is floor
   
   /** Different levels make different maps */
   def init() {
@@ -61,7 +62,6 @@ class Grid() extends Serializable {
     }
   map(6)(13).tileType = TileType.FLOOR
   map(7)(13).tileType = TileType.BOSSDOOR
-    
   map(1)(11).tileType = TileType.WALL
   map(5)(11).tileType = TileType.WALL
   map(3)(10).tileType = TileType.FLOOR
