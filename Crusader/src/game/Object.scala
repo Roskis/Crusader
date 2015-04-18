@@ -1115,34 +1115,35 @@ object ItemType extends Enumeration with Serializable {
 
   type Item = Value
   val KNIFE, ROBES, IRONARMOR, STEELSWORD, WOODENSHIELD, RATMEAT, SMALLHEALPOTION, BATTLEAXE, 
-  CLOTH1, CLOTH2, IRONSHIELD, KATANA, LARGESHIELD, SHORTSWORD, SMALLSHIELD, STEELARMOR = Value
+  CLOTH1, CLOTH2, IRONSHIELD, KATANA, LARGESHIELD, SHORTSWORD, SMALLSHIELD, STEELARMOR, CLAYMORE, 
+  DUALDAGGER, GOLDARMOR, MAGICSWORD, MONODAGGER, VIKINGARMOR = Value
   
   /** return chances how items occur in game */
   def levelChance(level: Int): Map[Item, Int] = {
     var chances = Map[Item, Int]()
     level match {
       case l if (l == 1) => chances = 
-        Map(WOODENSHIELD -> 2, IRONARMOR -> 1, SMALLHEALPOTION -> 4, SHORTSWORD -> 2, 
-            SMALLSHIELD -> 1)
+        Map(WOODENSHIELD -> 2, IRONARMOR -> 1, SMALLHEALPOTION -> 5, SHORTSWORD -> 1, 
+            SMALLSHIELD -> 1, MONODAGGER -> 2, DUALDAGGER -> 1) //LEATHERARMOR -> 2
       case l if (l == 2) => chances = 
-        Map(WOODENSHIELD -> 1, IRONARMOR -> 2, SMALLHEALPOTION -> 4, IRONSHIELD -> 1, 
-            SHORTSWORD -> 1, SMALLSHIELD -> 1)
+        Map(WOODENSHIELD -> 1, IRONARMOR -> 2, SMALLHEALPOTION -> 5, LARGESHIELD -> 1, 
+            SHORTSWORD -> 2, SMALLSHIELD -> 2, VIKINGARMOR -> 1, IRONARMOR -> 2, MONODAGGER -> 1, 
+            DUALDAGGER -> 1) // LEATHERARMOR -> 1, SPEAR -> 1
       case l if (l == 3) => chances = 
-        Map(WOODENSHIELD -> 1, STEELSWORD -> 1, IRONARMOR -> 1, SMALLHEALPOTION -> 4, 
-            BATTLEAXE -> 2, IRONSHIELD -> 1, LARGESHIELD -> 1, SHORTSWORD -> 1, SMALLSHIELD -> 2, 
-            STEELARMOR -> 1)
+        Map(DUALDAGGER -> 1, SHORTSWORD -> 1, IRONARMOR -> 1, SMALLHEALPOTION -> 5, 
+            BATTLEAXE -> 1, IRONSHIELD -> 1, LARGESHIELD -> 2, SHORTSWORD -> 1, SMALLSHIELD -> 1, 
+            STEELARMOR -> 1, VIKINGARMOR -> 2, IRONARMOR -> 1) // HEATERSHIELD -> 1, SPEAR -> 2
       case l if (l == 4) => chances = 
-        Map(STEELSWORD -> 2, IRONARMOR -> 1, SMALLHEALPOTION -> 4, BATTLEAXE -> 1, IRONSHIELD -> 2, 
-            LARGESHIELD -> 1, SHORTSWORD -> 1, SMALLSHIELD -> 1, STEELARMOR -> 2)
+        Map(STEELSWORD -> 2, IRONARMOR -> 1, SMALLHEALPOTION -> 5, BATTLEAXE -> 2, IRONSHIELD -> 1, 
+            LARGESHIELD -> 1, SHORTSWORD -> 1, VIKINGARMOR -> 1, GOLDARMOR -> 1, STEELARMOR -> 2, 
+            CLAYMORE -> 2) // HEATERSHIELD -> 2, SPEAR -> 1
       case l if (l == 5) => chances = 
-        Map(STEELSWORD -> 2, IRONARMOR -> 1, SMALLHEALPOTION -> 4, BATTLEAXE -> 1, IRONSHIELD -> 2, 
-            LARGESHIELD -> 1, STEELARMOR -> 2)
+        Map(STEELSWORD -> 2, IRONARMOR -> 1, SMALLHEALPOTION -> 5, BATTLEAXE -> 1, IRONSHIELD -> 2, 
+            GOLDARMOR -> 2, STEELARMOR -> 1, CLAYMORE -> 2) // HEATERSHIELD -> 1
       case _ => {chances = Map(KNIFE -> 100)}
     }
     chances
   }
-  
-  //BATTLEAXE -> , IRONSHIELD -> , LARGESHIELD -> , SHORTSWORD -> , SMALLSHIELD -> , STEELARMOR -> 
   
   /** return chances how items occur in game */
   def shopChance(level: Int): Map[Item, Int] = {
@@ -1177,6 +1178,12 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == SHORTSWORD) => "weapon"
       case t if (t == SMALLSHIELD) => "shield"
       case t if (t == STEELARMOR) => "armor"
+      case t if (t == CLAYMORE) => "weapon"
+      case t if (t == DUALDAGGER) => "weapon"
+      case t if (t == GOLDARMOR) => "armor"
+      case t if (t == MAGICSWORD) => "weapon"
+      case t if (t == MONODAGGER) => "weapon"
+      case t if (t == VIKINGARMOR) => "armor"
       case _ => ""
     }
   }
@@ -1200,6 +1207,12 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == SHORTSWORD) => shortSwordG
       case t if (t == SMALLSHIELD) => smallShieldG
       case t if (t == STEELARMOR) => steelArmorG
+      case t if (t == CLAYMORE) => claymoreG
+      case t if (t == DUALDAGGER) => dualDaggerG
+      case t if (t == GOLDARMOR) => goldArmorG
+      case t if (t == MAGICSWORD) => magicSwordG
+      case t if (t == MONODAGGER) => monoDaggerG
+      case t if (t == VIKINGARMOR) => vikingArmorG
       case _ => missing
     }
   }
@@ -1223,6 +1236,12 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == SHORTSWORD) => shortSwordE
       case t if (t == SMALLSHIELD) => smallShieldE
       case t if (t == STEELARMOR) => steelArmorE
+      case t if (t == CLAYMORE) => claymoreE
+      case t if (t == DUALDAGGER) => dualDaggerE
+      case t if (t == GOLDARMOR) => goldArmorE
+      case t if (t == MAGICSWORD) => magicSwordE
+      case t if (t == MONODAGGER) => monoDaggerE
+      case t if (t == VIKINGARMOR) => vikingArmorE
       case _ => missing
     }
   }
@@ -1230,15 +1249,14 @@ object ItemType extends Enumeration with Serializable {
   /** returns armor of the given equipment */
   def armor(ItemType: Item): Double = {
     ItemType match {
-      case t if (t == ROBES) => 0
       case t if (t == IRONARMOR) => 1
       case t if (t == WOODENSHIELD) => 0.5
-      case t if (t == CLOTH1) => 0
-      case t if (t == CLOTH2) => 0
       case t if (t == IRONSHIELD) => 1
       case t if (t == LARGESHIELD) => 1.5
       case t if (t == SMALLSHIELD) => 1
       case t if (t == STEELARMOR) => 1.5
+      case t if (t == GOLDARMOR) => 2
+      case t if (t == VIKINGARMOR) => 1
       case _ => 0
     }
   }
@@ -1262,6 +1280,12 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == SHORTSWORD) => 8
       case t if (t == SMALLSHIELD) => 5
       case t if (t == STEELARMOR) => 25
+      case t if (t == CLAYMORE) => 20
+      case t if (t == DUALDAGGER) => 6
+      case t if (t == GOLDARMOR) => 30
+      case t if (t == MAGICSWORD) => 10
+      case t if (t == MONODAGGER) => 3
+      case t if (t == VIKINGARMOR) => 15
       case _ => 0
     }
   }
@@ -1289,6 +1313,10 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == BATTLEAXE) => (1, 5, 0)
       case t if (t == KATANA) => (1, 6, 1)
       case t if (t == SHORTSWORD) => (1, 4, 0)
+      case t if (t == CLAYMORE) => (1, 7, 0)
+      case t if (t == DUALDAGGER) => (2, 3, 0)
+      case t if (t == MAGICSWORD) => (1, 8, 1)
+      case t if (t == MONODAGGER) => (1, 3, 0)
       case _ => (1, 1, 0)
     }
   }
@@ -1296,11 +1324,12 @@ object ItemType extends Enumeration with Serializable {
   /** returns armor piercing of the given equipment */
   def armorPiercing(ItemType: Item): Int = {
     ItemType match {
-      case t if (t == KNIFE) => 0
       case t if (t == STEELSWORD) => 1
       case t if (t == BATTLEAXE) => 2
       case t if (t == KATANA) => 1
       case t if (t == SHORTSWORD) => 1
+      case t if (t == CLAYMORE) => 2
+      case t if (t == MAGICSWORD) => 1
       case _ => 0
     }
   }
@@ -1313,6 +1342,10 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == BATTLEAXE) => 80
       case t if (t == KATANA) => 90
       case t if (t == SHORTSWORD) => 90
+      case t if (t == CLAYMORE) => 80
+      case t if (t == DUALDAGGER) => 75
+      case t if (t == MAGICSWORD) => 80
+      case t if (t == MONODAGGER) => 95
       case _ => 0
     }
   }
@@ -1325,6 +1358,10 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == BATTLEAXE) => 6
       case t if (t == KATANA) => 5
       case t if (t == SHORTSWORD) => 4
+      case t if (t == CLAYMORE) => 6
+      case t if (t == DUALDAGGER) => 6
+      case t if (t == MAGICSWORD) => 0
+      case t if (t == MONODAGGER) => 6
       case _ => 0
     }
   }
@@ -1346,6 +1383,11 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == SHORTSWORD) => 20
       case t if (t == SMALLSHIELD) => 20
       case t if (t == STEELARMOR) => 80
+      case t if (t == CLAYMORE) => 100
+      case t if (t == DUALDAGGER) => 20
+      case t if (t == GOLDARMOR) => 100
+      case t if (t == MONODAGGER) => 10
+      case t if (t == VIKINGARMOR) => 60
       case _ => 0
     }
   }
@@ -1369,6 +1411,12 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == SHORTSWORD) => "short sword"
       case t if (t == SMALLSHIELD) => "small shield"
       case t if (t == STEELARMOR) => "steel armor"
+      case t if (t == CLAYMORE) => "claymore"
+      case t if (t == DUALDAGGER) => "dual dagger"
+      case t if (t == GOLDARMOR) => "gold armor"
+      case t if (t == MAGICSWORD) => "magic sword"
+      case t if (t == MONODAGGER) => "dagger"
+      case t if (t == VIKINGARMOR) => "viking armor"
       case _ => "Unknown item name"
     }
   }
@@ -1392,6 +1440,12 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == SHORTSWORD) => "TODO"
       case t if (t == SMALLSHIELD) => "TODO"
       case t if (t == STEELARMOR) => "TODO"
+      case t if (t == CLAYMORE) => "TODO"
+      case t if (t == DUALDAGGER) => "TODO"
+      case t if (t == GOLDARMOR) => "TODO"
+      case t if (t == MAGICSWORD) => "TODO"
+      case t if (t == MONODAGGER) => "TODO"
+      case t if (t == VIKINGARMOR) => "TODO"
       case _ => "Unknown item description"
     }
   }

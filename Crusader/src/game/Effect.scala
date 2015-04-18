@@ -101,7 +101,8 @@ object Prayers extends Enumeration {
   
   /** Give player item */
   def item = {
-    new Equipment(getPlayer.getX, getPlayer.getY, ItemType.KATANA, false)
+    if (rnd.nextBoolean) new Equipment(getPlayer.getX, getPlayer.getY, ItemType.KATANA, false)
+    else new Equipment(getPlayer.getX, getPlayer.getY, ItemType.MAGICSWORD, false)
     addLog("Weapon appears under your feet.")
   }
   

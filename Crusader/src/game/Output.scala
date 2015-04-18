@@ -1,8 +1,7 @@
 package game
 
 import java.awt.Font
-import java.io.IOException
-import java.io.File
+import java.io.{IOException, File}
 
 import scala.Range
 import scala.collection.mutable.Buffer
@@ -41,7 +40,6 @@ object Output {
    * Loads images used in the game's mainmenu.
    */
   def startDisplay() {
-    
     try {
       Display.setFullscreen(getFullscreen)
       Display.setDisplayMode(getDisplayMode)
@@ -54,23 +52,26 @@ object Output {
         Display.destroy()
         System.exit(1)
     }
-
+    
+    glMatrixMode(GL_PROJECTION)
+    glOrtho(0, getWidth, getHeight, 0, 1, -1)
+    glMatrixMode(GL_MODELVIEW)
+    
+    drawQuadTex(background, (getWidth-background.getImageWidth)/2, 
+        (getHeight-background.getImageHeight)/2, background.getImageWidth, background.getImageHeight)
+    Display.update
+    
     glEnable(GL_TEXTURE_2D)
-    glShadeModel(GL_SMOOTH)
     glDisable(GL_DEPTH_TEST)
+    glShadeModel(GL_SMOOTH)
     glDisable(GL_LIGHTING)
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
     glClearDepth(1)
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     glViewport(0,0,getWidth,getHeight)
-    
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    glOrtho(0, getWidth, getHeight, 0, 1, -1)
-    glMatrixMode(GL_MODELVIEW)
-    
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+    org.lwjgl.input.Keyboard.enableRepeatEvents(true)
     
     try {
       awtFont = Font.createFont(Font.TRUETYPE_FONT, 
@@ -84,10 +85,6 @@ object Output {
     } catch {
       case e: Throwable => e.printStackTrace()
     }
-    
-    org.lwjgl.input.Keyboard.enableRepeatEvents(true)
-    addLog("Your holy mission is to purify the world from evil.")
-    
   }
   
   /** Method is called when we want to change the resolution. */
@@ -95,7 +92,6 @@ object Output {
     Display.setDisplayMode(getDisplayMode)
     glViewport(0,0,getDisplayMode.getWidth,getDisplayMode.getHeight)
     Display.setFullscreen(getFullscreen)
-    
   }
   
   /** Method to draw textures on the display.

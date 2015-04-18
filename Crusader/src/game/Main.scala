@@ -121,6 +121,7 @@ object Main {
   def newGame() {
     if (new File("save.dat").exists) new File("save.dat").delete
     gameLog.clear
+    addLog("Your holy mission is to purify the world from evil.")
     clearLists
     level = 0
     episode = 1
