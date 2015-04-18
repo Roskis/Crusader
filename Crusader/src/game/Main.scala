@@ -342,11 +342,21 @@ object Main {
         Mouse.getX <= 1246 && getHeight - Mouse.getY <= 392 && player.slotUseable != null) {
       player.slotUseable.use
     }
-    else if (Mouse.isButtonDown(0) && Mouse.getX < 1057 && (getHeight - Mouse.getY) < 545 && getPlayer.health > 0) {
-      player.moveOrAttack(getDirection(new Coordinate(getPlayer.getX, getPlayer.getY), 
-          new Coordinate((Mouse.getX * 1.0 / 32 + getPlayer.getX - 16).toInt, 
-              ((getHeight - Mouse.getY) * 1.0 / 32 + getPlayer.getY - 8).toInt)))
-      playTurn
+    else if (Mouse.isButtonDown(0) && !prevMouseState && Mouse.getX < 1056 && 
+        (getHeight - Mouse.getY) < 544 && getPlayer.health > 0) {
+      val mx = (Mouse.getX * 1.0 / 32 + getPlayer.getX - 16).toInt
+      val my = ((getHeight - Mouse.getY) * 1.0 / 32 + getPlayer.getY - 8).toInt
+      var path = getGrid.dijkstra(player.getTile, getGrid.getTile(mx, my)).drop(1)
+      var enemies = false
+      if (mx == getPlayer.getX && my == getPlayer.getY) playTurn
+      if (getGrid.isWithinGrid(mx, my) && getGrid.getTile(mx, my).explored) {
+        while (!(enemies || path.isEmpty)) {
+          player.moveOrAttack(path(0))
+          playTurn
+          path = path.drop(1)
+          for (enemy <- getMonsterList) if (enemy.getTile.visible) enemies = true
+        }
+      }
     }
     else {
       while (Keyboard.next) {
@@ -426,6 +436,7 @@ object Main {
       }
       lastWheel = Mouse.getDWheel
     }
+    prevMouseState = Mouse.isButtonDown(0)
   }
   
   /** Play one turn */

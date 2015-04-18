@@ -208,10 +208,10 @@ object Output {
     drawLog
     drawFog
     font.drawString(2, getHeight - 225, "X: " + getPlayer.getX.toString + " Y: " + getPlayer.getY.toString, Color.white)
-    //font.drawString(2, getHeight - 245, "Mouse X: " + mouseXCoord.toString, Color.red)
-    //font.drawString(130, getHeight - 245, "Y: " + mouseYCoord.toString, Color.red)
-    //font.drawString(2, getHeight - 225, "Mouse X: " + Mouse.getX.toString, Color.red)
-    //font.drawString(130, getHeight - 225, "Y: " + (getHeight - Mouse.getY).toString, Color.red)
+    font.drawString(2, getHeight - 265, "Mouse X: " + mouseXCoord.toString, Color.red)
+    font.drawString(130, getHeight - 265, "Y: " + mouseYCoord.toString, Color.red)
+    font.drawString(2, getHeight - 245, "Mouse X: " + Mouse.getX.toString, Color.red)
+    font.drawString(130, getHeight - 245, "Y: " + (getHeight - Mouse.getY).toString, Color.red)
     font.drawString(2, getHeight - 205, "Turn: " + getTurn, Color.white)
     val level = "Episode: " + getEpisode + " Level: " + getLevel
     font.drawString(1046-font.getWidth(level), getHeight - 205, level, Color.white)
@@ -397,10 +397,11 @@ object Output {
     val tile = getGrid.getTile(mouseXCoord, mouseYCoord)
     var left = true
     var text = ""
-    if (Mouse.getX < 1057 && (getHeight - Mouse.getY) < 545) drawQuadTex(mouseSelector, 
-        (Mouse.getX * 1.0 / 32).toInt * 32, ((getHeight - Mouse.getY) * 1.0 / 32).toInt * 32, 
-        mouseSelector.getImageWidth, mouseSelector.getImageHeight)
-    if (Mouse.getX < 1057 && (getHeight - Mouse.getY) < 545 && tile != null && tile.visible && 
+    if (Mouse.getX < 1056 && (getHeight - Mouse.getY) < 544 &&  Mouse.isInsideWindow) 
+      drawQuadTex(mouseSelector, (Mouse.getX * 1.0 / 32).toInt * 32, 
+          ((getHeight - Mouse.getY) * 1.0 / 32).toInt * 32, mouseSelector.getImageWidth, 
+          mouseSelector.getImageHeight)
+    if (Mouse.getX < 1056 && (getHeight - Mouse.getY) < 544 && tile != null && tile.visible && 
         !tile.getObjectList.isEmpty) {
       left = false
       text = tile.getObjectList.head.name.toUpperCase.head + tile.getObjectList.head.name.tail

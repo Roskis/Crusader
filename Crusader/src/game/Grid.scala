@@ -609,17 +609,50 @@ class Grid() extends Serializable {
     tile
   }
   
+  /** A star search algorithm to find route between points */
+  def dijkstra(start: Tile, end: Tile): Buffer[Tile] = {
+    var open = Buffer[Tile](start)
+    var visited = Buffer[(Tile, Tile)]((start, null))
+    var current: Tile = null
+    var goalFound = false
+    while (!(open.isEmpty || goalFound)) {
+      current = open.head
+      if (current == end) goalFound = true
+      open = open.drop(1)
+      for (neighbor <- neighbors(current, 8)) {
+        if (!visited.unzip._1.contains(neighbor) && !neighbor.blockMovement) {
+          open.append(neighbor)
+          visited.append((neighbor, current))
+        }
+        else if (neighbor == end) visited.append((neighbor, current))
+      }
+    }
+    current = end
+    var path = Buffer[Tile](current)
+    var index = 0
+    while (current != start) {
+      index = visited.unzip._1.indexOf(current)
+      if (index <= 0) return Buffer[Tile]()
+      current = visited.unzip._2(index)
+      path.append(current)
+    }
+    path.reverse
+  }
+  
+  /** Reset all labels of tiles */
+  def resetTiles {
+  for (i <- Range(0,size)) {
+    for (j <- Range(0,size)) {
+      map(i)(j).label = 0
+      }
+    }
+  }
+  
   /** Find's out if the map is one big area or two (or more) separate ones */
   def mapIsContinuous(): Boolean = {
     var checkList = Map[Int, Tile]()
     var patternNumber: Int = 0
-    
-    for (i <- Range(0,size)) {
-      for (j <- Range(0,size)) {
-        map(i)(j).label = 0
-      }
-    }
-    
+    resetTiles
     for (i <- Range(0,size)) {
       for (j <- Range(0,size)) {
         if (!map(i)(j).blockMovement) {

@@ -50,8 +50,11 @@ trait Object {
     if (getGrid.isWithinGrid(getX, getY)) getGrid.getTile(getX, getY).addObject(this)
   }
 
-  /** get object's coordinate */
+  /** Get object's coordinate */
   def getCoordinate() = new Coordinate(getX, getY)
+  
+  /** Get object's tile */
+  def getTile() = getGrid.getTile(getX, getY)
   
   /** x and y getters */
   def getX(): Int = x/32
@@ -355,9 +358,12 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
     }
   }
   
+  /** Alternative methods to moveOrAttack */
+  def moveOrAttack(tile: Tile) {moveOrAttack(new Coordinate(tile.getX, tile.getY))}
+  def moveOrAttack(direction: Direction.Value) {moveOrAttack(getCoordinates(direction, getX, getY))}
+  
   /** Move and attack command */
-  def moveOrAttack(direction: Direction.Value) = {
-    val coord = getCoordinates(direction, getX, getY)
+  def moveOrAttack(coord: Coordinate) = {
     if (getGrid.isWithinGrid(coord.getX, coord.getY)) {
       var canMove: Boolean = true
       for (obj <- getGrid.getTile(coord.getX, coord.getY).getObjectList) {
