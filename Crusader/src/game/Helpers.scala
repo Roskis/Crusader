@@ -203,24 +203,24 @@ object Helpers {
   private val ifog: Texture = loadTexture("Tiles/fog")
   private val igrass1 = loadTexture("Tiles/grass1")
   private val iwall1 = loadTexture("Tiles/wall1")
-  private val itempStairs = loadTexture("tempStairs")
-  private val itempDjinnDoorH = loadTexture("Tiles/djinnDoorH")
-  private val itempDjinnDoorV = loadTexture("Tiles/djinnDoorV")
-  private val itempDjinnFloor = {
+  private val iStairs = loadTexture("tempStairs")
+  private val iDjinnDoorH = loadTexture("Tiles/djinnDoorH")
+  private val iDjinnDoorV = loadTexture("Tiles/djinnDoorV")
+  private val iDjinnFloor = {
     val ran = rnd.nextInt(3)
     if (ran == 0) loadTexture("Tiles/djinnFloor1")
     else if (ran == 1 ) loadTexture("Tiles/djinnFloor2")
     else loadTexture("Tiles/djinnFloor3")
   }
-  private val itempDjinnWall = {
+  private val iDjinnWall = {
     val ran = rnd.nextInt(3)
     if (ran == 0) loadTexture("Tiles/djinnWall1")
     else if (ran == 1 ) loadTexture("Tiles/djinnWall2")
     else loadTexture("Tiles/djinnWall3")
   }
   private val imouseSelector = loadTexture("UI/mouseSelector")
-  private val ibackground = loadTexture("tempBackground")
-  private val iemptyBackground = loadTexture("tempEmptyBackground")
+  private val ibackground = loadTexture("UI/Background")
+  private val iemptyBackground = loadTexture("UI/EmptyBackground")
   private val icontinue = loadTexture("UI/Continue")
   private val icontinue2 = loadTexture("UI/Continue2")
   private val inewgame = loadTexture("UI/Newgame")
@@ -262,9 +262,9 @@ object Helpers {
   private val idiligence2 = loadTexture("UI/Diligence2")
   private val ilevel = loadTexture("UI/Level")
   private val ilevel2 = loadTexture("UI/Level2")
-  private val itempUIBackground = loadTexture("tempUIBackground")
-  private val itempUIBackground2 = loadTexture("tempUIBackground2")
-  private val itempLevelBackground = loadTexture("tempLevelBackground")
+  private val iUIBackground = loadTexture("UI/UIBackground")
+  private val iUIBackground2 = loadTexture("UI/UIBackground2")
+  private val iLevelBackground = loadTexture("UI/LevelBackground")
   private val ifireballch1 = loadTexture("Effects/fireballch1")
   private val ifireballch2 = loadTexture("Effects/fireballch2")
   private val ifireballch3 = loadTexture("Effects/fireballch3")
@@ -272,7 +272,9 @@ object Helpers {
   private val ifireballch5 = loadTexture("Effects/fireballch5")
   private val ialtar1 = loadTexture("Environment/altar1")
   private val ialtar2 = loadTexture("Environment/altar2")
-  private val idjinn = loadTexture("tempDjinn")
+  private val idjinn1 = loadTexture("Environment/djinn1")
+  private val idjinn2 = loadTexture("Environment/djinn2")
+  private val idjinn3 = loadTexture("Environment/djinn3")
   private val ibigTree1 = loadTexture("Environment/bigTree1")
   private val itree1 = loadTexture("Environment/tree1")
   private val irock1 = loadTexture("Environment/rock1")
@@ -340,11 +342,11 @@ object Helpers {
   def fog = ifog
   def grass1 = igrass1
   def wall1 = iwall1
-  def tempStairs = itempStairs
-  def tempDjinnDoorH = itempDjinnDoorH
-  def tempDjinnDoorV = itempDjinnDoorV
-  def tempDjinnFloor = itempDjinnFloor
-  def tempDjinnWall = itempDjinnWall
+  def Stairs = iStairs
+  def DjinnDoorH = iDjinnDoorH
+  def DjinnDoorV = iDjinnDoorV
+  def DjinnFloor = iDjinnFloor
+  def DjinnWall = iDjinnWall
   def background = ibackground
   def emptyBackground = iemptyBackground
   def continue = icontinue
@@ -389,9 +391,9 @@ object Helpers {
   def level = ilevel
   def level2 = ilevel2
   def mouseSelector = imouseSelector
-  def tempUIBackground = itempUIBackground
-  def tempUIBackground2 = itempUIBackground2
-  def tempLevelBackground = itempLevelBackground
+  def UIBackground = iUIBackground
+  def UIBackground2 = iUIBackground2
+  def LevelBackground = iLevelBackground
   def fireballch1 = ifireballch1
   def fireballch2 = ifireballch2
   def fireballch3 = ifireballch3
@@ -399,7 +401,9 @@ object Helpers {
   def fireballch5 = ifireballch5
   def altar1 = ialtar1
   def altar2 = ialtar2
-  def djinn = idjinn
+  def djinn1 = idjinn1
+  def djinn2 = idjinn2
+  def djinn3 = idjinn3
   def bigTree1 = ibigTree1
   def tree1 = itree1
   def rock1 = irock1

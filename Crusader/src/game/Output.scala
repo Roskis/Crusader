@@ -200,8 +200,8 @@ object Output {
     mouseXCoord = (Mouse.getX * 1.0 / 32 + getPlayer.getX - 16).toInt
     mouseYCoord = ((getHeight - Mouse.getY) * 1.0 / 32 + getPlayer.getY - 8).toInt
     glClear(GL_COLOR_BUFFER_BIT)
-    drawQuadTex(tempUIBackground2, (getWidth-tempUIBackground2.getImageWidth)/2, 
-        (getHeight-tempUIBackground2.getImageHeight)/2, tempUIBackground2.getImageWidth, tempUIBackground2.getImageHeight)
+    drawQuadTex(UIBackground2, (getWidth-UIBackground2.getImageWidth)/2, 
+        (getHeight-UIBackground2.getImageHeight)/2, UIBackground2.getImageWidth, UIBackground2.getImageHeight)
     getGrid.FOV
     drawTiles
     drawSideBar
@@ -275,9 +275,9 @@ object Output {
     if (XPWidth < 0) XPWidth = 0
     drawQuadTex(XPBar, middle-256/2+40, 176, (176*XPWidth).toInt, 122)
     
-    drawQuadTex(tempUIBackground, (getWidth-tempUIBackground.getImageWidth)/2, 
-        (getHeight-tempUIBackground.getImageHeight)/2, tempUIBackground.getImageWidth, 
-        tempUIBackground.getImageHeight)
+    drawQuadTex(UIBackground, (getWidth-UIBackground.getImageWidth)/2, 
+        (getHeight-UIBackground.getImageHeight)/2, UIBackground.getImageWidth, 
+        UIBackground.getImageHeight)
         
     h += 80
     val hptext = "HP: " + getPlayer.health.toInt + "/" + getPlayer.maxHealth
@@ -430,9 +430,9 @@ object Output {
   
   /** Draw the character level up screen */
   def drawLevel {
-    drawQuadTex(tempLevelBackground, (getWidth-tempLevelBackground.getImageWidth)/2, 
-        (getHeight-tempLevelBackground.getImageHeight)/2, tempLevelBackground.getImageWidth, 
-        tempLevelBackground.getImageHeight)
+    drawQuadTex(LevelBackground, (getWidth-LevelBackground.getImageWidth)/2, 
+        (getHeight-LevelBackground.getImageHeight)/2, LevelBackground.getImageWidth, 
+        LevelBackground.getImageHeight)
     val title = "Choose level:"
     var h = 20
     var v = 150
