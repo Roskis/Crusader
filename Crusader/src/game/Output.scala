@@ -204,10 +204,10 @@ object Output {
     drawLog
     drawFog
     font.drawString(2, getHeight - 225, "X: " + getPlayer.getX.toString + " Y: " + getPlayer.getY.toString, Color.white)
-    font.drawString(2, getHeight - 265, "Mouse X: " + mouseXCoord.toString, Color.red)
-    font.drawString(130, getHeight - 265, "Y: " + mouseYCoord.toString, Color.red)
-    font.drawString(2, getHeight - 245, "Mouse X: " + Mouse.getX.toString, Color.red)
-    font.drawString(130, getHeight - 245, "Y: " + (getHeight - Mouse.getY).toString, Color.red)
+    //font.drawString(2, getHeight - 265, "Mouse X: " + mouseXCoord.toString, Color.red)
+    //font.drawString(130, getHeight - 265, "Y: " + mouseYCoord.toString, Color.red)
+    //font.drawString(2, getHeight - 245, "Mouse X: " + Mouse.getX.toString, Color.red)
+    //font.drawString(130, getHeight - 245, "Y: " + (getHeight - Mouse.getY).toString, Color.red)
     font.drawString(2, getHeight - 205, "Turn: " + getTurn, Color.white)
     val level = "Episode: " + getEpisode + " Level: " + getLevel
     font.drawString(1046-font.getWidth(level), getHeight - 205, level, Color.white)
@@ -220,7 +220,6 @@ object Output {
     val piety = "Piety: " + getPlayer.piety.toInt
     font.drawString(1046-font.getWidth(piety), 42, piety, Color.white)
     drawObjectsUnderMouse
-    if (getGameState == GameState.LEVEL) drawLevel
     if (getLastMonster != null) {
       drawQuadTex(blackBorder, 33*32/2-204, 34, 408, 4)
       drawQuadTex(blackBorder, 33*32/2-204, 63, 408, 4)
@@ -234,6 +233,7 @@ object Output {
       drawQuadTex(HPBar, 33*32/2-200, 38, (400*HPWidth).toInt, 25)
       font.drawString((33*32 - font.getWidth(monsterStatus))/2, 34, monsterStatus)
     }
+    if (getGameState == GameState.LEVEL) drawLevel
   }
   
   /** Draw gamelog to bottom of the screen */

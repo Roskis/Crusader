@@ -239,7 +239,9 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   
   /** Damage is based on player's weapon */
   def damage(crit: Boolean): Int = {
-    var weapondmg = roll(slotWeapon.damage._1, slotWeapon.damage._2) + slotWeapon.damage._3
+    var weapondmg = 0
+    if (slotWeapon != null) weapondmg = roll(slotWeapon.damage._1, slotWeapon.damage._2) + slotWeapon.damage._3
+    else weapondmg = roll(2)
     var isBuffed = false
     for (effect <- effectList) if (effect.isInstanceOf[buff]) isBuffed = true
     if (isBuffed) weapondmg += roll(3)
@@ -252,7 +254,9 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   def smallestDamage: Int = {
     var num = 0
     val zealroll = roll(zeal+2)
-    val weaponroll = roll(slotWeapon.damage._1, slotWeapon.damage._2) + slotWeapon.damage._3
+    var weaponroll = 0
+    if (slotWeapon != null) weaponroll = roll(slotWeapon.damage._1, slotWeapon.damage._2) + slotWeapon.damage._3
+    else weaponroll = roll(2)
     if (rnd.nextInt(4) != 0) if (zealroll < weaponroll) num = zealroll else num = weaponroll
     num
   }
@@ -285,8 +289,14 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
     }
     var isBuffed = false
     for (effect <- effectList) if (effect.isInstanceOf[buff]) isBuffed = true
-    if (isBuffed) slotArmor.armor + patienceBonus + 1
-    else slotArmor.armor + patienceBonus
+    if (slotArmor != null) {
+      if (isBuffed) slotArmor.armor + patienceBonus + 1
+      else slotArmor.armor + patienceBonus
+    }
+    else {
+      if (isBuffed) patienceBonus + 1
+      else patienceBonus
+    }
   }
   
   /** Armor poercing of weapon used */
@@ -1050,9 +1060,21 @@ trait Item extends Object with Serializable {
   /** Pick up */
   def pickUp = {
     ItemType.slot(itemType) match {
-      case s if (s == "weapon") => if (getPlayer.slotWeapon != null) getPlayer.slotWeapon.unequip
+      case s if (s == "weapon") => {
+        if (ItemType.is2h(itemType)) {
+          if (getPlayer.slotWeapon != null) getPlayer.slotWeapon.unequip
+          if (getPlayer.slotShield != null) getPlayer.slotShield.unequip
+        }
+        else if (getPlayer.slotWeapon != null) getPlayer.slotWeapon.unequip
+      }
+      case s if (s == "shield") => {
+        if (ItemType.is2h(getPlayer.slotWeapon.itemType)) {
+          if (getPlayer.slotWeapon != null) getPlayer.slotWeapon.unequip
+          if (getPlayer.slotShield != null) getPlayer.slotShield.unequip
+        }
+        else if (getPlayer.slotShield != null) getPlayer.slotShield.unequip
+      }
       case s if (s == "armor") => if (getPlayer.slotArmor != null) getPlayer.slotArmor.unequip
-      case s if (s == "shield") => if (getPlayer.slotShield != null) getPlayer.slotShield.unequip
       case s if (s == "ring") => if (getPlayer.slotRing != null) getPlayer.slotRing.unequip
       case s if (s == "amulet") => if (getPlayer.slotAmulet != null) getPlayer.slotAmulet.unequip
       case s if (s == "item") => if (getPlayer.slotUseable != null) getPlayer.slotUseable.unequip
@@ -1246,17 +1268,26 @@ object ItemType extends Enumeration with Serializable {
     }
   }
 
+  /** returns boolean about item being held with two hands */
+  def is2h(ItemType: Item): Boolean = {
+    ItemType match {
+      case t if (t == CLAYMORE) => true
+      case t if (t == DUALDAGGER) => true
+      case _ => false
+    }
+  }
+  
   /** returns armor of the given equipment */
   def armor(ItemType: Item): Double = {
     ItemType match {
-      case t if (t == IRONARMOR) => 1
-      case t if (t == WOODENSHIELD) => 0.5
-      case t if (t == IRONSHIELD) => 1
-      case t if (t == LARGESHIELD) => 1.5
-      case t if (t == SMALLSHIELD) => 1
-      case t if (t == STEELARMOR) => 1.5
-      case t if (t == GOLDARMOR) => 2
-      case t if (t == VIKINGARMOR) => 1
+      case t if (t == IRONARMOR) => 0.5
+      case t if (t == WOODENSHIELD) => 0.25
+      case t if (t == IRONSHIELD) => 0.5
+      case t if (t == LARGESHIELD) => 0.75
+      case t if (t == SMALLSHIELD) => 0.5
+      case t if (t == STEELARMOR) => 0.75
+      case t if (t == GOLDARMOR) => 1
+      case t if (t == VIKINGARMOR) => 0.5
       case _ => 0
     }
   }
