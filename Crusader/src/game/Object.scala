@@ -133,6 +133,42 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   
   var effectList = Buffer[Effect]()
   
+  def getZeal: Int = {
+    var bonus = 0
+    for (effect <- effectList) if (effect.isInstanceOf[tempZeal]) bonus = 1
+    zeal + bonus
+  }
+  def getHumility: Int = {
+    var bonus = 0
+    for (effect <- effectList) if (effect.isInstanceOf[tempHumility]) bonus = 1
+    humility + bonus
+  }
+  def getTemperance: Int = {
+    var bonus = 0
+    for (effect <- effectList) if (effect.isInstanceOf[tempTemperance]) bonus = 1
+    temperance + bonus
+  }
+  def getKindness: Int = {
+    var bonus = 0
+    for (effect <- effectList) if (effect.isInstanceOf[tempKindness]) bonus = 1
+    kindness + bonus
+  }
+  def getPatience: Int = {
+    var bonus = 0
+    for (effect <- effectList) if (effect.isInstanceOf[tempPatience]) bonus = 1
+    patience + bonus
+  }
+  def getCharity: Int = {
+    var bonus = 0
+    for (effect <- effectList) if (effect.isInstanceOf[tempCharity]) bonus = 1
+    charity + bonus
+  }
+  def getDiligence: Int = {
+    var bonus = 0
+    for (effect <- effectList) if (effect.isInstanceOf[tempDiligence]) bonus = 1
+    diligence + bonus
+  }
+  
   /** Amount of piety defines view range */
   def viewRadius: Int = {
     var radius = (piety/100).toInt
@@ -171,6 +207,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
         case p if (p == LEVELUP) => levelUp
         case p if (p == LEVELDOWN) => levelDown
         case p if (p == TIMESTOP) => timeStop
+        case p if (p == TEMPBOOST) => tempBoost
         case _ => {println("prayer not found")}
       }
     }
@@ -182,7 +219,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   /** Modifier applied to prays */
   def prayChance = {
     var chance:Double = 20
-    chance += charity*2.5
+    chance += getCharity*2.5
     if (getX == getGrid.getAltar.getX && getY == getGrid.getAltar.getY && getLevel%5 == 0) chance += 40
     else if (getX == getGrid.getAltar.getX && getY == getGrid.getAltar.getY) chance += 20
     else if (getLevel%5 == 0) chance += 10
@@ -193,16 +230,16 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   }
   
   /** Modifier applied to all expirience gained */
-  def giveXP(amount: Double) = experience += amount * (1+0.1*diligence)
+  def giveXP(amount: Double) = experience += amount * (1+0.1*getDiligence)
   
   /** Modifier applied to all gold gained */
-  def giveGold(amount: Double) = gold += amount * (1+0.1*diligence)
+  def giveGold(amount: Double) = gold += amount * (1+0.1*getDiligence)
   
   /** Modifier applied to all piety gained */
-  def givePiety(amount: Double) = piety += amount * (1+0.1*charity)
+  def givePiety(amount: Double) = piety += amount * (1+0.1*getCharity)
   
   /** Player's maximum health */
-  def maxHealth: Int = 20+8*kindness
+  def maxHealth: Int = 20+8*getKindness
   
   /** Title of player */
   def title: String = {
@@ -224,11 +261,11 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   }
   
   /** Total level of player */
-  def totalLevel: Int = zeal + humility + temperance + kindness + patience + charity + diligence
+  def totalLevel: Int = getZeal + getHumility + getTemperance + getKindness + getPatience + getCharity + getDiligence
   
   /** Return smallest level xp requirement */
   def smallestLevel(): Int = {
-    var skills = List(zeal, humility, temperance, kindness, patience, charity, diligence)
+    var skills = List(getZeal, getHumility, getTemperance, getKindness, getPatience, getCharity, getDiligence)
     skills = skills.sortWith(_ < _)
     xpNeededForLevel(skills(0))
   }
@@ -249,15 +286,15 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
     var isBuffed = false
     for (effect <- effectList) if (effect.isInstanceOf[buff]) isBuffed = true
     if (isBuffed) weapondmg += roll(3)
-    if (crit) weapondmg += (zeal+2) + roll(zeal+2)
-    else weapondmg += roll(zeal+2)
+    if (crit) weapondmg += (getZeal+2) + roll(getZeal+2)
+    else weapondmg += roll(getZeal+2)
     weapondmg
   }
   
   /** Return small damage */
   def smallestDamage: Int = {
     var num = 0
-    val zealroll = roll(zeal+2)
+    val zealroll = roll(getZeal+2)
     var weaponroll = 0
     if (slotWeapon != null) weaponroll = roll(slotWeapon.damage._1, slotWeapon.damage._2) + slotWeapon.damage._3
     else weaponroll = roll(2)
@@ -285,10 +322,10 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   
   def armor: Double = {
     val patienceBonus: Double = {
-      if (patience > 7) 2
-      else if (patience > 5) 1.5
-      else if (patience > 3) 1
-      else if (patience > 1) 0.5
+      if (getPatience > 7) 2
+      else if (getPatience > 5) 1.5
+      else if (getPatience > 3) 1
+      else if (getPatience > 1) 0.5
       else 0
     }
     var isBuffed = false
@@ -313,7 +350,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   def blockChance: Int = if (slotShield != null) slotShield.blockChance else 0
   
   /** Shield Armor */
-  def shieldArmor: Double = if (slotShield != null) slotShield.armor else 0
+  def shieldArmor: Double = if (slotShield != null) slotShield.shieldArmor else 0
   
   /** Total weight of items after patience bonus */
   def totalWeight: Int = {
@@ -324,24 +361,24 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
     if (slotRing != null) num += slotRing.weight
     if (slotAmulet != null) num += slotAmulet.weight
     if (slotUseable != null) num += slotUseable.weight
-    ((1 - (0.05*patience)).toInt * num)
+    ((1 - (0.05*getPatience)).toInt * num)
   }
   
   /** Return dodge of player */
   def dodge: Int = {
     var isBuffed = false
     for (effect <- effectList) if (effect.isInstanceOf[buff]) isBuffed = true
-    if (isBuffed) (humility+2)*2 - totalWeight
-    else humility*2 - totalWeight
+    if (isBuffed) (getHumility+2)*2 - totalWeight
+    else getHumility*2 - totalWeight
   }
   
   /** Return accuracy of player */
   def accuracy: Int = {
     var blinded = false
     for (effect <- effectList) if (effect.isInstanceOf[blind]) blinded = true
-    if (slotWeapon != null && !blinded) slotWeapon.accuracy + temperance*2
-    else if (blinded) 10 + temperance*2
-    else 100 + temperance*2
+    if (slotWeapon != null && !blinded) slotWeapon.accuracy + getTemperance*2
+    else if (blinded) 10 + getTemperance*2
+    else 100 + getTemperance*2
   }
   
   /** Move to given coordinates or go to next map */
@@ -1004,6 +1041,7 @@ class Equipment(startX: Int, startY: Int, equipmentType: ItemType.Value, isEquip
   var price = ItemType.price(itemType)
   var inShop = false
   val armor = ItemType.armor(itemType)
+  val shieldArmor = ItemType.shieldArmor(itemType)
   val weight = ItemType.weight(itemType)
   val blockChance = ItemType.blockChance(itemType)
   val damage = ItemType.damage(itemType)
@@ -1041,7 +1079,9 @@ object ItemType extends Enumeration with Serializable {
   type Item = Value
   val KNIFE, ROBES, IRONARMOR, STEELSWORD, WOODENSHIELD, RATMEAT, SMALLHEALPOTION, BATTLEAXE, 
   CLOTH1, CLOTH2, IRONSHIELD, KATANA, LARGESHIELD, SHORTSWORD, SMALLSHIELD, STEELARMOR, CLAYMORE, 
-  DUALDAGGER, GOLDARMOR, MAGICSWORD, MONODAGGER, VIKINGARMOR = Value
+  DUALDAGGER, GOLDARMOR, MAGICSWORD, MONODAGGER, VIKINGARMOR, BUFFPOTION, CHARITYPOTION, 
+  DILIGENCEPOTION, HUMILITYPOTION, IMMUNITYPOTION, KINDNESSPOTION, PATIENCEPOTION, TEMPERANCEPOTION, 
+  TIMEPOTION, VISIONPOTION, ZEALPOTION = Value
   
   private var knife: scala.xml.Node = null
   private var robes: scala.xml.Node = null
@@ -1065,6 +1105,17 @@ object ItemType extends Enumeration with Serializable {
   private var magicSword: scala.xml.Node = null
   private var monoDagger: scala.xml.Node = null
   private var vikingArmor: scala.xml.Node = null
+  private var buffpotion: scala.xml.Node = null
+  private var charitypotion: scala.xml.Node = null
+  private var diligencepotion: scala.xml.Node = null
+  private var humilitypotion: scala.xml.Node = null
+  private var immunitypotion: scala.xml.Node = null
+  private var kindnesspotion: scala.xml.Node = null
+  private var patiencepotion: scala.xml.Node = null
+  private var temperancepotion: scala.xml.Node = null
+  private var timepotion: scala.xml.Node = null
+  private var visionpotion: scala.xml.Node = null
+  private var zealpotion: scala.xml.Node = null  
   
   private val xml = XML.loadFile("data/items.xml")
   
@@ -1091,6 +1142,17 @@ object ItemType extends Enumeration with Serializable {
     case o if ((o \ "ItemType").text == "MAGICSWORD") => magicSword = o
     case o if ((o \ "ItemType").text == "MONODAGGER") => monoDagger = o
     case o if ((o \ "ItemType").text == "VIKINGARMOR") => vikingArmor = o
+    case o if ((o \ "ItemType").text == "BUFFPOTION") => buffpotion = o
+    case o if ((o \ "ItemType").text == "CHARITYPOTION") => charitypotion = o
+    case o if ((o \ "ItemType").text == "DILIGENCEPOTION") => diligencepotion = o
+    case o if ((o \ "ItemType").text == "HUMILITYPOTION") => humilitypotion = o
+    case o if ((o \ "ItemType").text == "IMMUNITYPOTION") => immunitypotion = o
+    case o if ((o \ "ItemType").text == "KINDNESSPOTION") => kindnesspotion = o
+    case o if ((o \ "ItemType").text == "PATIENCEPOTION") => patiencepotion = o
+    case o if ((o \ "ItemType").text == "TEMPERANCEPOTION") => temperancepotion = o
+    case o if ((o \ "ItemType").text == "TIMEPOTION") => timepotion = o
+    case o if ((o \ "ItemType").text == "VISIONPOTION") => visionpotion = o
+    case o if ((o \ "ItemType").text == "ZEALPOTION") => zealpotion = o
     case _ => {}
   }
   
@@ -1119,6 +1181,17 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == MAGICSWORD) => magicSword
       case t if (t == MONODAGGER) => monoDagger
       case t if (t == VIKINGARMOR) => vikingArmor
+      case t if (t == BUFFPOTION) => buffpotion
+      case t if (t == CHARITYPOTION) => charitypotion
+      case t if (t == DILIGENCEPOTION) => diligencepotion
+      case t if (t == HUMILITYPOTION) => humilitypotion
+      case t if (t == IMMUNITYPOTION) => immunitypotion
+      case t if (t == KINDNESSPOTION) => kindnesspotion
+      case t if (t == PATIENCEPOTION) => patiencepotion
+      case t if (t == TEMPERANCEPOTION) => temperancepotion
+      case t if (t == TIMEPOTION) => timepotion
+      case t if (t == VISIONPOTION) => visionpotion
+      case t if (t == ZEALPOTION) => zealpotion
       case _ => null
     }
   }
@@ -1158,7 +1231,9 @@ object ItemType extends Enumeration with Serializable {
       case l if (l == 2) => chances += (CLOTH1 -> 2, CLOTH2 -> 1)
       case l if (l == 3) => chances += (CLOTH1 -> 1, CLOTH2 -> 1)
       case l if (l == 4) => chances += (CLOTH1 -> 1)
-      case l if (l == 5) => {}
+      case l if (l == 5) => chances += (BUFFPOTION -> 1, CHARITYPOTION -> 1, DILIGENCEPOTION -> 1, 
+          HUMILITYPOTION -> 1, IMMUNITYPOTION -> 1, KINDNESSPOTION -> 1, PATIENCEPOTION -> 1, 
+          TEMPERANCEPOTION -> 1, TIMEPOTION -> 1, VISIONPOTION -> 1, ZEALPOTION -> 1)
       case _ => {chances = Map(KNIFE -> 100)}
     }
     chances
@@ -1195,6 +1270,17 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == MAGICSWORD) => magicSwordG
       case t if (t == MONODAGGER) => monoDaggerG
       case t if (t == VIKINGARMOR) => vikingArmorG
+      case t if (t == BUFFPOTION) => Helpers.buffpotion
+      case t if (t == CHARITYPOTION) => Helpers.charitypotion
+      case t if (t == DILIGENCEPOTION) => Helpers.diligencepotion
+      case t if (t == HUMILITYPOTION) => Helpers.humilitypotion
+      case t if (t == IMMUNITYPOTION) => Helpers.immunitypotion
+      case t if (t == KINDNESSPOTION) => Helpers.kindnesspotion
+      case t if (t == PATIENCEPOTION) => Helpers.patiencepotion
+      case t if (t == TEMPERANCEPOTION) => Helpers.temperancepotion
+      case t if (t == TIMEPOTION) => Helpers.timepotion
+      case t if (t == VISIONPOTION) => Helpers.visionpotion
+      case t if (t == ZEALPOTION) => Helpers.zealpotion
       case _ => missing
     }
   }
@@ -1224,6 +1310,17 @@ object ItemType extends Enumeration with Serializable {
       case t if (t == MAGICSWORD) => magicSwordE
       case t if (t == MONODAGGER) => monoDaggerE
       case t if (t == VIKINGARMOR) => vikingArmorE
+      case t if (t == BUFFPOTION) => Helpers.buffpotion
+      case t if (t == CHARITYPOTION) => Helpers.charitypotion
+      case t if (t == DILIGENCEPOTION) => Helpers.diligencepotion
+      case t if (t == HUMILITYPOTION) => Helpers.humilitypotion
+      case t if (t == IMMUNITYPOTION) => Helpers.immunitypotion
+      case t if (t == KINDNESSPOTION) => Helpers.kindnesspotion
+      case t if (t == PATIENCEPOTION) => Helpers.patiencepotion
+      case t if (t == TEMPERANCEPOTION) => Helpers.temperancepotion
+      case t if (t == TIMEPOTION) => Helpers.timepotion
+      case t if (t == VISIONPOTION) => Helpers.visionpotion
+      case t if (t == ZEALPOTION) => Helpers.zealpotion
       case _ => missing
     }
   }
@@ -1238,6 +1335,13 @@ object ItemType extends Enumeration with Serializable {
   def armor(ItemType: Item): Double = {
     if (getXml(ItemType) != null && (getXml(ItemType) \ "armor").text != "") 
       (getXml(ItemType) \ "armor").text.toDouble
+    else 0.0
+  }
+  
+  /** returns armor of the given shield */
+  def shieldArmor(ItemType: Item): Double = {
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "shieldArmor").text != "") 
+      (getXml(ItemType) \ "shieldArmor").text.toDouble
     else 0.0
   }
   
@@ -1352,10 +1456,53 @@ class Useable(startX: Int, startY: Int, val itemType: ItemType.Value, isEquipped
         if (getPlayer.piety > 0) getPlayer.piety = getPlayer.piety * 0.9 - 10
         else getPlayer.piety * 1.1 - 10
         addLog(getPlayer.name.toUpperCase.head + getPlayer.name.tail + " eats " + name + ".")
-
       }
       case i if (i == ItemType.SMALLHEALPOTION) => {
         getPlayer.effectList = getPlayer.effectList :+ new smallHeal(roll(5)+5, getPlayer)
+        addLog(getPlayer.name.toUpperCase.head + getPlayer.name.tail + " drinks " + name + ".")
+      }
+      case i if (i == ItemType.BUFFPOTION) => {
+        getPlayer.effectList = getPlayer.effectList :+ new buff(roll(10)+10, getPlayer)
+        addLog(getPlayer.name.toUpperCase.head + getPlayer.name.tail + " drinks " + name + ".")
+      }
+      case i if (i == ItemType.IMMUNITYPOTION) => {
+        getPlayer.effectList = getPlayer.effectList :+ new immunity(roll(10)+10, getPlayer)
+        addLog(getPlayer.name.toUpperCase.head + getPlayer.name.tail + " drinks " + name + ".")
+      }
+      case i if (i == ItemType.TIMEPOTION) => {
+        getPlayer.effectList = getPlayer.effectList :+ new timestop(roll(10)+10, getPlayer)
+        addLog(getPlayer.name.toUpperCase.head + getPlayer.name.tail + " drinks " + name + ".")
+      }
+      case i if (i == ItemType.VISIONPOTION) => {
+        getPlayer.effectList = getPlayer.effectList :+ new vision(roll(20)+20, getPlayer)
+        addLog(getPlayer.name.toUpperCase.head + getPlayer.name.tail + " drinks " + name + ".")
+      }
+      case i if (i == ItemType.CHARITYPOTION) => {
+        getPlayer.charity += 1
+        addLog(getPlayer.name.toUpperCase.head + getPlayer.name.tail + " drinks " + name + ".")
+      }
+      case i if (i == ItemType.DILIGENCEPOTION) => {
+        getPlayer.diligence += 1
+        addLog(getPlayer.name.toUpperCase.head + getPlayer.name.tail + " drinks " + name + ".")
+      }
+      case i if (i == ItemType.HUMILITYPOTION) => {
+        getPlayer.humility += 1
+        addLog(getPlayer.name.toUpperCase.head + getPlayer.name.tail + " drinks " + name + ".")
+      }
+      case i if (i == ItemType.KINDNESSPOTION) => {
+        getPlayer.kindness += 1
+        addLog(getPlayer.name.toUpperCase.head + getPlayer.name.tail + " drinks " + name + ".")
+      }
+      case i if (i == ItemType.PATIENCEPOTION) => {
+        getPlayer.patience += 1
+        addLog(getPlayer.name.toUpperCase.head + getPlayer.name.tail + " drinks " + name + ".")
+      }
+      case i if (i == ItemType.TEMPERANCEPOTION) => {
+        getPlayer.temperance += 1
+        addLog(getPlayer.name.toUpperCase.head + getPlayer.name.tail + " drinks " + name + ".")
+      }
+      case i if (i == ItemType.ZEALPOTION) => {
+        getPlayer.zeal += 1
         addLog(getPlayer.name.toUpperCase.head + getPlayer.name.tail + " drinks " + name + ".")
       }
       case _ => {}

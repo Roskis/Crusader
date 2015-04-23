@@ -306,6 +306,17 @@ object Helpers {
   private val izeal3 = loadTexture("UI/Zeal3")
   private val ipray = loadTexture("UI/Pray")
   private val ipray3 = loadTexture("UI/Pray3")
+  private val ibuffpotion = loadTexture("Items/buffpotion")
+  private val icharitypotion = loadTexture("Items/charitypotion")
+  private val idiligencepotion = loadTexture("Items/diligencepotion")
+  private val ihumilitypotion = loadTexture("Items/humilitypotion")
+  private val iimmunitypotion = loadTexture("Items/immunitypotion")
+  private val ikindnesspotion = loadTexture("Items/kindnesspotion")
+  private val ipatiencepotion = loadTexture("Items/patiencepotion")
+  private val itemperancepotion = loadTexture("Items/temperancepotion")
+  private val itimepotion = loadTexture("Items/timepotion")
+  private val ivisionpotion = loadTexture("Items/visionpotion")
+  private val izealpotion = loadTexture("Items/zealpotion")
   
   /** Return textures */
   def playerImage = iplayerImage
@@ -469,6 +480,17 @@ object Helpers {
   def zeal3 = izeal3
   def pray = ipray
   def pray3 = ipray3
+  def buffpotion = ibuffpotion
+  def charitypotion = icharitypotion
+  def diligencepotion = idiligencepotion
+  def humilitypotion = ihumilitypotion
+  def immunitypotion = iimmunitypotion
+  def kindnesspotion = ikindnesspotion
+  def patiencepotion = ipatiencepotion
+  def temperancepotion = itemperancepotion
+  def timepotion = itimepotion
+  def visionpotion = ivisionpotion
+  def zealpotion = izealpotion
   
   buttonContinue = new Button(905, 200, 256, 64, continue, continue2, continue3)
   buttonNewGameMenu = new Button(905, 280, 256, 64, newgame, newgame2, newgame3)

@@ -583,7 +583,7 @@ object Main {
     var chances = Map(PARTIALRESTORATION -> 80, FULLRESTORATION -> 20, STAIRS -> 10, SMITE -> 10, 
         GOLDGAIN -> 10, EXPERIENCEGAIN -> 10, CLAIRVOYANCE -> 10, ITEM -> 1, FEAR -> 5, 
         AOEDAMAGE -> 5, BLINDINGLIGHT -> 5, REVEALSECRET -> 10, IMMUNITY -> 5, BUFF -> 20, 
-        VISION -> 10, LEVELUP -> 2, TIMESTOP -> 1)
+        VISION -> 10, LEVELUP -> 2, TIMESTOP -> 1, TEMPBOOST -> 10)
     if (player.piety < 0) {
       chances += (DEMENTIA -> 10)
       chances += (EXPERIENCELOSS -> 10)

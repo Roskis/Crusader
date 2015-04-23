@@ -492,64 +492,64 @@ object Output {
     
     fontMenu.drawString(v, 35, "Choose level:", Color.black)
     font.drawString(v+440, h+35, "Experience: " + getPlayer.experience.toInt, Color.black)
-    if (getPlayer.experience >= xpNeededForLevel(getPlayer.charity) && buttonCharity.isMouseWithin) 
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.getCharity) && buttonCharity.isMouseWithin) 
       drawQuadTex(buttonCharity.tex3, buttonCharity.getDrawX, buttonCharity.getDrawY, 
           buttonCharity.tex3.getImageWidth, buttonCharity.tex3.getImageHeight)
-    else if (getPlayer.experience >= xpNeededForLevel(getPlayer.charity)) 
+    else if (getPlayer.experience >= xpNeededForLevel(getPlayer.getCharity)) 
       drawQuadTex(buttonCharity.tex, buttonCharity.getDrawX, buttonCharity.getDrawY, 
           buttonCharity.tex.getImageWidth, buttonCharity.tex.getImageHeight)
     else drawQuadTex(buttonCharity.tex2, buttonCharity.getDrawX, buttonCharity.getDrawY, 
         buttonCharity.tex2.getImageWidth, buttonCharity.tex2.getImageHeight)
     h += 70
-    if (getPlayer.experience >= xpNeededForLevel(getPlayer.diligence) && buttonDiligence.isMouseWithin) 
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.getDiligence) && buttonDiligence.isMouseWithin) 
       drawQuadTex(buttonDiligence.tex3, buttonDiligence.getDrawX, buttonDiligence.getDrawY, 
           buttonDiligence.tex3.getImageWidth, buttonDiligence.tex3.getImageHeight)
-    else if (getPlayer.experience >= xpNeededForLevel(getPlayer.diligence)) 
+    else if (getPlayer.experience >= xpNeededForLevel(getPlayer.getDiligence)) 
       drawQuadTex(buttonDiligence.tex, buttonDiligence.getDrawX, buttonDiligence.getDrawY, 
           buttonDiligence.tex.getImageWidth, buttonDiligence.tex.getImageHeight)
     else drawQuadTex(buttonDiligence.tex2, buttonDiligence.getDrawX, buttonDiligence.getDrawY, 
         buttonDiligence.tex2.getImageWidth, buttonDiligence.tex2.getImageHeight)
     h += 70
-    if (getPlayer.experience >= xpNeededForLevel(getPlayer.humility) && buttonHumility.isMouseWithin) 
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.getHumility) && buttonHumility.isMouseWithin) 
       drawQuadTex(buttonHumility.tex3, buttonHumility.getDrawX, buttonHumility.getDrawY, 
           buttonHumility.tex3.getImageWidth, buttonHumility.tex3.getImageHeight)
-    else if (getPlayer.experience >= xpNeededForLevel(getPlayer.humility)) 
+    else if (getPlayer.experience >= xpNeededForLevel(getPlayer.getHumility)) 
       drawQuadTex(buttonHumility.tex, buttonHumility.getDrawX, buttonHumility.getDrawY, 
           buttonHumility.tex.getImageWidth, buttonHumility.tex.getImageHeight)
     else drawQuadTex(buttonHumility.tex2, buttonHumility.getDrawX, buttonHumility.getDrawY, 
         buttonHumility.tex2.getImageWidth, buttonHumility.tex2.getImageHeight)
     h += 70
-    if (getPlayer.experience >= xpNeededForLevel(getPlayer.kindness) && buttonKindness.isMouseWithin) 
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.getKindness) && buttonKindness.isMouseWithin) 
       drawQuadTex(buttonKindness.tex3, buttonKindness.getDrawX, buttonKindness.getDrawY, 
           buttonKindness.tex3.getImageWidth, buttonKindness.tex3.getImageHeight)
-    else if (getPlayer.experience >= xpNeededForLevel(getPlayer.kindness)) 
+    else if (getPlayer.experience >= xpNeededForLevel(getPlayer.getKindness)) 
       drawQuadTex(buttonKindness.tex, buttonKindness.getDrawX, buttonKindness.getDrawY, 
           buttonKindness.tex.getImageWidth, buttonKindness.tex.getImageHeight)
     else drawQuadTex(buttonKindness.tex2, buttonKindness.getDrawX, buttonKindness.getDrawY, 
         buttonKindness.tex2.getImageWidth, buttonKindness.tex2.getImageHeight)
     h += 70
-    if (getPlayer.experience >= xpNeededForLevel(getPlayer.patience) && buttonPatience.isMouseWithin) 
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.getPatience) && buttonPatience.isMouseWithin) 
       drawQuadTex(buttonPatience.tex3, buttonPatience.getDrawX, buttonPatience.getDrawY, 
           buttonPatience.tex3.getImageWidth, buttonPatience.tex3.getImageHeight)
-    else if (getPlayer.experience >= xpNeededForLevel(getPlayer.patience)) 
+    else if (getPlayer.experience >= xpNeededForLevel(getPlayer.getPatience)) 
       drawQuadTex(buttonPatience.tex, buttonPatience.getDrawX, buttonPatience.getDrawY, 
           buttonPatience.tex.getImageWidth, buttonPatience.tex.getImageHeight)
     else drawQuadTex(buttonPatience.tex2, buttonPatience.getDrawX, buttonPatience.getDrawY, 
         buttonPatience.tex2.getImageWidth, buttonPatience.tex2.getImageHeight)
     h += 70
-    if (getPlayer.experience >= xpNeededForLevel(getPlayer.temperance) && buttonTemperance.isMouseWithin) 
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.getTemperance) && buttonTemperance.isMouseWithin) 
       drawQuadTex(buttonTemperance.tex3, buttonTemperance.getDrawX, buttonTemperance.getDrawY, 
           buttonTemperance.tex3.getImageWidth, buttonTemperance.tex3.getImageHeight)
-    else if (getPlayer.experience >= xpNeededForLevel(getPlayer.temperance)) 
+    else if (getPlayer.experience >= xpNeededForLevel(getPlayer.getTemperance)) 
       drawQuadTex(buttonTemperance.tex, buttonTemperance.getDrawX, buttonTemperance.getDrawY, 
           buttonTemperance.tex.getImageWidth, buttonTemperance.tex.getImageHeight)
     else drawQuadTex(buttonTemperance.tex2, buttonTemperance.getDrawX, buttonTemperance.getDrawY, 
         buttonTemperance.tex2.getImageWidth, buttonTemperance.tex2.getImageHeight)
     h += 70
-    if (getPlayer.experience >= xpNeededForLevel(getPlayer.zeal) && buttonZeal.isMouseWithin) 
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.getZeal) && buttonZeal.isMouseWithin) 
       drawQuadTex(buttonZeal.tex3, buttonZeal.getDrawX, buttonZeal.getDrawY, 
           buttonZeal.tex3.getImageWidth, buttonZeal.tex3.getImageHeight)
-    else if (getPlayer.experience >= xpNeededForLevel(getPlayer.zeal)) 
+    else if (getPlayer.experience >= xpNeededForLevel(getPlayer.getZeal)) 
       drawQuadTex(buttonZeal.tex, buttonZeal.getDrawX, buttonZeal.getDrawY, 
           buttonZeal.tex.getImageWidth, buttonZeal.tex.getImageHeight)
     else drawQuadTex(buttonZeal.tex2, buttonZeal.getDrawX, buttonZeal.getDrawY, 
@@ -564,77 +564,77 @@ object Output {
     v = 400
     for (lev <- Range(0,10)) {
       v += 16
-      if (lev + 1 <= getPlayer.charity) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
+      if (lev + 1 <= getPlayer.getCharity) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
       else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
     }
     v += 32
-    font.drawString(v, h, if (getPlayer.charity < 10) "Costs: " + xpNeededForLevel(getPlayer.charity) else "", Color.black)
+    font.drawString(v, h, if (getPlayer.getCharity < 10) "Costs: " + xpNeededForLevel(getPlayer.getCharity) else "", Color.black)
     v += 128
     font.drawString(v, h, "Charity increases piety gain.", Color.black)
     h += 70
     v = 400
     for (lev <- Range(0,10)) {
       v += 16
-      if (lev + 1 <= getPlayer.diligence) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
+      if (lev + 1 <= getPlayer.getDiligence) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
       else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
     }
     v += 32
-    font.drawString(v, h, if (getPlayer.diligence < 10) "Costs: " + xpNeededForLevel(getPlayer.diligence) else "", Color.black)
+    font.drawString(v, h, if (getPlayer.getDiligence < 10) "Costs: " + xpNeededForLevel(getPlayer.getDiligence) else "", Color.black)
     v += 128
     font.drawString(v, h, "Diligence increases gold and xp gain.", Color.black)
     h += 70
     v = 400
     for (lev <- Range(0,10)) {
       v += 16
-      if (lev + 1 <= getPlayer.humility) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
+      if (lev + 1 <= getPlayer.getHumility) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
       else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
     }
     v += 32
-    font.drawString(v, h, if (getPlayer.humility < 10) "Costs: " + xpNeededForLevel(getPlayer.humility) else "", Color.black)
+    font.drawString(v, h, if (getPlayer.getHumility < 10) "Costs: " + xpNeededForLevel(getPlayer.getHumility) else "", Color.black)
     v += 128
     font.drawString(v, h, "Humility increases dodge chance.", Color.black)
     h += 70
     v = 400
     for (lev <- Range(0,10)) {
       v += 16
-      if (lev + 1 <= getPlayer.kindness) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
+      if (lev + 1 <= getPlayer.getKindness) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
       else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
     }
     v += 32
-    font.drawString(v, h, if (getPlayer.kindness < 10) "Costs: " + xpNeededForLevel(getPlayer.kindness) else "", Color.black)
+    font.drawString(v, h, if (getPlayer.getKindness < 10) "Costs: " + xpNeededForLevel(getPlayer.getKindness) else "", Color.black)
     v += 128
     font.drawString(v, h, "Kindness increases maximum health.", Color.black)
     h += 70
     v = 400
     for (lev <- Range(0,10)) {
       v += 16
-      if (lev + 1 <= getPlayer.patience) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
+      if (lev + 1 <= getPlayer.getPatience) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
       else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
     }
     v += 32
-    font.drawString(v, h, if (getPlayer.patience < 10) "Costs: " + xpNeededForLevel(getPlayer.patience) else "", Color.black)
+    font.drawString(v, h, if (getPlayer.getPatience < 10) "Costs: " + xpNeededForLevel(getPlayer.getPatience) else "", Color.black)
     v += 128
     font.drawString(v, h, "Patience increases weight limit.", Color.black)
     h += 70
     v = 400
     for (lev <- Range(0,10)) {
       v += 16
-      if (lev + 1 <= getPlayer.temperance) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
+      if (lev + 1 <= getPlayer.getTemperance) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
       else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
     }
     v += 32
-    font.drawString(v, h, if (getPlayer.temperance < 10) "Costs: " + xpNeededForLevel(getPlayer.temperance) else "", Color.black)
+    font.drawString(v, h, if (getPlayer.getTemperance < 10) "Costs: " + xpNeededForLevel(getPlayer.getTemperance) else "", Color.black)
     v += 128
     font.drawString(v, h, "Temperance increases accuracy.", Color.black)
     h += 70
     v = 400
     for (lev <- Range(0,10)) {
       v += 16
-      if (lev + 1 <= getPlayer.zeal) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
+      if (lev + 1 <= getPlayer.getZeal) drawQuadTex(level, v, h, level.getImageWidth, level.getImageHeight)
       else drawQuadTex(level2, v, h, level2.getImageWidth, level2.getImageHeight)
     }
     v += 32
-    font.drawString(v, h, if (getPlayer.zeal < 10) "Costs: " + xpNeededForLevel(getPlayer.zeal) else "", Color.black)
+    font.drawString(v, h, if (getPlayer.getZeal < 10) "Costs: " + xpNeededForLevel(getPlayer.getZeal) else "", Color.black)
     v += 128
     font.drawString(v, h, "Zeal increases damage.", Color.black)
   }

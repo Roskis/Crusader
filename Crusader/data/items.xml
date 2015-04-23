@@ -45,7 +45,7 @@
         <name>wooden shield</name>
         <description>TODO</description>
         <slot>shield</slot>
-        <armor>0.5</armor>
+        <shieldArmor>0.5</shieldArmor>
         <weight>2</weight>
         <blockChance>10</blockChance>
         <price>10</price>
@@ -98,7 +98,7 @@
         <name>iron shield</name>
         <description>TODO</description>
         <slot>shield</slot>
-        <armor>1</armor>
+        <shieldArmor>1</shieldArmor>
         <weight>10</weight>
         <blockChance>15</blockChance>
         <price>60</price>
@@ -119,7 +119,7 @@
         <name>large shield</name>
         <description>TODO</description>
         <slot>shield</slot>
-        <armor>1.5</armor>
+        <shieldArmor>1.5</shieldArmor>
         <weight>15</weight>
         <blockChance>15</blockChance>
         <price>80</price>
@@ -141,7 +141,7 @@
         <name>small shield</name>
         <description>TODO</description>
         <slot>shield</slot>
-        <armor>1</armor>
+        <shieldArmor>1</shieldArmor>
         <weight>5</weight>
         <blockChance>10</blockChance>
         <price>20</price>
@@ -219,5 +219,93 @@
         <armor>1</armor>
         <weight>15</weight>
         <price>60</price>
+    </item>
+    <item>
+        <ItemType>BUFFPOTION</ItemType>
+        <name>Potion of power</name>
+        <description>TODO</description>
+        <slot>item</slot>
+        <weight>2</weight>
+        <price>100</price>
+    </item>
+    <item>
+        <ItemType>CHARITYPOTION</ItemType>
+        <name>Potion of charity</name>
+        <description>TODO</description>
+        <slot>item</slot>
+        <weight>2</weight>
+        <price>200</price>
+    </item>
+    <item>
+        <ItemType>DILIGENCEPOTION</ItemType>
+        <name>Potion of diligence</name>
+        <description>TODO</description>
+        <slot>item</slot>
+        <weight>2</weight>
+        <price>200</price>
+    </item>
+    <item>
+        <ItemType>HUMILITYPOTION</ItemType>
+        <name>Potion of humility</name>
+        <description>TODO</description>
+        <slot>item</slot>
+        <weight>2</weight>
+        <price>200</price>
+    </item>
+    <item>
+        <ItemType>IMMUNITYPOTION</ItemType>
+        <name>Potion of immunity</name>
+        <description>TODO</description>
+        <slot>item</slot>
+        <weight>2</weight>
+        <price>500</price>
+    </item>
+    <item>
+        <ItemType>KINDNESSPOTION</ItemType>
+        <name>Potion of kindness</name>
+        <description>TODO</description>
+        <slot>item</slot>
+        <weight>2</weight>
+        <price>200</price>
+    </item>
+    <item>
+        <ItemType>PATIENCEPOTION</ItemType>
+        <name>Potion of patience</name>
+        <description>TODO</description>
+        <slot>item</slot>
+        <weight>2</weight>
+        <price>200</price>
+    </item>
+    <item>
+        <ItemType>TEMPERANCEPOTION</ItemType>
+        <name>Potion of temperance</name>
+        <description>TODO</description>
+        <slot>item</slot>
+        <weight>2</weight>
+        <price>200</price>
+    </item>
+    <item>
+        <ItemType>TIMEPOTION</ItemType>
+        <name>Potion of time</name>
+        <description>TODO</description>
+        <slot>item</slot>
+        <weight>2</weight>
+        <price>1000</price>
+    </item>
+    <item>
+        <ItemType>VISIONPOTION</ItemType>
+        <name>Potion of vision</name>
+        <description>TODO</description>
+        <slot>item</slot>
+        <weight>2</weight>
+        <price>50</price>
+    </item>
+    <item>
+        <ItemType>ZEALPOTION</ItemType>
+        <name>Potion of zeal</name>
+        <description>TODO</description>
+        <slot>item</slot>
+        <weight>2</weight>
+        <price>200</price>
     </item>
 </root>

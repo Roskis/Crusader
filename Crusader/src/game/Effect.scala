@@ -12,7 +12,7 @@ object Prayers extends Enumeration {
   type Prayer = Value
   val PARTIALRESTORATION, FULLRESTORATION, LIGHTNINGBOLT, GOLDLOSS, EXPERIENCELOSS, DEMENTIA, 
     STAIRS, SMITE, GOLDGAIN, EXPERIENCEGAIN, CLAIRVOYANCE, ITEM, FEAR, AOEDAMAGE, BLINDINGLIGHT, 
-    REVEALSECRET, IMMUNITY, BUFF, VISION, LEVELUP, LEVELDOWN, TIMESTOP = Value
+    REVEALSECRET, IMMUNITY, BUFF, VISION, LEVELUP, LEVELDOWN, TIMESTOP, TEMPBOOST = Value
   val rnd = getRnd
   
   /** Player regains part of maximum health */
@@ -72,7 +72,7 @@ object Prayers extends Enumeration {
   def smite = {
     if (getLastMonster != null) {
       val mon = getLastMonster
-      val damage = roll(getPlayer.zeal + 1, 3)
+      val damage = roll(getPlayer.getZeal + 1, 3)
       mon.health -= damage
       if (mon.health <= 0) mon.kill
       addLog(mon.name.toUpperCase.head + mon.name.tail + " takes " + damage.toInt +  " damage.")
@@ -81,14 +81,14 @@ object Prayers extends Enumeration {
   
   /** Give player some gold */
   def goldGain = {
-    val toAdd = roll(getPlayer.diligence, 10) + rnd.nextInt(10) + 1
+    val toAdd = roll(getPlayer.getDiligence, 10) + rnd.nextInt(10) + 1
     getPlayer.gold += toAdd
     addLog("You gain " + toAdd.toInt +  " gold.")
   }
   
   /** Give player some experience */
   def experienceGain = {
-    val toAdd = roll(getPlayer.diligence, (getPlayer.totalLevel/4).toInt) + rnd.nextInt(10) + 1
+    val toAdd = roll(getPlayer.getDiligence, (getPlayer.totalLevel/4).toInt) + rnd.nextInt(10) + 1
     getPlayer.experience += toAdd
     addLog("You gain " + toAdd.toInt + " experience.")
   }
@@ -118,7 +118,7 @@ object Prayers extends Enumeration {
     var monstersToDamage = Buffer[Monster]()
     for (monster <- getMonsterList) if (monster.distance(getPlayer) < 5) monstersToDamage.append(monster)
     for (monster <- monstersToDamage) {
-      monster.health -= roll(getPlayer.zeal + 1, 3)
+      monster.health -= roll(getPlayer.getZeal + 1, 3)
       if (monster.health <= 0) monster.kill
     }
     addLog("Burning light surrounds you damaging nearby monsters.")
@@ -197,8 +197,8 @@ object Prayers extends Enumeration {
     println("LVL")
     if (getPlayer.totalLevel <= 0) {}
     else {
-      val list = List(getPlayer.zeal, getPlayer.humility, getPlayer.temperance, getPlayer.kindness, 
-          getPlayer.patience, getPlayer.charity, getPlayer.diligence)
+      val list = List(getPlayer.getZeal, getPlayer.getHumility, getPlayer.getTemperance, getPlayer.getKindness, 
+          getPlayer.getPatience, getPlayer.getCharity, getPlayer.getDiligence)
       var skillNum = 0
       do {skillNum = rnd.nextInt(list.size)}
       while (list(skillNum) == 0)
@@ -241,6 +241,42 @@ object Prayers extends Enumeration {
   def timeStop = {
     getPlayer.effectList = getPlayer.effectList :+ new timestop(roll(10)+10, getPlayer)
     addLog("Time around you is temporarily frozen.")
+  }
+  
+  /** Temporary level boost */
+  def tempBoost = {
+    val text = "Your " + 
+    (rnd.nextInt(7) match {
+      case n if (n == 0) => {
+        getPlayer.effectList = getPlayer.effectList :+ new tempZeal(roll(10)+10, getPlayer)
+        "Zeal"
+      }
+      case n if (n == 1) => {
+        getPlayer.effectList = getPlayer.effectList :+ new tempHumility(roll(10)+10, getPlayer)
+        "Humility"
+        }
+      case n if (n == 2) => {
+        getPlayer.effectList = getPlayer.effectList :+ new tempTemperance(roll(10)+10, getPlayer)
+        "Temperance"
+        }
+      case n if (n == 3) => {
+        getPlayer.effectList = getPlayer.effectList :+ new tempKindness(roll(10)+10, getPlayer)
+        "Kindness"
+        }
+      case n if (n == 4) => {
+        getPlayer.effectList = getPlayer.effectList :+ new tempPatience(roll(10)+10, getPlayer)
+        "Patience"
+        }
+      case n if (n == 5) => {
+        getPlayer.effectList = getPlayer.effectList :+ new tempCharity(roll(10)+10, getPlayer)
+        "Charity"
+        }
+      case n if (n == 6) => {
+        getPlayer.effectList = getPlayer.effectList :+ new tempDiligence(roll(10)+10, getPlayer)
+        "Diligence"
+        }
+    }) + " is temporarily increased by one."
+    addLog(text)
   }
   
 }
@@ -367,6 +403,90 @@ class vision(dur: Int, tar: Character) extends Effect with Serializable {
 /** Timestop for player */
 class timestop(dur: Int, tar: Character) extends Effect with Serializable {
   val name = "Timestop"
+  val target = tar
+  var duration = dur
+  def caster = null
+  def turn = {
+    duration -= 1
+    if (duration == 0) addLog("Effect of " + name + " has ended.")
+  }
+}
+
+/** Temporary charity boost */
+class tempCharity(dur: Int, tar: Character) extends Effect with Serializable {
+  val name = "Charity boost"
+  val target = tar
+  var duration = dur
+  def caster = null
+  def turn = {
+    duration -= 1
+    if (duration == 0) addLog("Effect of " + name + " has ended.")
+  }
+}
+
+/** Temporary diligene boost */
+class tempDiligence(dur: Int, tar: Character) extends Effect with Serializable {
+  val name = "Diligence boost"
+  val target = tar
+  var duration = dur
+  def caster = null
+  def turn = {
+    duration -= 1
+    if (duration == 0) addLog("Effect of " + name + " has ended.")
+  }
+}
+
+/** Temporary humility boost */
+class tempHumility(dur: Int, tar: Character) extends Effect with Serializable {
+  val name = "Humility boost"
+  val target = tar
+  var duration = dur
+  def caster = null
+  def turn = {
+    duration -= 1
+    if (duration == 0) addLog("Effect of " + name + " has ended.")
+  }
+}
+
+/** Temporary kindness boost */
+class tempKindness(dur: Int, tar: Character) extends Effect with Serializable {
+  val name = "Kindness boost"
+  val target = tar
+  var duration = dur
+  def caster = null
+  def turn = {
+    duration -= 1
+    if (duration == 0) addLog("Effect of " + name + " has ended.")
+  }
+}
+
+/** Temporary patience boost */
+class tempPatience(dur: Int, tar: Character) extends Effect with Serializable {
+  val name = "Patience boost"
+  val target = tar
+  var duration = dur
+  def caster = null
+  def turn = {
+    duration -= 1
+    if (duration == 0) addLog("Effect of " + name + " has ended.")
+  }
+}
+
+/** Temporary temperance boost */
+class tempTemperance(dur: Int, tar: Character) extends Effect with Serializable {
+  val name = "Temperance boost"
+  val target = tar
+  var duration = dur
+  def caster = null
+  def turn = {
+    duration -= 1
+    if (duration == 0) addLog("Effect of " + name + " has ended.")
+  }
+}
+
+/** Temporary zeal boost */
+class tempZeal(dur: Int, tar: Character) extends Effect with Serializable {
+  val name = "Zeal boost"
   val target = tar
   var duration = dur
   def caster = null
