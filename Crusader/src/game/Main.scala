@@ -78,7 +78,7 @@ object Main {
     * The program will start here. Mainloop includes the creation for window, processing the user 
     * input and asking Output to draw window.
     */
-  def main(args:Array[String]) {
+  def main(args:Array[String]) {      
     startDisplay()
     player = new Player("", 0, 0)
     /** Gameloop */

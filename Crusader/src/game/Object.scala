@@ -6,6 +6,8 @@ import scala.collection.mutable.Buffer
 
 import org.newdawn.slick.opengl.Texture
 
+import scala.xml.XML
+
 import Direction._
 import Main._
 import Output.drawQuadTex
@@ -734,6 +736,56 @@ object MonsterType extends Enumeration with Serializable {
   val RAT, BAT, SNAKE, SPIDER, GOBLINA, GOBLINB, HOUND, LIZARDA, LIZARDB, LIZARDC, CROCODILE, 
   SLOTH = Value
   
+  private var rat: scala.xml.Node = null
+  private var bat: scala.xml.Node = null
+  private var snake: scala.xml.Node = null
+  private var spider: scala.xml.Node = null
+  private var goblina: scala.xml.Node = null
+  private var goblinb: scala.xml.Node = null
+  private var hound: scala.xml.Node = null
+  private var lizarda: scala.xml.Node = null
+  private var lizardb: scala.xml.Node = null
+  private var lizardc: scala.xml.Node = null
+  private var crocodile: scala.xml.Node = null
+  private var sloth: scala.xml.Node = null
+  
+  private val xml = XML.loadFile("data/monsters.xml")
+  
+  for (i <- xml.child) i match {
+    case o if ((o \ "MonsterType").text == "RAT") => rat = o
+    case o if ((o \ "MonsterType").text == "BAT") => bat = o
+    case o if ((o \ "MonsterType").text == "SNAKE") => snake = o
+    case o if ((o \ "MonsterType").text == "SPIDER") => spider = o
+    case o if ((o \ "MonsterType").text == "GOBLINA") => goblina = o
+    case o if ((o \ "MonsterType").text == "GOBLINB") => goblinb = o
+    case o if ((o \ "MonsterType").text == "HOUND") => hound = o
+    case o if ((o \ "MonsterType").text == "LIZARDA") => lizarda = o
+    case o if ((o \ "MonsterType").text == "LIZARDB") => lizardb = o
+    case o if ((o \ "MonsterType").text == "LIZARDC") => lizardc = o
+    case o if ((o \ "MonsterType").text == "CROCODILE") => crocodile = o
+    case o if ((o \ "MonsterType").text == "SLOTH") => sloth = o
+    case _ => {}
+  }
+  
+  /** return monster's xml node */
+  def getXml(MonsterType: Monster): scala.xml.Node = {
+    MonsterType match {
+      case t if (t == RAT) => rat
+      case t if (t == BAT) => bat
+      case t if (t == SNAKE) => snake
+      case t if (t == SPIDER) => spider
+      case t if (t == GOBLINA) => goblina
+      case t if (t == GOBLINB) => goblinb
+      case t if (t == HOUND) => hound
+      case t if (t == LIZARDA) => lizarda
+      case t if (t == LIZARDB) => lizardb
+      case t if (t == LIZARDC) => lizardc
+      case t if (t == CROCODILE) => crocodile
+      case t if (t == SLOTH) => sloth
+      case _ => null
+    }
+  }
+  
   /** return chances how monsters occur in game */
   def levelChance(level: Int): Map[Monster, Int] = {
     var chances = Map[Monster, Int]()
@@ -776,21 +828,8 @@ object MonsterType extends Enumeration with Serializable {
   
   /** returns max health of the given monster */
   def maxHP(MonsterType: Monster): Int = {
-    MonsterType match {
-      case t if (t == RAT) => 2
-      case t if (t == BAT) => 2
-      case t if (t == SNAKE) => 5
-      case t if (t == SPIDER) => 5
-      case t if (t == GOBLINA) => 15
-      case t if (t == GOBLINB) => 15
-      case t if (t == HOUND) => 10
-      case t if (t == LIZARDA) => 15
-      case t if (t == LIZARDB) => 15
-      case t if (t == LIZARDC) => 15
-      case t if (t == CROCODILE) => 20
-      case t if (t == SLOTH) => 50
-      case _ => 0
-    }
+    if (getXml(MonsterType) != null) (getXml(MonsterType) \ "maxHP").text.toInt
+    else 0
   }
   
   /** returns damage of the given monster 
@@ -799,173 +838,59 @@ object MonsterType extends Enumeration with Serializable {
    * (num of dices, eyes, flat). Examples 2d3+5 = (2, 3, 5) and 1d4 = (1, 4, 0).
    *  */
   def damage(MonsterType: Monster): Tuple3[Int, Int, Int] = {
-    MonsterType match {
-      case t if (t == RAT) => (1, 1, 1)
-      case t if (t == BAT) => (1, 2, 0)
-      case t if (t == SNAKE) => (1, 2, 0)
-      case t if (t == SPIDER) => (1, 2, 0)
-      case t if (t == GOBLINA) => (1, 2, 0)
-      case t if (t == GOBLINB) => (1, 3, 0)
-      case t if (t == HOUND) => (1, 3, 0)
-      case t if (t == LIZARDA) => (1, 3, 0)
-      case t if (t == LIZARDB) => (1, 4, 0)
-      case t if (t == LIZARDC) => (1, 4, 0)
-      case t if (t == CROCODILE) => (1, 5, 0)
-      case t if (t == SLOTH) => (3, 3, 1)
-      case _ => (0, 0, 0)
+    if (getXml(MonsterType) != null) {
+      val a = (getXml(MonsterType) \ "damage").text.split(",")
+      (a(0).toInt, a(1).toInt, a(2).toInt)
     }
+    else (1, 1, 0)
   }
   
   /** returns armor of the given monster */
   def armor(MonsterType: Monster): Double = {
-    MonsterType match {
-      case t if (t == RAT) => 0
-      case t if (t == BAT) => 0
-      case t if (t == SNAKE) => 0
-      case t if (t == SPIDER) => 0
-      case t if (t == GOBLINA) => 1
-      case t if (t == GOBLINB) => 1.5
-      case t if (t == HOUND) => 0
-      case t if (t == LIZARDA) => 2
-      case t if (t == LIZARDB) => 1
-      case t if (t == LIZARDC) => 0
-      case t if (t == CROCODILE) => 2
-      case t if (t == SLOTH) => 2
-      case _ => 0
-    }
+    if (getXml(MonsterType) != null) (getXml(MonsterType) \ "armor").text.toDouble
+    else 0.0
   }
   
   /** returns accuracy of the given monster */
   def accuracy(MonsterType: Monster): Int = {
-    MonsterType match {
-      case t if (t == RAT) => 100
-      case t if (t == BAT) => 95
-      case t if (t == SNAKE) => 90
-      case t if (t == SPIDER) => 90
-      case t if (t == GOBLINA) => 85
-      case t if (t == GOBLINB) => 85
-      case t if (t == HOUND) => 90
-      case t if (t == LIZARDA) => 90
-      case t if (t == LIZARDB) => 85
-      case t if (t == LIZARDC) => 75
-      case t if (t == CROCODILE) => 80
-      case t if (t == SLOTH) => 50
-      case _ => 0
-    }
+    if (getXml(MonsterType) != null) (getXml(MonsterType) \ "accuracy").text.toInt
+    else 0
   }
   
   /** returns critical chance of the given monster */
   def criticalChance(MonsterType: Monster): Int = {
-    MonsterType match {
-      case t if (t == RAT) => 0
-      case t if (t == BAT) => 2
-      case t if (t == SNAKE) => 4
-      case t if (t == SPIDER) => 2
-      case t if (t == GOBLINA) => 4
-      case t if (t == GOBLINB) => 5
-      case t if (t == HOUND) => 6
-      case t if (t == LIZARDA) => 5
-      case t if (t == LIZARDB) => 5
-      case t if (t == LIZARDC) => 5
-      case t if (t == CROCODILE) => 2
-      case t if (t == SLOTH) => 10
-      case _ => 0
-    }
+    if (getXml(MonsterType) != null) (getXml(MonsterType) \ "criticalChance").text.toInt
+    else 0
   }
   
   /** returns dodge chance of the given monster */
   def dodge(MonsterType: Monster): Int = {
-    MonsterType match {
-      case t if (t == RAT) => 20
-      case t if (t == BAT) => 30
-      case t if (t == SNAKE) => 10
-      case t if (t == SPIDER) => 15
-      case t if (t == GOBLINA) => 10
-      case t if (t == GOBLINB) => 12
-      case t if (t == HOUND) => 10
-      case t if (t == LIZARDA) => 8
-      case t if (t == LIZARDB) => 8
-      case t if (t == LIZARDC) => 10
-      case t if (t == CROCODILE) => 0
-      case t if (t == SLOTH) => 0
-      case _ => 0
-    }
+    if (getXml(MonsterType) != null) (getXml(MonsterType) \ "dodge").text.toInt
+    else 0
   }
   
   /** returns armor pierce of the given monster */
   def armorPierce(MonsterType: Monster): Int = {
-    MonsterType match {
-      case t if (t == RAT) => 0
-      case t if (t == BAT) => 0
-      case t if (t == SNAKE) => 0
-      case t if (t == SPIDER) => 0
-      case t if (t == GOBLINA) => 0
-      case t if (t == GOBLINB) => 1
-      case t if (t == HOUND) => 0
-      case t if (t == LIZARDA) => 2
-      case t if (t == LIZARDB) => 1
-      case t if (t == LIZARDC) => 0
-      case t if (t == CROCODILE) => 2
-      case t if (t == SLOTH) => 2
-      case _ => 0
-    }
+    if (getXml(MonsterType) != null) (getXml(MonsterType) \ "armorPierce").text.toInt
+    else 0
   }
   
   /** returns gold of the given monster */
   def gold(MonsterType: Monster): Int = {
-    MonsterType match {
-      case t if (t == RAT) => 0
-      case t if (t == BAT) => 1
-      case t if (t == SNAKE) => 3
-      case t if (t == SPIDER) => 2
-      case t if (t == GOBLINA) => 10
-      case t if (t == GOBLINB) => 15
-      case t if (t == HOUND) => 5
-      case t if (t == LIZARDA) => 10
-      case t if (t == LIZARDB) => 10
-      case t if (t == LIZARDC) => 10
-      case t if (t == CROCODILE) => 20
-      case t if (t == SLOTH) => 200
-      case _ => 0
-    }
+    if (getXml(MonsterType) != null) (getXml(MonsterType) \ "gold").text.toInt
+    else 0
   }
   
   /** returns experience of the given monster */
   def experience(MonsterType: Monster): Int = {
-    MonsterType match {
-      case t if (t == RAT) => 1
-      case t if (t == BAT) => 1
-      case t if (t == SNAKE) => 3
-      case t if (t == SPIDER) => 2
-      case t if (t == GOBLINA) => 10
-      case t if (t == GOBLINB) => 15
-      case t if (t == HOUND) => 5
-      case t if (t == LIZARDA) => 15
-      case t if (t == LIZARDB) => 15
-      case t if (t == LIZARDC) => 15
-      case t if (t == CROCODILE) => 20
-      case t if (t == SLOTH) => 200
-      case _ => 0
-    }
+    if (getXml(MonsterType) != null) (getXml(MonsterType) \ "experience").text.toInt
+    else 0
   }
   
   /** returns piety of the given monster */
   def piety(MonsterType: Monster): Int = {
-    MonsterType match {
-      case t if (t == RAT) => 2
-      case t if (t == BAT) => 1
-      case t if (t == SNAKE) => 2
-      case t if (t == SPIDER) => 4
-      case t if (t == GOBLINA) => 10
-      case t if (t == GOBLINB) => 15
-      case t if (t == HOUND) => 3
-      case t if (t == LIZARDA) => 15
-      case t if (t == LIZARDB) => 15
-      case t if (t == LIZARDC) => 15
-      case t if (t == CROCODILE) => 0
-      case t if (t == SLOTH) => 200
-      case _ => 0
-    }
+    if (getXml(MonsterType) != null) (getXml(MonsterType) \ "piety").text.toInt
+    else 0
   }
   
   /** monsters might give item drops when dying */
@@ -979,40 +904,14 @@ object MonsterType extends Enumeration with Serializable {
   
   /** returns name of the given monster */
   def name(MonsterType: Monster): String = {
-    MonsterType match {
-      case t if (t == RAT) => "rat"
-      case t if (t == BAT) => "bat"
-      case t if (t == SNAKE) => "snake"
-      case t if (t == SPIDER) => "spider"
-      case t if (t == GOBLINA) => "goblin"
-      case t if (t == GOBLINB) => "goblin"
-      case t if (t == HOUND) => "hound"
-      case t if (t == LIZARDA) => "lizard"
-      case t if (t == LIZARDB) => "lizard"
-      case t if (t == LIZARDC) => "lizard"
-      case t if (t == CROCODILE) => "crocodile"
-      case t if (t == SLOTH) => "sloth demon"
-      case _ => "Unknown monster name"
-    }
+    if (getXml(MonsterType) != null) (getXml(MonsterType) \ "name").text
+    else "Unknown monster name"
   }
   
   /** returns description of the given monster */
   def description(MonsterType: Monster): String = {
-    MonsterType match {
-      case t if (t == RAT) => "TODO"
-      case t if (t == BAT) => "TODO"
-      case t if (t == SNAKE) => "TODO"
-      case t if (t == SPIDER) => "TODO"
-      case t if (t == GOBLINA) => "TODO"
-      case t if (t == GOBLINB) => "TODO"
-      case t if (t == HOUND) => "TODO"
-      case t if (t == LIZARDA) => "TODO"
-      case t if (t == LIZARDB) => "TODO"
-      case t if (t == LIZARDC) => "TODO"
-      case t if (t == CROCODILE) => "TODO"
-      case t if (t == SLOTH) => "TODO"
-      case _ => "Unknown monster name"
-    }
+    if (getXml(MonsterType) != null) (getXml(MonsterType) \ "description").text
+    else "Unknown monster description"
   }
 }
 
@@ -1141,6 +1040,86 @@ object ItemType extends Enumeration with Serializable {
   CLOTH1, CLOTH2, IRONSHIELD, KATANA, LARGESHIELD, SHORTSWORD, SMALLSHIELD, STEELARMOR, CLAYMORE, 
   DUALDAGGER, GOLDARMOR, MAGICSWORD, MONODAGGER, VIKINGARMOR = Value
   
+  private var knife: scala.xml.Node = null
+  private var robes: scala.xml.Node = null
+  private var ironArmor: scala.xml.Node = null
+  private var steelSword: scala.xml.Node = null
+  private var woodenShield: scala.xml.Node = null
+  private var ratMeat: scala.xml.Node = null
+  private var smallHealingPotion: scala.xml.Node = null
+  private var battleAxe: scala.xml.Node = null
+  private var cloth1: scala.xml.Node = null
+  private var cloth2: scala.xml.Node = null
+  private var ironShield: scala.xml.Node = null
+  private var katana: scala.xml.Node = null
+  private var largeShield: scala.xml.Node = null
+  private var shortSword: scala.xml.Node = null
+  private var smallShield: scala.xml.Node = null
+  private var steelArmor: scala.xml.Node = null
+  private var claymore: scala.xml.Node = null
+  private var dualDagger: scala.xml.Node = null
+  private var goldArmor: scala.xml.Node = null
+  private var magicSword: scala.xml.Node = null
+  private var monoDagger: scala.xml.Node = null
+  private var vikingArmor: scala.xml.Node = null
+  
+  private val xml = XML.loadFile("data/items.xml")
+  
+  for (i <- xml.child) i match {
+    case o if ((o \ "ItemType").text == "KNIFE") => knife = o
+    case o if ((o \ "ItemType").text == "ROBES") => robes = o
+    case o if ((o \ "ItemType").text == "IRONARMOR") => ironArmor = o
+    case o if ((o \ "ItemType").text == "STEELSWORD") => steelSword = o
+    case o if ((o \ "ItemType").text == "WOODENSHIELD") => woodenShield = o
+    case o if ((o \ "ItemType").text == "RATMEAT") => ratMeat = o
+    case o if ((o \ "ItemType").text == "SMALLHEALPOTION") => smallHealingPotion = o
+    case o if ((o \ "ItemType").text == "BATTLEAXE") => battleAxe = o
+    case o if ((o \ "ItemType").text == "CLOTH1") => cloth1 = o
+    case o if ((o \ "ItemType").text == "CLOTH2") => cloth2 = o
+    case o if ((o \ "ItemType").text == "IRONSHIELD") => ironShield = o
+    case o if ((o \ "ItemType").text == "KATANA") => katana = o
+    case o if ((o \ "ItemType").text == "LARGESHIELD") => largeShield = o
+    case o if ((o \ "ItemType").text == "SHORTSWORD") => shortSword = o
+    case o if ((o \ "ItemType").text == "SMALLSHIELD") => smallShield = o
+    case o if ((o \ "ItemType").text == "STEELARMOR") => steelArmor = o
+    case o if ((o \ "ItemType").text == "CLAYMORE") => claymore = o
+    case o if ((o \ "ItemType").text == "DUALDAGGER") => dualDagger = o
+    case o if ((o \ "ItemType").text == "GOLDARMOR") => goldArmor = o
+    case o if ((o \ "ItemType").text == "MAGICSWORD") => magicSword = o
+    case o if ((o \ "ItemType").text == "MONODAGGER") => monoDagger = o
+    case o if ((o \ "ItemType").text == "VIKINGARMOR") => vikingArmor = o
+    case _ => {}
+  }
+  
+  /** return item's xml node */
+  def getXml(ItemType: Item): scala.xml.Node = {
+    ItemType match {
+      case t if (t == KNIFE) => knife
+      case t if (t == ROBES) => robes
+      case t if (t == IRONARMOR) => ironArmor
+      case t if (t == STEELSWORD) => steelSword
+      case t if (t == WOODENSHIELD) => woodenShield
+      case t if (t == RATMEAT) => ratMeat
+      case t if (t == SMALLHEALPOTION) => smallHealingPotion
+      case t if (t == BATTLEAXE) => battleAxe
+      case t if (t == CLOTH1) => cloth1
+      case t if (t == CLOTH2) => cloth2
+      case t if (t == IRONSHIELD) => ironShield
+      case t if (t == KATANA) => katana
+      case t if (t == LARGESHIELD) => largeShield
+      case t if (t == SHORTSWORD) => shortSword
+      case t if (t == SMALLSHIELD) => smallShield
+      case t if (t == STEELARMOR) => steelArmor
+      case t if (t == CLAYMORE) => claymore
+      case t if (t == DUALDAGGER) => dualDagger
+      case t if (t == GOLDARMOR) => goldArmor
+      case t if (t == MAGICSWORD) => magicSword
+      case t if (t == MONODAGGER) => monoDagger
+      case t if (t == VIKINGARMOR) => vikingArmor
+      case _ => null
+    }
+  }
+  
   /** return chances how items occur in game */
   def levelChance(level: Int): Map[Item, Int] = {
     var chances = Map[Item, Int]()
@@ -1184,31 +1163,8 @@ object ItemType extends Enumeration with Serializable {
   
   /** returns slot of the given equipment */
   def slot(ItemType: Item): String = {
-    ItemType match {
-      case t if (t == KNIFE) => "weapon"
-      case t if (t == ROBES) => "armor"
-      case t if (t == IRONARMOR) => "armor"
-      case t if (t == STEELSWORD) => "weapon"
-      case t if (t == WOODENSHIELD) => "shield"
-      case t if (t == RATMEAT) => "item"
-      case t if (t == SMALLHEALPOTION) => "item"
-      case t if (t == BATTLEAXE) => "weapon"
-      case t if (t == CLOTH1) => "armor"
-      case t if (t == CLOTH2) => "armor"
-      case t if (t == IRONSHIELD) => "shield"
-      case t if (t == KATANA) => "weapon"
-      case t if (t == LARGESHIELD) => "shield"
-      case t if (t == SHORTSWORD) => "weapon"
-      case t if (t == SMALLSHIELD) => "shield"
-      case t if (t == STEELARMOR) => "armor"
-      case t if (t == CLAYMORE) => "weapon"
-      case t if (t == DUALDAGGER) => "weapon"
-      case t if (t == GOLDARMOR) => "armor"
-      case t if (t == MAGICSWORD) => "weapon"
-      case t if (t == MONODAGGER) => "weapon"
-      case t if (t == VIKINGARMOR) => "armor"
-      case _ => ""
-    }
+    if (getXml(ItemType) != null) (getXml(ItemType) \ "slot").text
+    else ""
   }
   
   /** returns ground texture of the given equipment */
@@ -1271,66 +1227,28 @@ object ItemType extends Enumeration with Serializable {
 
   /** returns boolean about item being held with two hands */
   def is2h(ItemType: Item): Boolean = {
-    ItemType match {
-      case t if (t == CLAYMORE) => true
-      case t if (t == DUALDAGGER) => true
-      case _ => false
-    }
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "is2h").text == "true") true
+    else false
   }
   
   /** returns armor of the given equipment */
   def armor(ItemType: Item): Double = {
-    ItemType match {
-      case t if (t == IRONARMOR) => 1
-      case t if (t == WOODENSHIELD) => 0.5
-      case t if (t == IRONSHIELD) => 1
-      case t if (t == LARGESHIELD) => 1.5
-      case t if (t == SMALLSHIELD) => 1
-      case t if (t == STEELARMOR) => 1.5
-      case t if (t == GOLDARMOR) => 2
-      case t if (t == VIKINGARMOR) => 1
-      case _ => 0
-    }
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "armor").text != "") 
+      (getXml(ItemType) \ "armor").text.toDouble
+    else 0.0
   }
   
   /** returns weight of the given equipment */
   def weight(ItemType: Item): Int = {
-    ItemType match {
-      case t if (t == KNIFE) => 2
-      case t if (t == ROBES) => 2
-      case t if (t == IRONARMOR) => 25
-      case t if (t == STEELSWORD) => 12
-      case t if (t == WOODENSHIELD) => 5
-      case t if (t == RATMEAT) => 3
-      case t if (t == SMALLHEALPOTION) => 2
-      case t if (t == BATTLEAXE) => 15
-      case t if (t == CLOTH1) => 2
-      case t if (t == CLOTH2) => 2
-      case t if (t == IRONSHIELD) => 10
-      case t if (t == KATANA) => 10
-      case t if (t == LARGESHIELD) => 15
-      case t if (t == SHORTSWORD) => 8
-      case t if (t == SMALLSHIELD) => 5
-      case t if (t == STEELARMOR) => 25
-      case t if (t == CLAYMORE) => 20
-      case t if (t == DUALDAGGER) => 6
-      case t if (t == GOLDARMOR) => 30
-      case t if (t == MAGICSWORD) => 10
-      case t if (t == MONODAGGER) => 3
-      case t if (t == VIKINGARMOR) => 15
-      case _ => 0
-    }
+    if (getXml(ItemType) != null) (getXml(ItemType) \ "weight").text.toInt
+    else 0
   }
   
   /** returns block chance of the given equipment */
   def blockChance(ItemType: Item): Int = {
-    ItemType match {
-      case t if (t == WOODENSHIELD) => 10
-      case t if (t == IRONSHIELD) => 15
-      case t if (t == LARGESHIELD) => 15
-      case t if (t == SMALLSHIELD) => 10
-      case _ => 0
-    }
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "blockChance").text != "") 
+      (getXml(ItemType) \ "blockChance").text.toInt
+    else 0
   }
   
   /** Return damage of the given equipment.
@@ -1339,147 +1257,53 @@ object ItemType extends Enumeration with Serializable {
    * (num of dices, eyes, flat). Examples 2d3+5 = (2, 3, 5) and 1d4 = (1, 4, 0).
    */
   def damage(ItemType: Item): Tuple3[Int, Int, Int] = {
-    ItemType match {
-      case t if (t == KNIFE) => (1, 2, 0)
-      case t if (t == STEELSWORD) => (1, 6, 0)
-      case t if (t == BATTLEAXE) => (1, 5, 0)
-      case t if (t == KATANA) => (1, 6, 1)
-      case t if (t == SHORTSWORD) => (1, 4, 0)
-      case t if (t == CLAYMORE) => (1, 7, 0)
-      case t if (t == DUALDAGGER) => (2, 3, 0)
-      case t if (t == MAGICSWORD) => (1, 8, 1)
-      case t if (t == MONODAGGER) => (1, 3, 0)
-      case _ => (1, 1, 0)
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "damage").text != "") {
+      val a = (getXml(ItemType) \ "damage").text.split(",")
+      (a(0).toInt, a(1).toInt, a(2).toInt)
     }
+    else (1, 1, 0)
   }
   
   /** returns armor piercing of the given equipment */
   def armorPiercing(ItemType: Item): Int = {
-    ItemType match {
-      case t if (t == STEELSWORD) => 1
-      case t if (t == BATTLEAXE) => 2
-      case t if (t == KATANA) => 1
-      case t if (t == SHORTSWORD) => 1
-      case t if (t == CLAYMORE) => 2
-      case t if (t == MAGICSWORD) => 1
-      case _ => 0
-    }
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "armorPiercing").text != "") 
+      (getXml(ItemType) \ "armorPiercing").text.toInt
+    else 0
   }
   
   /** returns accuracy of the given equipment */
   def accuracy(ItemType: Item): Int = {
-    ItemType match {
-      case t if (t == KNIFE) => 100
-      case t if (t == STEELSWORD) => 90
-      case t if (t == BATTLEAXE) => 80
-      case t if (t == KATANA) => 90
-      case t if (t == SHORTSWORD) => 90
-      case t if (t == CLAYMORE) => 80
-      case t if (t == DUALDAGGER) => 75
-      case t if (t == MAGICSWORD) => 80
-      case t if (t == MONODAGGER) => 95
-      case _ => 0
-    }
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "accuracy").text != "") 
+      (getXml(ItemType) \ "accuracy").text.toInt
+    else 0
   }
   
   /** returns critical chance of the given equipment */
   def critChance(ItemType: Item): Int = {
-    ItemType match {
-      case t if (t == KNIFE) => 4
-      case t if (t == STEELSWORD) => 5
-      case t if (t == BATTLEAXE) => 6
-      case t if (t == KATANA) => 5
-      case t if (t == SHORTSWORD) => 4
-      case t if (t == CLAYMORE) => 6
-      case t if (t == DUALDAGGER) => 6
-      case t if (t == MAGICSWORD) => 0
-      case t if (t == MONODAGGER) => 6
-      case _ => 0
-    }
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "critChance").text != "") 
+      (getXml(ItemType) \ "critChance").text.toInt
+    else 0
   }
   
   /** returns price of the given equipment */
   def price(ItemType: Item): Int = {
-    ItemType match {
-      case t if (t == KNIFE) => 4
-      case t if (t == ROBES) => 2
-      case t if (t == IRONARMOR) => 50
-      case t if (t == STEELSWORD) => 80
-      case t if (t == WOODENSHIELD) => 10
-      case t if (t == SMALLHEALPOTION) => 10
-      case t if (t == BATTLEAXE) => 50
-      case t if (t == CLOTH1) => 5
-      case t if (t == CLOTH2) => 5
-      case t if (t == IRONSHIELD) => 60
-      case t if (t == LARGESHIELD) => 80
-      case t if (t == SHORTSWORD) => 20
-      case t if (t == SMALLSHIELD) => 20
-      case t if (t == STEELARMOR) => 80
-      case t if (t == CLAYMORE) => 100
-      case t if (t == DUALDAGGER) => 20
-      case t if (t == GOLDARMOR) => 100
-      case t if (t == MONODAGGER) => 10
-      case t if (t == VIKINGARMOR) => 60
-      case _ => 0
-    }
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "price").text != "") 
+      (getXml(ItemType) \ "price").text.toInt
+    else 0
   }
   
   /** returns name of the given equipment */
   def name(ItemType: Item): String = {
-    ItemType match {
-      case t if (t == KNIFE) => "knife"
-      case t if (t == ROBES) => "robes"
-      case t if (t == IRONARMOR) => "iron armor"
-      case t if (t == STEELSWORD) => "steel sword"
-      case t if (t == WOODENSHIELD) => "wooden shield"
-      case t if (t == RATMEAT) => "rat meat"
-      case t if (t == SMALLHEALPOTION) => "small healing salve"
-      case t if (t == BATTLEAXE) => "battle axe"
-      case t if (t == CLOTH1) => "clothes"
-      case t if (t == CLOTH2) => "clothes"
-      case t if (t == IRONSHIELD) => "iron shield"
-      case t if (t == KATANA) => "katana"
-      case t if (t == LARGESHIELD) => "large shield"
-      case t if (t == SHORTSWORD) => "short sword"
-      case t if (t == SMALLSHIELD) => "small shield"
-      case t if (t == STEELARMOR) => "steel armor"
-      case t if (t == CLAYMORE) => "claymore"
-      case t if (t == DUALDAGGER) => "dual dagger"
-      case t if (t == GOLDARMOR) => "gold armor"
-      case t if (t == MAGICSWORD) => "magic sword"
-      case t if (t == MONODAGGER) => "dagger"
-      case t if (t == VIKINGARMOR) => "viking armor"
-      case _ => "Unknown item name"
-    }
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "name").text != "") 
+      (getXml(ItemType) \ "name").text
+    else "Unknown item name"
   }
   
   /** returns description of the given equipment */
   def description(ItemType: Item): String = {
-    ItemType match {
-      case t if (t == KNIFE) => "TODO"
-      case t if (t == ROBES) => "TODO"
-      case t if (t == IRONARMOR) => "TODO"
-      case t if (t == STEELSWORD) => "TODO"
-      case t if (t == WOODENSHIELD) => "TODO"
-      case t if (t == RATMEAT) => "TODO"
-      case t if (t == SMALLHEALPOTION) => "TODO"
-      case t if (t == BATTLEAXE) => "TODO"
-      case t if (t == CLOTH1) => "TODO"
-      case t if (t == CLOTH2) => "TODO"
-      case t if (t == IRONSHIELD) => "TODO"
-      case t if (t == KATANA) => "TODO"
-      case t if (t == LARGESHIELD) => "TODO"
-      case t if (t == SHORTSWORD) => "TODO"
-      case t if (t == SMALLSHIELD) => "TODO"
-      case t if (t == STEELARMOR) => "TODO"
-      case t if (t == CLAYMORE) => "TODO"
-      case t if (t == DUALDAGGER) => "TODO"
-      case t if (t == GOLDARMOR) => "TODO"
-      case t if (t == MAGICSWORD) => "TODO"
-      case t if (t == MONODAGGER) => "TODO"
-      case t if (t == VIKINGARMOR) => "TODO"
-      case _ => "Unknown item description"
-    }
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "description").text != "") 
+      (getXml(ItemType) \ "description").text
+    else "Unknown item description"
   }
   
 }

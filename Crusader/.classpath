@@ -9,5 +9,6 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/slick.jar"/>
 	<classpathentry kind="lib" path="lib/lwjgl.jar"/>
+	<classpathentry kind="lib" path="lib/scala-xml-2.11.0-M4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
