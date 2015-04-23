@@ -241,10 +241,11 @@ object Helpers {
   private val irandom = loadTexture("UI/Random")
   private val iunseen = loadTexture("Tiles/unseen")
   private val iXPButton = loadTexture("UI/XPButton")
-  private val iXPButton2 = loadTexture("UI/XPButton2")
   private val iquit = loadTexture("UI/Quit")
   private val iHPBar = loadTexture("UI/HPBar")
   private val iXPBar = loadTexture("UI/XPBar")
+  private val iXPBar2 = loadTexture("UI/XPBar2")
+  private val iXPBar3 = loadTexture("UI/XPBar3")
   private val iminimapAltar = loadTexture("UI/minimapAltar")
   private val iminimapDjinn = loadTexture("UI/minimapDjinn")
   private val iminimapEnemy = loadTexture("UI/minimapEnemy")
@@ -302,8 +303,9 @@ object Helpers {
   private val iquit3 = loadTexture("UI/Quit3")
   private val irandom3 = loadTexture("UI/Random3")
   private val itemperance3 = loadTexture("UI/Temperance3")
-  private val ixpbutton3 = loadTexture("UI/XPButton3")
   private val izeal3 = loadTexture("UI/Zeal3")
+  private val ipray = loadTexture("UI/Pray")
+  private val ipray3 = loadTexture("UI/Pray3")
   
   /** Return textures */
   def playerImage = iplayerImage
@@ -401,10 +403,11 @@ object Helpers {
   def random = irandom
   def unseen = iunseen
   def XPButton = iXPButton
-  def XPButton2 = iXPButton2
   def quit = iquit
   def HPBar = iHPBar
   def XPBar = iXPBar
+  def XPBar2 = iXPBar2
+  def XPBar3 = iXPBar3
   def minimapAltar = iminimapAltar
   def minimapDjinn = iminimapDjinn
   def minimapEnemy = iminimapEnemy
@@ -463,8 +466,9 @@ object Helpers {
   def quit3 = iquit3
   def random3 = irandom3
   def temperance3 = itemperance3
-  def XPButton3 = ixpbutton3
   def zeal3 = izeal3
+  def pray = ipray
+  def pray3 = ipray3
   
   buttonContinue = new Button(905, 200, 256, 64, continue, continue2, continue3)
   buttonNewGameMenu = new Button(905, 280, 256, 64, newgame, newgame2, newgame3)
@@ -474,7 +478,8 @@ object Helpers {
   buttonNewGameChar = new Button(799, 600, 256, 64, newgame, newgame2, newgame3)
   buttonBackChar = new Button(257, 600, 256, 64, back, back, back3)
   buttonRandom = new Button(528, 600, 256, 64, random, random, random3)
-  buttonXP = new Button(1070, 222, 200, 64, XPButton, XPButton2, XPButton3)
+  buttonXP = new Button(1085, 180, 166, 26, XPButton, XPButton, XPButton)
+  buttonPray = new Button(1070, 222, 200, 64, pray, pray, pray3)
   buttonQuit = new Button(1070, 640, 200, 64, quit, quit, quit3)
   buttonBackLVL = new Button(149, 606, 256, 64, back, back, back3)
   buttonCharity = new Button(149, 117, 256, 64, charity, charity2, charity3)

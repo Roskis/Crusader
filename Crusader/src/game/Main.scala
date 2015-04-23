@@ -74,6 +74,7 @@ object Main {
   var buttonZeal: Button = null
   var buttonBackOpt: Button = null
   var buttonBackCre: Button = null
+  var buttonPray:Button = null
   
   /** The program's main method.
     *
@@ -348,14 +349,18 @@ object Main {
   /** Follow user input in game */
   def gameKeys {
     if (Mouse.isButtonDown(0) && getPlayer.experience >= getPlayer.smallestLevel && 
-        buttonXP.isMouseWithin) {
+        buttonXP.isMouseWithin && !prevMouseState) {
       gameState = LEVEL
       while (Keyboard.next) {}
     }
-    else if (Mouse.isButtonDown(0) && buttonQuit.isMouseWithin) {
+    else if (Mouse.isButtonDown(0) && buttonQuit.isMouseWithin && !prevMouseState) {
       if (player.health > 0) saveGame
       gameState = MAIN_MENU
       while (Keyboard.next) {}
+    }
+    else if (Mouse.isButtonDown(0) && buttonPray.isMouseWithin && player.health > 0 && !prevMouseState) {
+      player.pray
+      playTurn
     }
     else if (Mouse.isButtonDown(0) && Mouse.getX >= 1216 && getHeight - Mouse.getY >= 362 && 
         Mouse.getX <= 1246 && getHeight - Mouse.getY <= 392 && player.slotUseable != null) {

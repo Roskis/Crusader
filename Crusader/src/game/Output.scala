@@ -260,8 +260,8 @@ object Output {
     font.drawString(2, getHeight - 225, "X: " + getPlayer.getX.toString + " Y: " + getPlayer.getY.toString, Color.white)
     //font.drawString(2, getHeight - 265, "Mouse X: " + mouseXCoord.toString, Color.red)
     //font.drawString(130, getHeight - 265, "Y: " + mouseYCoord.toString, Color.red)
-    //font.drawString(2, getHeight - 245, "Mouse X: " + Mouse.getX.toString, Color.red)
-    //font.drawString(130, getHeight - 245, "Y: " + (getHeight - Mouse.getY).toString, Color.red)
+    font.drawString(2, getHeight - 245, "Mouse X: " + Mouse.getX.toString, Color.red)
+    font.drawString(130, getHeight - 245, "Y: " + (getHeight - Mouse.getY).toString, Color.red)
     font.drawString(2, getHeight - 205, "Turn: " + getTurn, Color.white)
     val level = "Episode: " + getEpisode + " Level: " + getLevel
     font.drawString(1046-font.getWidth(level), getHeight - 205, level, Color.white)
@@ -323,7 +323,9 @@ object Output {
     var XPWidth = getPlayer.experience*1.0 / getPlayer.smallestLevel
     if (XPWidth > 1) XPWidth = 1
     if (XPWidth < 0) XPWidth = 0
-    drawQuadTex(XPBar, middle-256/2+40, 176, (176*XPWidth).toInt, 122)
+    if (getPlayer.experience >= getPlayer.smallestLevel && buttonXP.isMouseWithin) drawQuadTex(XPBar3, middle-256/2+40, 176, (176*XPWidth).toInt, 122)
+    else if (getPlayer.experience >= getPlayer.smallestLevel) drawQuadTex(XPBar2, middle-256/2+40, 176, (176*XPWidth).toInt, 122)
+    else drawQuadTex(XPBar, middle-256/2+40, 176, (176*XPWidth).toInt, 122)
     
     drawQuadTex(UIBackground, (getWidth-UIBackground.getImageWidth)/2, 
         (getHeight-UIBackground.getImageHeight)/2, UIBackground.getImageWidth, 
@@ -336,16 +338,12 @@ object Output {
     h += 96
     val xptext = "XP: " + getPlayer.experience.toInt + "/" + getPlayer.smallestLevel
     font.drawString(middle-font.getWidth(xptext)/2, h, xptext, Color.black)
-    
-    if (getPlayer.experience >= getPlayer.smallestLevel && buttonXP.isMouseWithin) 
-      drawQuadTex(buttonXP.tex3, buttonXP.getDrawX, buttonXP.getDrawY, buttonXP.tex3.getImageWidth, 
-          buttonXP.tex3.getImageHeight)
-    else if (getPlayer.experience >= getPlayer.smallestLevel) 
-      drawQuadTex(buttonXP.tex, buttonXP.getDrawX, buttonXP.getDrawY, buttonXP.tex.getImageWidth, 
-          buttonXP.tex.getImageHeight)
-    else drawQuadTex(buttonXP.tex2, buttonXP.getDrawX, buttonXP.getDrawY, 
-        buttonXP.tex2.getImageWidth, buttonXP.tex2.getImageHeight)
         
+    if (buttonPray.isMouseWithin) drawQuadTex(buttonPray.tex3, buttonPray.getDrawX, 
+        buttonPray.getDrawY, buttonPray.tex3.getImageWidth, buttonPray.tex3.getImageHeight)
+    else drawQuadTex(buttonPray.tex2, buttonPray.getDrawX, buttonPray.getDrawY, 
+        buttonPray.tex2.getImageWidth, buttonPray.tex2.getImageHeight)
+    
     h += 130
     if (getPlayer.slotWeapon != null) drawQuadTex(getPlayer.slotWeapon.image, 
         middle-getPlayer.slotWeapon.image.getImageWidth*5/2, h, 
