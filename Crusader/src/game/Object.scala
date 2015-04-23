@@ -135,37 +135,37 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   
   def getZeal: Int = {
     var bonus = 0
-    for (effect <- effectList) if (effect.isInstanceOf[tempZeal]) bonus = 1
+    for (effect <- effectList) if (effect.isInstanceOf[tempZeal]) bonus += 1
     zeal + bonus
   }
   def getHumility: Int = {
     var bonus = 0
-    for (effect <- effectList) if (effect.isInstanceOf[tempHumility]) bonus = 1
+    for (effect <- effectList) if (effect.isInstanceOf[tempHumility]) bonus += 1
     humility + bonus
   }
   def getTemperance: Int = {
     var bonus = 0
-    for (effect <- effectList) if (effect.isInstanceOf[tempTemperance]) bonus = 1
+    for (effect <- effectList) if (effect.isInstanceOf[tempTemperance]) bonus += 1
     temperance + bonus
   }
   def getKindness: Int = {
     var bonus = 0
-    for (effect <- effectList) if (effect.isInstanceOf[tempKindness]) bonus = 1
+    for (effect <- effectList) if (effect.isInstanceOf[tempKindness]) bonus += 1
     kindness + bonus
   }
   def getPatience: Int = {
     var bonus = 0
-    for (effect <- effectList) if (effect.isInstanceOf[tempPatience]) bonus = 1
+    for (effect <- effectList) if (effect.isInstanceOf[tempPatience]) bonus += 1
     patience + bonus
   }
   def getCharity: Int = {
     var bonus = 0
-    for (effect <- effectList) if (effect.isInstanceOf[tempCharity]) bonus = 1
+    for (effect <- effectList) if (effect.isInstanceOf[tempCharity]) bonus += 1
     charity + bonus
   }
   def getDiligence: Int = {
     var bonus = 0
-    for (effect <- effectList) if (effect.isInstanceOf[tempDiligence]) bonus = 1
+    for (effect <- effectList) if (effect.isInstanceOf[tempDiligence]) bonus += 1
     diligence + bonus
   }
   

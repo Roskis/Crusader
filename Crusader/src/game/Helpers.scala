@@ -317,6 +317,7 @@ object Helpers {
   private val itimepotion = loadTexture("Items/timepotion")
   private val ivisionpotion = loadTexture("Items/visionpotion")
   private val izealpotion = loadTexture("Items/zealpotion")
+  private val iloading = loadTexture("UI/Loading")
   
   /** Return textures */
   def playerImage = iplayerImage
@@ -491,6 +492,7 @@ object Helpers {
   def timepotion = itimepotion
   def visionpotion = ivisionpotion
   def zealpotion = izealpotion
+  def loading = iloading
   
   buttonContinue = new Button(905, 200, 256, 64, continue, continue2, continue3)
   buttonNewGameMenu = new Button(905, 280, 256, 64, newgame, newgame2, newgame3)

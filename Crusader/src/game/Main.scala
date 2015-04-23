@@ -134,6 +134,10 @@ object Main {
   
   /** Advance one level */
   def nextMap() {
+    drawQuadTex(loading, (getWidth-loading.getImageWidth)/2, (getHeight-loading.getImageHeight)/2, 
+        loading.getImageWidth, loading.getImageHeight)
+    Display.update
+    Display.sync(frameRate)
     updateLastMonster(null)
     shopVisited = false
     clearLists
