@@ -702,7 +702,8 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
         if (obj.isInstanceOf[Monster]) boo = false
       if (cannotMove != null) addLog(name.toUpperCase.head + name.tail + " is binded by " + 
         cannotMove.caster.name.toUpperCase.head + cannotMove.caster.name.tail + ".")
-      else if (distance(coord) < 2 && !getGrid.getTile(coord.getX, coord.getY).blockMovement && boo) {
+      else if (distance(coord) < 2 && !getGrid.getTile(coord.getX, coord.getY).blockMovement && boo && 
+          getGrid.getTile(coord.getX, coord.getY).tileType != TileType.SECRETDOOR) {
         changePosition(coord.getX, coord.getY)
       }
     }
@@ -1346,6 +1347,8 @@ class Useable(startX: Int, startY: Int, val itemType: ItemType.Value, isEquipped
       case i if (i == ItemType.RATMEAT) => {
         getPlayer.health += roll(6)
         if (getPlayer.health > getPlayer.maxHealth) getPlayer.health = getPlayer.maxHealth
+        if (getPlayer.piety > 0) getPlayer.piety = getPlayer.piety * 0.9 - 10
+        else getPlayer.piety * 1.1 - 10
         addLog(getPlayer.name.toUpperCase.head + getPlayer.name.tail + " eats " + name + ".")
 
       }

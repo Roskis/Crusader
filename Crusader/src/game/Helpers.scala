@@ -1,25 +1,28 @@
 package game
 
 import Main._
+import org.lwjgl.input.Mouse
 import org.newdawn.slick.util.ResourceLoader
 import org.newdawn.slick.opengl.{Texture, TextureLoader}
 import java.io.{IOException, InputStream}
 import scala.collection.mutable.Buffer
 import Math.abs
 
+
 /** Basic button */
-class Button(val x: Int, val y: Int, val width: Int, val height: Int, val tex: Texture, val tex2: Texture) {
+class Button(val x: Int, val y: Int, val width: Int, val height: Int, val tex: Texture, val tex2: Texture, val tex3: Texture) {
   def getX = x*widthScale
   def getY = y*heightScale
   def getWidth = width*widthScale
   def getHeight = height*heightScale
   def getDrawX = x-(tex.getImageWidth-width)/2
   def getDrawY = y-(tex.getImageHeight-height)/2
-  def isMouseWithin(mouseX: Int, mouseY: Int): Boolean = 
-    mouseX > getX && 
-    mouseX < getX+getWidth && 
-    (Main.getHeight * heightScale - mouseY) > getY && 
-    (Main.getHeight * heightScale - mouseY) < (getY+getHeight)
+  def isMouseWithin: Boolean = 
+    Mouse.getX > getX && 
+    Mouse.getX < getX+getWidth && 
+    (Main.getHeight * heightScale - Mouse.getY) > getY && 
+    (Main.getHeight * heightScale - Mouse.getY) < (getY+getHeight) && 
+    Mouse.isInsideWindow
 }
 
 /** Simple coordinate system */
@@ -285,6 +288,22 @@ object Helpers {
   private val itree1 = loadTexture("Environment/tree1")
   private val irock1 = loadTexture("Environment/rock1")
   private val irock2 = loadTexture("Environment/rock2")
+  private val iback3 = loadTexture("UI/Back3")
+  private val icharity3 = loadTexture("UI/Charity3")
+  private val icontinue3 = loadTexture("UI/Continue3")
+  private val icredits3 = loadTexture("UI/Credits3")
+  private val idiligence3 = loadTexture("UI/Diligence3")
+  private val iexit3 = loadTexture("UI/Exit3")
+  private val ihumility3 = loadTexture("UI/Humility3")
+  private val ikindness3 = loadTexture("UI/Kindness3")
+  private val inewgame3 = loadTexture("UI/Newgame3")
+  private val ioptions3 = loadTexture("UI/Options3")
+  private val ipatience3 = loadTexture("UI/Patience3")
+  private val iquit3 = loadTexture("UI/Quit3")
+  private val irandom3 = loadTexture("UI/Random3")
+  private val itemperance3 = loadTexture("UI/Temperance3")
+  private val ixpbutton3 = loadTexture("UI/XPButton3")
+  private val izeal3 = loadTexture("UI/Zeal3")
   
   /** Return textures */
   def playerImage = iplayerImage
@@ -430,25 +449,43 @@ object Helpers {
   def tree1 = itree1
   def rock1 = irock1
   def rock2 = irock2
+  def back3 = iback3
+  def charity3 = icharity3
+  def continue3 = icontinue3
+  def credits3 = icredits3
+  def diligence3 = idiligence3
+  def exit3 = iexit3
+  def humility3 = ihumility3
+  def kindness3 = ikindness3
+  def newgame3 = inewgame3
+  def options3 = ioptions3
+  def patience3 = ipatience3
+  def quit3 = iquit3
+  def random3 = irandom3
+  def temperance3 = itemperance3
+  def XPButton3 = ixpbutton3
+  def zeal3 = izeal3
   
-  buttonContinue = new Button(905, 200, 256, 64, continue, continue2)
-  buttonNewGameMenu = new Button(905, 280, 256, 64, newgame, newgame2)
-  buttonOptions = new Button(905, 360, 256, 64, options, options)
-  buttonCredits = new Button(905, 440, 256, 64, credits, credits)
-  buttonExit = new Button(905, 520, 256, 64, exit, exit)
-  buttonNewGameChar = new Button(799, 600, 256, 64, newgame, newgame2)
-  buttonBackChar = new Button(257, 600, 256, 64, back, back)
-  buttonRandom = new Button(528, 600, 256, 64, random, random)
-  buttonXP = new Button(1070, 222, 200, 64, XPButton, XPButton2)
-  buttonQuit = new Button(1070, 640, 200, 64, quit, quit)
-  buttonBackLVL = new Button(149, 606, 256, 64, back, back)
-  buttonCharity = new Button(149, 117, 256, 64, charity, charity2)
-  buttonDiligence = new Button(149, 187, 256, 64, diligence, diligence2)
-  buttonHumility = new Button(149, 257, 256, 64, humility, humility2)
-  buttonKindness = new Button(149, 327, 256, 64, kindness, kindness2)
-  buttonPatience = new Button(149, 397, 256, 64, patience, patience2)
-  buttonTemperance = new Button(149, 467, 256, 64, temperance, temperance2)
-  buttonZeal = new Button(149, 537, 256, 64, zeal, zeal2)
+  buttonContinue = new Button(905, 200, 256, 64, continue, continue2, continue3)
+  buttonNewGameMenu = new Button(905, 280, 256, 64, newgame, newgame2, newgame3)
+  buttonOptions = new Button(905, 360, 256, 64, options, options, options3)
+  buttonCredits = new Button(905, 440, 256, 64, credits, credits, credits3)
+  buttonExit = new Button(905, 520, 256, 64, exit, exit, exit3)
+  buttonNewGameChar = new Button(799, 600, 256, 64, newgame, newgame2, newgame3)
+  buttonBackChar = new Button(257, 600, 256, 64, back, back, back3)
+  buttonRandom = new Button(528, 600, 256, 64, random, random, random3)
+  buttonXP = new Button(1070, 222, 200, 64, XPButton, XPButton2, XPButton3)
+  buttonQuit = new Button(1070, 640, 200, 64, quit, quit, quit3)
+  buttonBackLVL = new Button(149, 606, 256, 64, back, back, back3)
+  buttonCharity = new Button(149, 117, 256, 64, charity, charity2, charity3)
+  buttonDiligence = new Button(149, 187, 256, 64, diligence, diligence2, diligence3)
+  buttonHumility = new Button(149, 257, 256, 64, humility, humility2, humility3)
+  buttonKindness = new Button(149, 327, 256, 64, kindness, kindness2, kindness3)
+  buttonPatience = new Button(149, 397, 256, 64, patience, patience2, patience3)
+  buttonTemperance = new Button(149, 467, 256, 64, temperance, temperance2, temperance3)
+  buttonZeal = new Button(149, 537, 256, 64, zeal, zeal2, zeal3)
+  buttonBackOpt = new Button(512, 592, 256, 64, back, back, back3)
+  buttonBackCre = new Button(512, 592, 256, 64, back, back, back3)
   
   /** Few djinn names */
   def djinnName: String = {

@@ -72,6 +72,8 @@ object Main {
   var buttonPatience: Button = null
   var buttonTemperance: Button = null
   var buttonZeal: Button = null
+  var buttonBackOpt: Button = null
+  var buttonBackCre: Button = null
   
   /** The program's main method.
     *
@@ -144,37 +146,37 @@ object Main {
   
   /** Follow user input when choosing new level */
   def levelKeys {
-    if (Mouse.isButtonDown(0) && buttonBackLVL.isMouseWithin(Mouse.getX, Mouse.getY)) {
+    if (Mouse.isButtonDown(0) && buttonBackLVL.isMouseWithin) {
       gameState = GAME
       while (Keyboard.next) {}
     }
     else if (player.health > 0) {
       if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.charity) && 
-          player.charity < 10 && !prevMouseState && buttonCharity.isMouseWithin(Mouse.getX, Mouse.getY)) {
+          player.charity < 10 && !prevMouseState && buttonCharity.isMouseWithin) {
         player.experience -= xpNeededForLevel(player.charity)
         player.charity += 1
       } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.diligence) && 
-          player.diligence < 10 && !prevMouseState && buttonDiligence.isMouseWithin(Mouse.getX, Mouse.getY)) {
+          player.diligence < 10 && !prevMouseState && buttonDiligence.isMouseWithin) {
         player.experience -= xpNeededForLevel(player.diligence)
         player.diligence += 1
       } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.humility) && 
-          player.humility < 10 && !prevMouseState && buttonHumility.isMouseWithin(Mouse.getX, Mouse.getY)) {
+          player.humility < 10 && !prevMouseState && buttonHumility.isMouseWithin) {
         player.experience -= xpNeededForLevel(player.humility)
         player.humility += 1
       } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.kindness) && 
-          player.kindness < 10 && !prevMouseState && buttonKindness.isMouseWithin(Mouse.getX, Mouse.getY)) {
+          player.kindness < 10 && !prevMouseState && buttonKindness.isMouseWithin) {
         player.experience -= xpNeededForLevel(player.kindness)
         player.kindness += 1
       } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.patience) && 
-          player.patience < 10 && !prevMouseState && buttonPatience.isMouseWithin(Mouse.getX, Mouse.getY)) {
+          player.patience < 10 && !prevMouseState && buttonPatience.isMouseWithin) {
         player.experience -= xpNeededForLevel(player.patience)
         player.patience += 1
       } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.temperance) && 
-          player.temperance < 10 && !prevMouseState && buttonTemperance.isMouseWithin(Mouse.getX, Mouse.getY)) {
+          player.temperance < 10 && !prevMouseState && buttonTemperance.isMouseWithin) {
         player.experience -= xpNeededForLevel(player.temperance)
         player.temperance += 1
       } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.zeal) && 
-          player.zeal < 10 && !prevMouseState && buttonZeal.isMouseWithin(Mouse.getX, Mouse.getY)) {
+          player.zeal < 10 && !prevMouseState && buttonZeal.isMouseWithin) {
         player.experience -= xpNeededForLevel(player.zeal)
         player.zeal += 1
       } else while (Keyboard.next) {
@@ -227,17 +229,17 @@ object Main {
   
   /** Follow user input when creating new character */
   def characterKeys {
-    if (Mouse.isButtonDown(0) && buttonNewGameChar.isMouseWithin(Mouse.getX, Mouse.getY) && player.name != "" && 
+    if (Mouse.isButtonDown(0) && buttonNewGameChar.isMouseWithin && player.name != "" && 
         Output.font.getWidth(getPlayer.name) < 700) {
           gameState = GAME
           while (Keyboard.next) {}
           newGame
     }
-    else if (Mouse.isButtonDown(0) && buttonBackChar.isMouseWithin(Mouse.getX, Mouse.getY)) {
+    else if (Mouse.isButtonDown(0) && buttonBackChar.isMouseWithin) {
       gameState = MAIN_MENU
       while (Keyboard.next) {}
     }
-    else if (Mouse.isButtonDown(0) && buttonRandom.isMouseWithin(Mouse.getX, Mouse.getY)) {
+    else if (Mouse.isButtonDown(0) && buttonRandom.isMouseWithin) {
       player.name = randomName
     }
     else while (Keyboard.next) {
@@ -263,7 +265,10 @@ object Main {
   
   /** Follow user input in options */
   def creditsKeys {
-    while (Keyboard.next) {
+    if ((Mouse.isButtonDown(0) && buttonBackCre.isMouseWithin)) {
+      gameState = MAIN_MENU
+      while (Keyboard.next) {}
+    } else while (Keyboard.next) {
       Keyboard.getEventKey match {
         case k if (k == Keyboard.KEY_ESCAPE && Keyboard.getEventKeyState) => {
           gameState = MAIN_MENU
@@ -276,7 +281,10 @@ object Main {
   
   /** Follow user input in options */
   def optionKeys {
-    while (Keyboard.next) {
+    if ((Mouse.isButtonDown(0) && buttonBackOpt.isMouseWithin)) {
+      gameState = MAIN_MENU
+      while (Keyboard.next) {}
+    } else while (Keyboard.next) {
       Keyboard.getEventKey match {
         case k if (Keyboard.isKeyDown(56) && k == Keyboard.KEY_RETURN && Keyboard.getEventKeyState) => {
           fullscreen = !fullscreen
@@ -293,24 +301,24 @@ object Main {
   
   /** Follow user input in menu */
   def menuKeys {
-    if ((Mouse.isButtonDown(0) && buttonNewGameMenu.isMouseWithin(Mouse.getX, Mouse.getY))) {
+    if ((Mouse.isButtonDown(0) && buttonNewGameMenu.isMouseWithin)) {
       gameState = CHARACTER_CREATION
       while (Keyboard.next) {}
       player = new Player(player.name, 0, 0)
-    } else if ((Mouse.isButtonDown(0) && buttonExit.isMouseWithin(Mouse.getX, Mouse.getY)) || 
+    } else if ((Mouse.isButtonDown(0) && buttonExit.isMouseWithin) || 
         Keyboard.isKeyDown(Keyboard.KEY_Q)) {
       Display.destroy()
       System.exit(0)
-    } else if ((Mouse.isButtonDown(0) && buttonContinue.isMouseWithin(Mouse.getX, Mouse.getY)) || 
+    } else if ((Mouse.isButtonDown(0) && buttonContinue.isMouseWithin) || 
         Keyboard.isKeyDown(Keyboard.KEY_Q)) {
       if (new File("save.dat").exists && loadGame) {
         gameState = GAME
         while (Keyboard.next) {}
       }
-    } else if ((Mouse.isButtonDown(0) && buttonOptions.isMouseWithin(Mouse.getX, Mouse.getY))) {
+    } else if ((Mouse.isButtonDown(0) && buttonOptions.isMouseWithin)) {
       gameState = OPTIONS
       while (Keyboard.next) {}
-    } else if ((Mouse.isButtonDown(0) && buttonCredits.isMouseWithin(Mouse.getX, Mouse.getY))) {
+    } else if ((Mouse.isButtonDown(0) && buttonCredits.isMouseWithin)) {
       gameState = CREDITS
       while (Keyboard.next) {}
     } else {
@@ -321,6 +329,16 @@ object Main {
             while (Keyboard.next) {}
             player = new Player(player.name, 0, 0)
           }
+          case k if (k == Keyboard.KEY_C && Keyboard.getEventKeyState) => {
+            if (new File("save.dat").exists && loadGame) {
+              gameState = GAME
+              while (Keyboard.next) {}
+            }
+          }
+          case k if (k == Keyboard.KEY_O && Keyboard.getEventKeyState) => {
+            gameState = OPTIONS
+            while (Keyboard.next) {}
+          }
           case _ => {}
         }
       }
@@ -330,11 +348,11 @@ object Main {
   /** Follow user input in game */
   def gameKeys {
     if (Mouse.isButtonDown(0) && getPlayer.experience >= getPlayer.smallestLevel && 
-        buttonXP.isMouseWithin(Mouse.getX, Mouse.getY)) {
+        buttonXP.isMouseWithin) {
       gameState = LEVEL
       while (Keyboard.next) {}
     }
-    else if (Mouse.isButtonDown(0) && buttonQuit.isMouseWithin(Mouse.getX, Mouse.getY)) {
+    else if (Mouse.isButtonDown(0) && buttonQuit.isMouseWithin) {
       if (player.health > 0) saveGame
       gameState = MAIN_MENU
       while (Keyboard.next) {}

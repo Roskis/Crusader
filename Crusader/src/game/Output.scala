@@ -123,19 +123,36 @@ object Output {
   def drawCharacterCreation() {
     glClear(GL_COLOR_BUFFER_BIT)
     drawQuadTex(emptyBackground, (getWidth-emptyBackground.getImageWidth)/2, 
-        (getHeight-emptyBackground.getImageHeight)/2, emptyBackground.getImageWidth, emptyBackground.getImageHeight)
+        (getHeight-emptyBackground.getImageHeight)/2, emptyBackground.getImageWidth, 
+        emptyBackground.getImageHeight)
     if (font.getWidth(getPlayer.name) >= 700) {
-      font.drawString(getWidth/2-font.getWidth("Name is too long")/2, getHeight*5/9, "Name is too long", Color.red)
-      drawQuadTex(buttonNewGameChar.tex2, buttonNewGameChar.getDrawX, buttonNewGameChar.getDrawY, buttonNewGameChar.tex2.getImageWidth, buttonNewGameChar.tex2.getImageHeight)
+      font.drawString(getWidth/2-font.getWidth("Name is too long")/2, getHeight*5/9, 
+          "Name is too long", Color.red)
+      drawQuadTex(buttonNewGameChar.tex2, buttonNewGameChar.getDrawX, buttonNewGameChar.getDrawY, 
+          buttonNewGameChar.tex2.getImageWidth, buttonNewGameChar.tex2.getImageHeight)
     }
-    else if (getPlayer.name == "") drawQuadTex(buttonNewGameChar.tex2, buttonNewGameChar.getDrawX, buttonNewGameChar.getDrawY, buttonNewGameChar.tex2.getImageWidth, buttonNewGameChar.tex2.getImageHeight)
-    else drawQuadTex(buttonNewGameChar.tex, buttonNewGameChar.getDrawX, buttonNewGameChar.getDrawY, buttonNewGameChar.tex.getImageWidth, buttonNewGameChar.tex.getImageHeight)
-    drawQuadTex(buttonBackChar.tex, buttonBackChar.getDrawX, buttonBackChar.getDrawY, buttonBackChar.tex.getImageWidth, buttonBackChar.tex.getImageHeight)
-    drawQuadTex(buttonRandom.tex, buttonRandom.getDrawX, buttonRandom.getDrawY, buttonRandom.tex.getImageWidth, buttonRandom.tex.getImageHeight)
-    fontMenu.drawString(getWidth/2-fontMenu.getWidth("Enter name:")/2, getHeight*3/9, "Enter name:", Color.black)
-    font.drawString(getWidth/2-font.getWidth(getPlayer.name)/2, getHeight*4/9, getPlayer.name, Color.black)
-    font.drawString(2, getHeight - 24, "Mouse X: " + Mouse.getX.toString, Color.red)
-    font.drawString(130, getHeight - 24, "Y: " + (getHeight - Mouse.getY).toString, Color.red)
+    else if (getPlayer.name == "") drawQuadTex(buttonNewGameChar.tex2, buttonNewGameChar.getDrawX, 
+        buttonNewGameChar.getDrawY, buttonNewGameChar.tex2.getImageWidth, 
+        buttonNewGameChar.tex2.getImageHeight)
+    else if (buttonNewGameChar.isMouseWithin) drawQuadTex(buttonNewGameChar.tex3, 
+        buttonNewGameChar.getDrawX, buttonNewGameChar.getDrawY, buttonNewGameChar.tex3.getImageWidth, 
+        buttonNewGameChar.tex3.getImageHeight)
+    else drawQuadTex(buttonNewGameChar.tex, buttonNewGameChar.getDrawX, buttonNewGameChar.getDrawY, 
+        buttonNewGameChar.tex.getImageWidth, buttonNewGameChar.tex.getImageHeight)
+    if (buttonBackChar.isMouseWithin) drawQuadTex(buttonBackChar.tex3, buttonBackChar.getDrawX, 
+        buttonBackChar.getDrawY, buttonBackChar.tex3.getImageWidth, buttonBackChar.tex3.getImageHeight)
+    else drawQuadTex(buttonBackChar.tex, buttonBackChar.getDrawX, buttonBackChar.getDrawY, 
+        buttonBackChar.tex.getImageWidth, buttonBackChar.tex.getImageHeight)
+    if (buttonRandom.isMouseWithin) drawQuadTex(buttonRandom.tex3, buttonRandom.getDrawX, 
+        buttonRandom.getDrawY, buttonRandom.tex3.getImageWidth, buttonRandom.tex3.getImageHeight)
+    else drawQuadTex(buttonRandom.tex, buttonRandom.getDrawX, buttonRandom.getDrawY, 
+        buttonRandom.tex.getImageWidth, buttonRandom.tex.getImageHeight)
+    fontMenu.drawString(getWidth/2-fontMenu.getWidth("Enter name:")/2, getHeight*3/9, 
+        "Enter name:", Color.black)
+    font.drawString(getWidth/2-font.getWidth(getPlayer.name)/2, getHeight*4/9, 
+        getPlayer.name, Color.black)
+    //font.drawString(2, getHeight - 24, "Mouse X: " + Mouse.getX.toString, Color.red)
+    //font.drawString(130, getHeight - 24, "Y: " + (getHeight - Mouse.getY).toString, Color.red)
   }
   
   /** Draw credits */
@@ -151,8 +168,13 @@ object Output {
     font.drawString(getWidth/2-font.getWidth(text3)/2, getHeight/3+50, text3, Color.black)
     val text4 = "Artist: Johanna Karkinen"
     font.drawString(getWidth/2-font.getWidth(text4)/2, getHeight/3+75, text4, Color.black)
-    val text5 = "Escape to go back."
-    font.drawString(getWidth/2-font.getWidth(text5)/2, getHeight/3+100, text5, Color.black)
+    
+    if (buttonBackCre.isMouseWithin) {
+      drawQuadTex(buttonBackCre.tex3, buttonBackCre.getDrawX, buttonBackCre.getDrawY, 
+          buttonBackCre.tex3.getImageWidth, buttonBackCre.tex3.getImageHeight)
+    }
+    else drawQuadTex(buttonBackCre.tex, buttonBackCre.getDrawX, buttonBackCre.getDrawY, 
+        buttonBackCre.tex.getImageWidth, buttonBackCre.tex.getImageHeight)
   }
   
   /** Draw options */
@@ -160,12 +182,31 @@ object Output {
     glClear(GL_COLOR_BUFFER_BIT)
     drawQuadTex(emptyBackground, (getWidth-emptyBackground.getImageWidth)/2, 
         (getHeight-emptyBackground.getImageHeight)/2, emptyBackground.getImageWidth, emptyBackground.getImageHeight)
-    val text1 = "Resolution: " + getDisplayMode.getWidth + "x" + getDisplayMode.getHeight
-    font.drawString(getWidth/2-font.getWidth(text1)/2, getHeight/3, text1, Color.black)
+    val text1 = "Resolution is " + getDisplayMode.getWidth + "x" + getDisplayMode.getHeight
+    font.drawString(getWidth/2-font.getWidth(text1)/2, getHeight/6, text1, Color.black)
     val text2 = "ALT+ENTER to change to fullscreen."
-    font.drawString(getWidth/2-font.getWidth(text2)/2, getHeight/3+25, text2, Color.black)
-    val text3 = "Escape to go back."
-    font.drawString(getWidth/2-font.getWidth(text3)/2, getHeight/3+50, text3, Color.black)
+    font.drawString(getWidth/2-font.getWidth(text2)/2, getHeight/6+25, text2, Color.black)
+    val text3 = "Keys:"
+    font.drawString(getWidth/2-font.getWidth(text3)/2, getHeight/6+75, text3, Color.black)
+    val text4 = "Numpad/arrows = Movement"
+    font.drawString(getWidth/2-font.getWidth(text4)/2, getHeight/6+100, text4, Color.black)
+    val text5 = "Esc = Save&Quit"
+    font.drawString(getWidth/2-font.getWidth(text5)/2, getHeight/6+125, text5, Color.black)
+    val text6 = "Q = Level up"
+    font.drawString(getWidth/2-font.getWidth(text6)/2, getHeight/6+150, text6, Color.black)
+    val text7 = "W = Wait/Buy item"
+    font.drawString(getWidth/2-font.getWidth(text7)/2, getHeight/6+175, text7, Color.black)
+    val text8 = "E = Use item"
+    font.drawString(getWidth/2-font.getWidth(text8)/2, getHeight/6+200, text8, Color.black)
+    val text9 = "R = Pray"
+    font.drawString(getWidth/2-font.getWidth(text9)/2, getHeight/6+225, text9, Color.black)
+    
+    if (buttonBackOpt.isMouseWithin) {
+      drawQuadTex(buttonBackOpt.tex3, buttonBackOpt.getDrawX, buttonBackOpt.getDrawY, 
+          buttonBackOpt.tex3.getImageWidth, buttonBackOpt.tex3.getImageHeight)
+    }
+    else drawQuadTex(buttonBackOpt.tex, buttonBackOpt.getDrawX, buttonBackOpt.getDrawY, 
+        buttonBackOpt.tex.getImageWidth, buttonBackOpt.tex.getImageHeight)
   }
   
   /** Draw the main menu */
@@ -173,21 +214,34 @@ object Output {
     glClear(GL_COLOR_BUFFER_BIT)
     drawQuadTex(background, (getWidth-background.getImageWidth)/2, 
         (getHeight-background.getImageHeight)/2, background.getImageWidth, background.getImageHeight)
-    if (new File("save.dat").exists) drawQuadTex(buttonContinue.tex, buttonContinue.getDrawX.toInt, 
+    if (new File("save.dat").exists && buttonContinue.isMouseWithin) drawQuadTex(buttonContinue.tex3, 
+        buttonContinue.getDrawX.toInt, buttonContinue.getDrawY.toInt, buttonContinue.tex3.getImageWidth, 
+        buttonContinue.tex3.getImageHeight)
+    else if (new File("save.dat").exists) drawQuadTex(buttonContinue.tex, buttonContinue.getDrawX.toInt, 
         buttonContinue.getDrawY.toInt, buttonContinue.tex.getImageWidth, buttonContinue.tex.getImageHeight)
     else drawQuadTex(buttonContinue.tex2, buttonContinue.getDrawX, buttonContinue.getDrawY, 
         buttonContinue.tex2.getImageWidth, buttonContinue.tex2.getImageHeight)
-    drawQuadTex(buttonNewGameMenu.tex, buttonNewGameMenu.getDrawX, buttonNewGameMenu.getDrawY, 
+    if (buttonNewGameMenu.isMouseWithin) {
+      drawQuadTex(buttonNewGameMenu.tex3, buttonNewGameMenu.getDrawX, buttonNewGameMenu.getDrawY, 
+          buttonNewGameMenu.tex3.getImageWidth, buttonNewGameMenu.tex3.getImageHeight)
+    }
+    else drawQuadTex(buttonNewGameMenu.tex, buttonNewGameMenu.getDrawX, buttonNewGameMenu.getDrawY, 
         buttonNewGameMenu.tex.getImageWidth, buttonNewGameMenu.tex.getImageHeight)
-    drawQuadTex(buttonOptions.tex, buttonOptions.getDrawX, buttonOptions.getDrawY, 
+    if (buttonOptions.isMouseWithin) drawQuadTex(buttonOptions.tex3, buttonOptions.getDrawX, 
+        buttonOptions.getDrawY, buttonOptions.tex3.getImageWidth, buttonOptions.tex3.getImageHeight)
+    else drawQuadTex(buttonOptions.tex, buttonOptions.getDrawX, buttonOptions.getDrawY, 
         buttonOptions.tex.getImageWidth, buttonOptions.tex.getImageHeight)
-    drawQuadTex(buttonCredits.tex, buttonCredits.getDrawX, buttonCredits.getDrawY, 
+    if (buttonCredits.isMouseWithin) drawQuadTex(buttonCredits.tex3, buttonCredits.getDrawX, 
+        buttonCredits.getDrawY, buttonCredits.tex3.getImageWidth, buttonCredits.tex3.getImageHeight)
+    else drawQuadTex(buttonCredits.tex, buttonCredits.getDrawX, buttonCredits.getDrawY, 
         buttonCredits.tex.getImageWidth, buttonCredits.tex.getImageHeight)
-    drawQuadTex(buttonExit.tex, buttonExit.getDrawX, buttonExit.getDrawY, 
+    if (buttonExit.isMouseWithin) drawQuadTex(buttonExit.tex3, buttonExit.getDrawX, buttonExit.getDrawY, 
+        buttonExit.tex3.getImageWidth, buttonExit.tex3.getImageHeight)
+    else drawQuadTex(buttonExit.tex, buttonExit.getDrawX, buttonExit.getDrawY, 
         buttonExit.tex.getImageWidth, buttonExit.tex.getImageHeight)
     fontMenu.drawString(920, getHeight/10, "Crusader", Color.black)        
-    font.drawString(2, getHeight - 24, "Mouse X: " + Mouse.getX.toString, Color.red)
-    font.drawString(130, getHeight - 24, "Y: " + (getHeight - Mouse.getY).toString, Color.red)
+    //font.drawString(2, getHeight - 24, "Mouse X: " + Mouse.getX.toString, Color.red)
+    //font.drawString(130, getHeight - 24, "Y: " + (getHeight - Mouse.getY).toString, Color.red)
     font.drawString(getWidth - 10 - font.getWidth("Version: " + getVersion), getHeight - 24, "Version: " + getVersion, Color.black)
   }
   
@@ -283,7 +337,10 @@ object Output {
     val xptext = "XP: " + getPlayer.experience.toInt + "/" + getPlayer.smallestLevel
     font.drawString(middle-font.getWidth(xptext)/2, h, xptext, Color.black)
     
-    if (getPlayer.experience >= getPlayer.smallestLevel) 
+    if (getPlayer.experience >= getPlayer.smallestLevel && buttonXP.isMouseWithin) 
+      drawQuadTex(buttonXP.tex3, buttonXP.getDrawX, buttonXP.getDrawY, buttonXP.tex3.getImageWidth, 
+          buttonXP.tex3.getImageHeight)
+    else if (getPlayer.experience >= getPlayer.smallestLevel) 
       drawQuadTex(buttonXP.tex, buttonXP.getDrawX, buttonXP.getDrawY, buttonXP.tex.getImageWidth, 
           buttonXP.tex.getImageHeight)
     else drawQuadTex(buttonXP.tex2, buttonXP.getDrawX, buttonXP.getDrawY, 
@@ -314,7 +371,10 @@ object Output {
     h += 155
     drawMinimap(middle, h)
     
-    drawQuadTex(buttonQuit.tex, buttonQuit.getDrawX, buttonQuit.getDrawY, buttonQuit.tex.getImageWidth, buttonQuit.tex.getImageHeight)
+    if (buttonQuit.isMouseWithin) drawQuadTex(buttonQuit.tex3, buttonQuit.getDrawX, 
+        buttonQuit.getDrawY, buttonQuit.tex3.getImageWidth, buttonQuit.tex3.getImageHeight)
+    else drawQuadTex(buttonQuit.tex, buttonQuit.getDrawX, buttonQuit.getDrawY, 
+        buttonQuit.tex.getImageWidth, buttonQuit.tex.getImageHeight)
   }
   
   /** Draw minimap */
@@ -434,49 +494,72 @@ object Output {
     
     fontMenu.drawString(v, 35, "Choose level:", Color.black)
     font.drawString(v+440, h+35, "Experience: " + getPlayer.experience.toInt, Color.black)
-    if (getPlayer.experience >= xpNeededForLevel(getPlayer.charity)) 
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.charity) && buttonCharity.isMouseWithin) 
+      drawQuadTex(buttonCharity.tex3, buttonCharity.getDrawX, buttonCharity.getDrawY, 
+          buttonCharity.tex3.getImageWidth, buttonCharity.tex3.getImageHeight)
+    else if (getPlayer.experience >= xpNeededForLevel(getPlayer.charity)) 
       drawQuadTex(buttonCharity.tex, buttonCharity.getDrawX, buttonCharity.getDrawY, 
           buttonCharity.tex.getImageWidth, buttonCharity.tex.getImageHeight)
     else drawQuadTex(buttonCharity.tex2, buttonCharity.getDrawX, buttonCharity.getDrawY, 
         buttonCharity.tex2.getImageWidth, buttonCharity.tex2.getImageHeight)
     h += 70
-    if (getPlayer.experience >= xpNeededForLevel(getPlayer.diligence)) 
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.diligence) && buttonDiligence.isMouseWithin) 
+      drawQuadTex(buttonDiligence.tex3, buttonDiligence.getDrawX, buttonDiligence.getDrawY, 
+          buttonDiligence.tex3.getImageWidth, buttonDiligence.tex3.getImageHeight)
+    else if (getPlayer.experience >= xpNeededForLevel(getPlayer.diligence)) 
       drawQuadTex(buttonDiligence.tex, buttonDiligence.getDrawX, buttonDiligence.getDrawY, 
-          buttonDiligence.tex.getImageWidth, buttonDiligence.tex2.getImageHeight)
+          buttonDiligence.tex.getImageWidth, buttonDiligence.tex.getImageHeight)
     else drawQuadTex(buttonDiligence.tex2, buttonDiligence.getDrawX, buttonDiligence.getDrawY, 
         buttonDiligence.tex2.getImageWidth, buttonDiligence.tex2.getImageHeight)
     h += 70
-    if (getPlayer.experience >= xpNeededForLevel(getPlayer.humility)) 
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.humility) && buttonHumility.isMouseWithin) 
+      drawQuadTex(buttonHumility.tex3, buttonHumility.getDrawX, buttonHumility.getDrawY, 
+          buttonHumility.tex3.getImageWidth, buttonHumility.tex3.getImageHeight)
+    else if (getPlayer.experience >= xpNeededForLevel(getPlayer.humility)) 
       drawQuadTex(buttonHumility.tex, buttonHumility.getDrawX, buttonHumility.getDrawY, 
           buttonHumility.tex.getImageWidth, buttonHumility.tex.getImageHeight)
     else drawQuadTex(buttonHumility.tex2, buttonHumility.getDrawX, buttonHumility.getDrawY, 
         buttonHumility.tex2.getImageWidth, buttonHumility.tex2.getImageHeight)
     h += 70
-    if (getPlayer.experience >= xpNeededForLevel(getPlayer.kindness)) 
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.kindness) && buttonKindness.isMouseWithin) 
+      drawQuadTex(buttonKindness.tex3, buttonKindness.getDrawX, buttonKindness.getDrawY, 
+          buttonKindness.tex3.getImageWidth, buttonKindness.tex3.getImageHeight)
+    else if (getPlayer.experience >= xpNeededForLevel(getPlayer.kindness)) 
       drawQuadTex(buttonKindness.tex, buttonKindness.getDrawX, buttonKindness.getDrawY, 
           buttonKindness.tex.getImageWidth, buttonKindness.tex.getImageHeight)
     else drawQuadTex(buttonKindness.tex2, buttonKindness.getDrawX, buttonKindness.getDrawY, 
         buttonKindness.tex2.getImageWidth, buttonKindness.tex2.getImageHeight)
     h += 70
-    if (getPlayer.experience >= xpNeededForLevel(getPlayer.patience)) 
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.patience) && buttonPatience.isMouseWithin) 
+      drawQuadTex(buttonPatience.tex3, buttonPatience.getDrawX, buttonPatience.getDrawY, 
+          buttonPatience.tex3.getImageWidth, buttonPatience.tex3.getImageHeight)
+    else if (getPlayer.experience >= xpNeededForLevel(getPlayer.patience)) 
       drawQuadTex(buttonPatience.tex, buttonPatience.getDrawX, buttonPatience.getDrawY, 
           buttonPatience.tex.getImageWidth, buttonPatience.tex.getImageHeight)
     else drawQuadTex(buttonPatience.tex2, buttonPatience.getDrawX, buttonPatience.getDrawY, 
         buttonPatience.tex2.getImageWidth, buttonPatience.tex2.getImageHeight)
     h += 70
-    if (getPlayer.experience >= xpNeededForLevel(getPlayer.temperance)) 
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.temperance) && buttonTemperance.isMouseWithin) 
+      drawQuadTex(buttonTemperance.tex3, buttonTemperance.getDrawX, buttonTemperance.getDrawY, 
+          buttonTemperance.tex3.getImageWidth, buttonTemperance.tex3.getImageHeight)
+    else if (getPlayer.experience >= xpNeededForLevel(getPlayer.temperance)) 
       drawQuadTex(buttonTemperance.tex, buttonTemperance.getDrawX, buttonTemperance.getDrawY, 
           buttonTemperance.tex.getImageWidth, buttonTemperance.tex.getImageHeight)
     else drawQuadTex(buttonTemperance.tex2, buttonTemperance.getDrawX, buttonTemperance.getDrawY, 
         buttonTemperance.tex2.getImageWidth, buttonTemperance.tex2.getImageHeight)
     h += 70
-    if (getPlayer.experience >= xpNeededForLevel(getPlayer.zeal)) 
+    if (getPlayer.experience >= xpNeededForLevel(getPlayer.zeal) && buttonZeal.isMouseWithin) 
+      drawQuadTex(buttonZeal.tex3, buttonZeal.getDrawX, buttonZeal.getDrawY, 
+          buttonZeal.tex3.getImageWidth, buttonZeal.tex3.getImageHeight)
+    else if (getPlayer.experience >= xpNeededForLevel(getPlayer.zeal)) 
       drawQuadTex(buttonZeal.tex, buttonZeal.getDrawX, buttonZeal.getDrawY, 
           buttonZeal.tex.getImageWidth, buttonZeal.tex.getImageHeight)
     else drawQuadTex(buttonZeal.tex2, buttonZeal.getDrawX, buttonZeal.getDrawY, 
         buttonZeal.tex2.getImageWidth, buttonZeal.tex2.getImageHeight)
     h += 70
-    drawQuadTex(buttonBackLVL.tex, buttonBackLVL.getDrawX, buttonBackLVL.getDrawY, 
+    if (buttonBackLVL.isMouseWithin) drawQuadTex(buttonBackLVL.tex3, buttonBackLVL.getDrawX, 
+        buttonBackLVL.getDrawY, buttonBackLVL.tex3.getImageWidth, buttonBackLVL.tex3.getImageHeight)
+    else drawQuadTex(buttonBackLVL.tex, buttonBackLVL.getDrawX, buttonBackLVL.getDrawY, 
         buttonBackLVL.tex.getImageWidth, buttonBackLVL.tex.getImageHeight)
     
     h = 128
