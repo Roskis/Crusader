@@ -12,7 +12,7 @@ object Prayers extends Enumeration {
   type Prayer = Value
   val PARTIALRESTORATION, FULLRESTORATION, LIGHTNINGBOLT, GOLDLOSS, EXPERIENCELOSS, DEMENTIA, 
     STAIRS, SMITE, GOLDGAIN, EXPERIENCEGAIN, CLAIRVOYANCE, ITEM, FEAR, AOEDAMAGE, BLINDINGLIGHT, 
-    REVEALSECRET, IMMUNITY, BUFF, VISION, LEVELUP = Value
+    REVEALSECRET, IMMUNITY, BUFF, VISION, LEVELUP, LEVELDOWN, TIMESTOP = Value
   val rnd = getRnd
   
   /** Player regains part of maximum health */
@@ -158,36 +158,89 @@ object Prayers extends Enumeration {
 
   /** Level up a random skill */
   def levelUp = {
-    rnd.nextInt(7) match {
+    val text = "Your " + 
+    (rnd.nextInt(7) match {
       case n if (n == 0) => {
         getPlayer.zeal += 1
-        addLog("Your Zeal is permanently increased by one.")
+        "Zeal"
       }
       case n if (n == 1) => {
         getPlayer.humility += 1
-        addLog("Your Humility is permanently increased by one.")
+        "Humility"
         }
       case n if (n == 2) => {
         getPlayer.temperance += 1
-        addLog("Your Temperance is permanently increased by one.")
+        "Temperance"
         }
       case n if (n == 3) => {
         getPlayer.kindness += 1
-        addLog("Your Kindness is permanently increased by one.")
+        "Kindness"
         }
       case n if (n == 4) => {
         getPlayer.patience += 1
-        addLog("Your Patience is permanently increased by one.")
+        "Patience"
         }
       case n if (n == 5) => {
         getPlayer.charity += 1
-        addLog("Your Charity is permanently increased by one.")
+        "Charity"
         }
       case n if (n == 6) => {
         getPlayer.diligence += 1
-        addLog("Your Diligence is permanently increased by one.")
+        "Diligence"
         }
+    }) + " is permanently increased by one."
+    addLog(text)
+  }
+  
+  /** Lose a random skill */
+  def levelDown = {
+    println("LVL")
+    if (getPlayer.totalLevel <= 0) {}
+    else {
+      val list = List(getPlayer.zeal, getPlayer.humility, getPlayer.temperance, getPlayer.kindness, 
+          getPlayer.patience, getPlayer.charity, getPlayer.diligence)
+      var skillNum = 0
+      do {skillNum = rnd.nextInt(list.size)}
+      while (list(skillNum) == 0)
+      val text = "Your " + (skillNum match {
+        case 0 => {
+          getPlayer.zeal -= 1
+          "Zeal"
+          }
+        case 1 => {
+          getPlayer.humility -= 1
+          "Humility"
+        }
+        case 2 => {
+          getPlayer.temperance -= 1
+          "Temperance"
+        }
+        case 3 => {
+          getPlayer.kindness -= 1
+          "Kindness"
+        }
+        case 4 => {
+          getPlayer.patience -= 1
+          "Patience"
+        }
+        case 5 => {
+          getPlayer.charity -= 1
+          "Charity"
+        }
+        case 6 => {
+          getPlayer.diligence -= 1
+          "Diligence"
+        }
+        case _ => {"skill name not found"}
+      }) + " is permanently decreased by one."
+      addLog(text)
     }
+  }
+  
+  /** Timestop prayer */
+  def timeStop = {
+    getPlayer.effectList = getPlayer.effectList :+ new timestop(roll(10)+10, getPlayer)
+    addLog("Time around you is temporarily frozen.")
   }
   
 }
@@ -302,6 +355,18 @@ class buff(dur: Int, tar: Character) extends Effect with Serializable {
 /** Increased range of vision */
 class vision(dur: Int, tar: Character) extends Effect with Serializable {
   val name = "Increased vision"
+  val target = tar
+  var duration = dur
+  def caster = null
+  def turn = {
+    duration -= 1
+    if (duration == 0) addLog("Effect of " + name + " has ended.")
+  }
+}
+
+/** Timestop for player */
+class timestop(dur: Int, tar: Character) extends Effect with Serializable {
+  val name = "Timestop"
   val target = tar
   var duration = dur
   def caster = null

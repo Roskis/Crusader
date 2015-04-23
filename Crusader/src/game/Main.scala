@@ -467,7 +467,9 @@ object Main {
   def playTurn() {
     for (effect <- player.effectList) effect.turn
     player.effectList.filter(_.duration <= 0) foreach {player.effectList -= _}
-    for (monster <- monsterList) monster.turn
+    var timestop = false
+    for (effect <- player.effectList) if (effect.isInstanceOf[timestop]) timestop = true
+    if (!timestop) for (monster <- monsterList) monster.turn
     turn += 1
     if (player.health <= 0 && player.piety >= 500) {
       player.piety = player.piety/2 - 500
@@ -581,12 +583,20 @@ object Main {
     var chances = Map(PARTIALRESTORATION -> 80, FULLRESTORATION -> 20, STAIRS -> 10, SMITE -> 10, 
         GOLDGAIN -> 10, EXPERIENCEGAIN -> 10, CLAIRVOYANCE -> 10, ITEM -> 1, FEAR -> 5, 
         AOEDAMAGE -> 5, BLINDINGLIGHT -> 5, REVEALSECRET -> 10, IMMUNITY -> 5, BUFF -> 20, 
-        VISION -> 10, LEVELUP -> 2)
+        VISION -> 10, LEVELUP -> 2, TIMESTOP -> 1)
     if (player.piety < 0) {
+      chances += (DEMENTIA -> 10)
+      chances += (EXPERIENCELOSS -> 10)
+      chances += (GOLDLOSS -> 10)
+      chances += (LIGHTNINGBOLT -> 10)
+      chances += (LEVELDOWN -> 10)
+    }
+    if (player.piety < 1000) {
       chances += (DEMENTIA -> 100)
       chances += (EXPERIENCELOSS -> 100)
       chances += (GOLDLOSS -> 100)
       chances += (LIGHTNINGBOLT -> 100)
+      chances += (LEVELDOWN -> 100)
     }
     if (player.piety > 200) chances += (FULLRESTORATION -> 20)
     chances

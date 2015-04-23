@@ -501,7 +501,8 @@ object Helpers {
   
   /** Few djinn greetings */
   def shopWelcome: String = {
-    val list = List("Greetings stranger, may I interest you in my wares?", 
+    val list = List(
+        "Greetings stranger, may I interest you in my wares?", 
         "Fine day isn't it, now have a look at my wares.", 
         "Buy or sell my price is always fair.", 
         "Welcome to my shop crusader.", 
@@ -510,7 +511,8 @@ object Helpers {
         "Business is business even in the midst of oblivion.", 
         "Oh hi there adventurer, may I aid you on your journey?", 
         "What do you need, mortal?", 
-        "What is it you're looking for, mortal?")
+        "What is it you're looking for, mortal?"
+        )
     list(rnd.nextInt(list.size))
   }
   
@@ -645,18 +647,18 @@ object Helpers {
     }
   }
 
-  private val firstname = List("John", "Oliver", "Alexander", "Bertrand", "William", "Jean", 
-      "Peter", "Walter", "Eustace", "Raymond", "Adhemar", "Girard", "Berenguer", "Robert", "Ralph", 
-      "Geoffrey", "Thomas", "Guglielmo", "Guy", "Alan", "Robert", "Raoul", "Louis", "Roger", 
-      "Henry", "Renaut", "Amadeus", "Frederick", "Otto", "Philip", "Humphrey", "Walter", "Stephen", 
-      "Amalric", "Gerard", "Miles", "Bertrand", "Andronikos", "Richard", "André", "Hubert", 
-      "Ranulf", "Alberic", "Conon", "Floris", "Rudolf", "Depolt", "Sibylla", "Eraclius", "Balian", 
-      "Reginald", "Gerard", "Humphrey", "Conrad", "Wolfger", "Boniface", "Enrico", "Leopold", 
-      "Hugh", "Pelagio", "Pedro", "Guérin", "Andrew", "Alamanno", "Amaury", "Balian", "Simon", 
-      "Alfonso", "Charles", "Guillaume", "Renaud", "Edward", "Leo")
+  private val firstname = List("John", "Oliver", "Alexander", "William", "Jean", "Peter", "Walter", 
+      "Eustace", "Raymond", "Adhemar", "Robert", "Ralph", "Geoffrey", "Thomas", "Guglielmo", "Guy", 
+      "Alan", "Raoul", "Louis", "Roger", "Henry", "Amadeus", "Frederick", "Otto", "Milo", "Hamelin",  
+      "Philip", "Humphrey", "Stephen", "Gerard", "Miles", "Andronikos", "Richard", "André", "Arthur", 
+      "Hubert", "Ranulf", "Alberic", "Conon", "Floris", "Rudolf", "Depolt", "Sibylla", "Eraclius", 
+      "Balian", "Reginald", "Gerard", "Conrad", "Wolfger", "Boniface", "Enrico", "Leopold", "Hugh", 
+      "Pelagio", "Pedro", "Guérin", "Andrew", "Alamanno", "Balian", "Simon", "Alfonso", "Charles", 
+      "Guillaume", "Renaud", "Edward", "Leo", "Giles", "Maud", "Hervey", "Constance", "Pernell", 
+      "Patrick", "Edmund", "Walkelin", "Waleran")
 
   private val lastname = List("Hawkwood", "Hugh", "Baldwin", "Nevsky", "Marshal", "Godfrey", 
-      "Boucicaut", "Bohemond", "Tancred", "Herman", "Richard", "Eustace", "Gervaise", 
+      "Boucicaut", "Bohemond", "Tancred", "Herman", "Eustace", "Gervaise", "Amaury", "Bertrand", 
       "Fulcher", "Fulk", "Grenier", "Warner", "William-Jordan", "Gaston", "Centule", "Guinard", 
       "Aicard", "Ramon", "Bartholomew", "Raymond", "Raimbaut", "Roman", "William", "Curthose", 
       "Arnulf", "Rotrou", "Jordan", "Enguerrand", "Embriaco", "Montlhéry", "Gouffier", "Leopold", 
@@ -664,7 +666,8 @@ object Helpers {
       "Ghibbelin", "Hugues", "Humphrey", "Bertrand", "Bures", "Fulk", "Barisan", "Thierry", 
       "Alphonse", "Enguerrand", "Eleanor", "Ottokar", "Amalric", "Melisende", "Manasses", "Galeran", 
       "Grenier", "Barisan", "Balian", "Héribrand", "Gilbert", "Kontostephanos", "Walchelin", 
-      "Dandolo", "Galvani", "Kaykaus", "Briwere")
+      "Dandolo", "Galvani", "Kaykaus", "Briwere", "Bertrand", "Girard", "Berenguer", "Renaut", 
+      "Amalric")
 
   private val longerLastname = List("de Clisson", "de le Bourg", "de Saint-Gilles", "de Monteil", 
       "de Guader", "de Payens", "de Warenne", "de Beaumont", "de Provence", "de la Roche", 

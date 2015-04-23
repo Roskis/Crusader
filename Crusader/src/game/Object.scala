@@ -169,6 +169,8 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
         case p if (p == BUFF) => buff
         case p if (p == VISION) => vision
         case p if (p == LEVELUP) => levelUp
+        case p if (p == LEVELDOWN) => levelDown
+        case p if (p == TIMESTOP) => timeStop
         case _ => {println("prayer not found")}
       }
     }
@@ -179,7 +181,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   
   /** Modifier applied to prays */
   def prayChance = {
-    var chance:Double = 10
+    var chance:Double = 20
     chance += charity*2.5
     if (getX == getGrid.getAltar.getX && getY == getGrid.getAltar.getY && getLevel%5 == 0) chance += 40
     else if (getX == getGrid.getAltar.getX && getY == getGrid.getAltar.getY) chance += 20
