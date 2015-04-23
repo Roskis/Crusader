@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
 Main-Class: game.Launcher
-Class-Path: lib/lwjgl.jar lib/scala-library-2.11.3.jar lib/slick.jar
+Class-Path: lib/lwjgl.jar lib/scala-library-2.11.3.jar lib/slick.jar lib/scala-xml-2.11.0-M4.jar
 
