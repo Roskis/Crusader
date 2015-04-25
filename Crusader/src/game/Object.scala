@@ -124,7 +124,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   var charity: Int = 0
   var diligence: Int = 0
   
-  var slotWeapon: Equipment = new Equipment(-100, -100, ItemType.CLAYMORE, true)
+  var slotWeapon: Equipment = new Equipment(-100, -100, ItemType.KNIFE, true)
   var slotArmor: Equipment = new Equipment(-100, -100, ItemType.ROBES, true)
   var slotShield: Equipment = null
   var slotRing: Equipment = null
