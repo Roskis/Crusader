@@ -111,7 +111,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   var blockMovement = true
   var blockVision = false
   
-  var health: Double = 2000
+  var health: Double = 20
   var experience: Double = 0
   var gold: Double = 0
   var piety: Double = 0
