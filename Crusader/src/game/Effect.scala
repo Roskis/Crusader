@@ -194,7 +194,6 @@ object Prayers extends Enumeration {
   
   /** Lose a random skill */
   def levelDown = {
-    println("LVL")
     if (getPlayer.totalLevel <= 0) {}
     else {
       val list = List(getPlayer.getZeal, getPlayer.getHumility, getPlayer.getTemperance, getPlayer.getKindness, 

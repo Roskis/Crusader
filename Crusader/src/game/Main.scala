@@ -101,6 +101,10 @@ object Main {
     /** Gameloop */
     while (!Display.isCloseRequested) {
       gameState match {
+        case g if (g == GAME) => {
+          gameKeys
+          drawGame
+        }
         case g if (g == MAIN_MENU) => {
           menuKeys
           drawMainMenu
@@ -112,10 +116,6 @@ object Main {
         case g if (g == CREDITS) => {
           creditsKeys
           drawCredits
-        }
-        case g if (g == GAME) => {
-          gameKeys
-          drawGame
         }
         case g if (g == LEVEL) => {
           levelKeys

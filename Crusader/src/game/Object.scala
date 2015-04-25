@@ -111,7 +111,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   var blockMovement = true
   var blockVision = false
   
-  var health: Double = 20
+  var health: Double = 2000
   var experience: Double = 0
   var gold: Double = 0
   var piety: Double = 0
@@ -124,7 +124,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   var charity: Int = 0
   var diligence: Int = 0
   
-  var slotWeapon: Equipment = new Equipment(-100, -100, ItemType.KNIFE, true)
+  var slotWeapon: Equipment = new Equipment(-100, -100, ItemType.CLAYMORE, true)
   var slotArmor: Equipment = new Equipment(-100, -100, ItemType.ROBES, true)
   var slotShield: Equipment = null
   var slotRing: Equipment = null

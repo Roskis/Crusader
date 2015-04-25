@@ -56,9 +56,14 @@ object Output {
     glMatrixMode(GL_PROJECTION)
     glOrtho(0, getWidth, getHeight, 0, 1, -1)
     glMatrixMode(GL_MODELVIEW)
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
     
     drawQuadTex(background, (getWidth-background.getImageWidth)/2, 
         (getHeight-background.getImageHeight)/2, background.getImageWidth, background.getImageHeight)
+    drawQuadTex(loading, (getWidth-loading.getImageWidth)/2, (getHeight-loading.getImageHeight)/2, 
+        loading.getImageWidth, loading.getImageHeight)
     Display.update
     
     glEnable(GL_TEXTURE_2D)
@@ -67,8 +72,6 @@ object Output {
     glDisable(GL_LIGHTING)
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
     glClearDepth(1)
-    glEnable(GL_BLEND)
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     glViewport(0,0,getWidth,getHeight)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
     org.lwjgl.input.Keyboard.enableRepeatEvents(true)

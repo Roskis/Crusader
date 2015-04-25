@@ -65,7 +65,17 @@ class Tile(Xcoord: Int, Ycoord: Int, var tileType: TileType.Value) extends Seria
   def getObjectList = objectList
   
   /** Draw everything on this tile */
-  def drawObjects = if (explored) for (obj <- objectList) obj.draw
+  def drawObjects = {
+    if ((tileType == TileType.DJINNFLOOR || tileType == TileType.DJINNWALL) && explored && !visible) {
+      drawQuadTex(
+          (
+            if (getGrid.shopImageNumbers._2 == 1) DjinnWall1
+            else if (getGrid.shopImageNumbers._2 == 2) DjinnWall2
+            else DjinnWall3
+          ), x - (getPlayer.getX - 16) * 32, y - (getPlayer.getY - 8) * 32, image.getImageWidth, image.getImageHeight)
+    }
+    else if (explored) for (obj <- objectList) obj.draw
+  }
   
   /** Draw Tile */
   def draw = if (explored) drawQuadTex(image, x - (getPlayer.getX - 16) * 32, 
@@ -73,13 +83,8 @@ class Tile(Xcoord: Int, Ycoord: Int, var tileType: TileType.Value) extends Seria
   
   /** Draw Fog */
   def drawFog = {
-    if (!visible && explored)
-      drawQuadTex(if (tileType == TileType.DJINNFLOOR || tileType == TileType.DJINNWALL) (
-        if (getGrid.shopImageNumbers._2 == 1) DjinnWall1
-        else if (getGrid.shopImageNumbers._2 == 2) DjinnWall2
-        else DjinnWall3
-        ) 
-      else TileType.getFog, x - (getPlayer.getX - 16) * 32, y - (getPlayer.getY - 8) * 32, 
+    if (!visible && explored && tileType != TileType.DJINNFLOOR && tileType != TileType.DJINNWALL)
+      drawQuadTex(TileType.getFog, x - (getPlayer.getX - 16) * 32, y - (getPlayer.getY - 8) * 32, 
       image.getImageWidth, image.getImageHeight)
   }
   
