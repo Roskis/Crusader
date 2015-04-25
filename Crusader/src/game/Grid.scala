@@ -9,6 +9,7 @@ import Direction._
 import Main._
 import Helpers._
 import PassiveType._
+import MonsterType._
 
 /** Grid is reponsible for handling the map */
 class Grid() extends Serializable {
@@ -17,9 +18,9 @@ class Grid() extends Serializable {
   private var map = Array.ofDim[Tile](size, size)
   private var stairs: Tile = new Tile(-100, -100, TileType.STAIRS)
   private var altar: PassiveObject = null
-  private var djinn: PassiveObject = null
+  private var djinn: Monster = null
   var secretTile: Tile = null
-  val shopImageNumbers = (rnd.nextInt(3)+1, rnd.nextInt(3)+1, rnd.nextInt(3)+1) //first is shopkeeper, second is walls and third is floor
+  val shopImageNumbers = (rnd.nextInt(2)+1, rnd.nextInt(3)+1, rnd.nextInt(3)+1) //first is shopkeeper, second is walls and third is floor
   
   /** Different levels make different maps */
   def init() {
@@ -29,7 +30,8 @@ class Grid() extends Serializable {
       do {
         clearLists
         altar = new PassiveObject("Altar", " TODO ", -100, -100, ALTAR1)
-        djinn = new PassiveObject(djinnName, " TODO ", -100, -100, DJINN)
+        djinn = new Monster(-100, -100, DJINN)
+        djinn.name = djinnName
         makeMap1(45, 4, 4)
       }
       while (!mapIsContinuous)
@@ -38,14 +40,16 @@ class Grid() extends Serializable {
       size = 27
       map = Array.ofDim[Tile](size, size)
       altar = new PassiveObject("Altar", " TODO ", -100, -100, ALTAR2)
-      djinn = new PassiveObject("Djinn", " TODO ", -100, -100, DJINN)
+        djinn = new Monster(-100, -100, DJINN)
+        djinn.name = djinnName
       makeBoss1
     }
     else {
       size = 10
       map = Array.ofDim[Tile](size, size)
       altar = new PassiveObject("Altar", " TODO ", -100, -100, ALTAR1)
-      djinn = new PassiveObject("Djinn", " TODO ", -100, -100, DJINN)
+        djinn = new Monster(-100, -100, DJINN)
+        djinn.name = djinnName
       testMap
     }
   }

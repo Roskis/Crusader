@@ -170,7 +170,7 @@
         <name>sloth demon</name>
         <description>TODO</description>
         <maxHP>50</maxHP>
-        <damage>3,3,1</damage>
+        <damage>3,3,3</damage>
         <armor>2</armor>
         <accuracy>50</accuracy>
         <criticalChance>10</criticalChance>
@@ -179,5 +179,20 @@
         <gold>200</gold>
         <experience>200</experience>
         <piety>200</piety>
+    </monster>
+    <monster>
+        <MonsterType>DJINN</MonsterType>
+        <name>djinn</name>
+        <description>TODO</description>
+        <maxHP>50</maxHP>
+        <damage>2,3,3</damage>
+        <armor>0</armor>
+        <accuracy>90</accuracy>
+        <criticalChance>10</criticalChance>
+        <dodge>10</dodge>
+        <armorPierce>1</armorPierce>
+        <gold>0</gold>
+        <experience>50</experience>
+        <piety>0</piety>
     </monster>
 </root>

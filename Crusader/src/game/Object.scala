@@ -395,11 +395,11 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
     for (obj <- getGrid.getTile(getX, getY).getObjectList - this) {
       obj match {
         case item: Item => {
-          if(item.inShop && getPlayer.gold >= item.price) {
+          if(item.inShop && getPlayer.gold >= item.price && getGrid.getDjinn.mode == "passive") {
             addLog("SOLD!!!")
             item.buy
           }
-          else if (item.inShop) {
+          else if (item.inShop && getGrid.getDjinn.mode == "passive") {
             addLog("You don't have enought gold.")
           }
           else item.pickUp
@@ -424,7 +424,8 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
             attack(monster)
           }
           case item: Item => {
-            if (item.inShop) addLog(item.name.toUpperCase.head + item.name.tail + " is " + item.price + " gold.")
+            if (item.inShop && getGrid.getDjinn.mode == "passive") 
+              addLog(item.name.toUpperCase.head + item.name.tail + " is " + item.price + " gold.")
             else if (ItemType.slot(item.itemType) == "item" && slotUseable == null) item.pickUp
           }
           case _ => {}
@@ -472,18 +473,13 @@ class PassiveObject(objectName: String, objectDescription: String, startX: Int, 
 object PassiveType extends Enumeration with Serializable {
 
   type Passive = Value
-  val ALTAR1, ALTAR2, DJINN, BIGTREE1, TREE1, ROCK1, ROCK2 = Value
+  val ALTAR1, ALTAR2, BIGTREE1, TREE1, ROCK1, ROCK2 = Value
 
   /** returns texture of the given monster */
   def image(PassiveType: Passive): Texture = {
     PassiveType match {
       case t if (t == ALTAR1) => altar1
       case t if (t == ALTAR2) => altar2
-      case t if (t == DJINN) => {
-        if (getGrid.shopImageNumbers._1 == 1) djinn1
-        else if (getGrid.shopImageNumbers._1 == 2) djinn2
-        else djinn3
-      }
       case t if (t == BIGTREE1) => bigTree1
       case t if (t == TREE1) => tree1
       case t if (t == ROCK1) => rock1
@@ -569,7 +565,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     health -= effectiveDamage
     addLog(attacker.name.toUpperCase.head + attacker.name.tail + " deals " + 
         effectiveDamage.toInt.toString + " damage to " + name.toUpperCase.head + name.tail + ".")
-    mode = "aggressive"
+    if (mType != MonsterType.DJINN) mode = "aggressive"
     if (health <= 0) kill
   }
   
@@ -610,6 +606,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
         case m if (m == MonsterType.LIZARDC) => lizardMageAI
         case m if (m == MonsterType.SLOTH) => slothAI
         case m if (m == MonsterType.SPIDER) => spiderAI
+        case m if (m == MonsterType.DJINN) => djinnAI
         case _ => basicAI
       }
     }
@@ -709,6 +706,20 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     }
   }
   
+  /** AI for djinn's */
+  def djinnAI = {
+    if ((health == MonsterType.maxHP(mType) || health == spellchannel) && mode == "passive") {}
+    else if (!usedAbility) {
+      addLog("I warn you mortal! Do not try to fight me.")
+      usedAbility = true
+      spellchannel = health.toInt
+      }
+    else {
+      mode = "aggressive"
+      tryAttack
+    }
+  }
+  
   /** Simple ai for most of the monsters */
   def basicAI = {
     if (distance(getPlayer) > 7 && mode == "passive") {}
@@ -751,12 +762,19 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   /** Move the object to given direction */
   def move(direction: Direction.Value): Unit =  move(new Coordinate(
       getCoordinates(direction, getX, getY).getX, getCoordinates(direction, getX, getY).getY))
-  
+      
   /** Draw the object to the screen */
   override def draw = {
-    if (getGrid.getTile(getX, getY).visible && getGrid.getTile(getX, getY).explored) {
+    if (getGrid.getTile(getX, getY).visible && getGrid.getTile(getX, getY).explored && 
+        image.getImageWidth == 32 && image.getImageHeight == 32) {
       drawQuadTex(image, x - (getPlayer.getX - 16) * 32, 
           y - (getPlayer.getY - 8) * 32, image.getImageWidth, image.getImageHeight)
+    }
+    else if (getGrid.getTile(getX, getY).visible && getGrid.getTile(getX, getY).explored) {
+      drawQuadTex(image, x - (getPlayer.getX - 16) * 32 - 16, y - (getPlayer.getY - 8) * 32 - 32, 
+        image.getImageWidth, image.getImageHeight)
+    }
+    if (getGrid.getTile(getX, getY).visible && getGrid.getTile(getX, getY).explored) 
       for (extra <- extraToDraw) {
         if (extra.getImageHeight.toInt == 32 && extra.getImageWidth.toInt == 32) 
           drawQuadTex(extra, x - (getPlayer.getX - 16) * 32, y - (getPlayer.getY - 8) * 32, 
@@ -765,8 +783,8 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
           drawQuadTex(extra, x - (getPlayer.getX - 16) * 32 - 16, y - (getPlayer.getY - 7) * 32, 
               extra.getImageWidth, extra.getImageHeight)
       }
-    }
   }
+  
 }
 
 /** TODO */
@@ -774,7 +792,7 @@ object MonsterType extends Enumeration with Serializable {
 
   type Monster = Value
   val RAT, BAT, SNAKE, SPIDER, GOBLINA, GOBLINB, HOUND, LIZARDA, LIZARDB, LIZARDC, CROCODILE, 
-  SLOTH = Value
+  SLOTH, DJINN = Value
   
   private var rat: scala.xml.Node = null
   private var bat: scala.xml.Node = null
@@ -788,6 +806,7 @@ object MonsterType extends Enumeration with Serializable {
   private var lizardc: scala.xml.Node = null
   private var crocodile: scala.xml.Node = null
   private var sloth: scala.xml.Node = null
+  private var djinn: scala.xml.Node = null
   
   private val xml = XML.loadFile("data/monsters.xml")
   
@@ -804,6 +823,7 @@ object MonsterType extends Enumeration with Serializable {
     case o if ((o \ "MonsterType").text == "LIZARDC") => lizardc = o
     case o if ((o \ "MonsterType").text == "CROCODILE") => crocodile = o
     case o if ((o \ "MonsterType").text == "SLOTH") => sloth = o
+    case o if ((o \ "MonsterType").text == "DJINN") => djinn = o
     case _ => {}
   }
   
@@ -822,6 +842,7 @@ object MonsterType extends Enumeration with Serializable {
       case t if (t == LIZARDC) => lizardc
       case t if (t == CROCODILE) => crocodile
       case t if (t == SLOTH) => sloth
+      case t if (t == DJINN) => djinn
       case _ => null
     }
   }
@@ -862,6 +883,11 @@ object MonsterType extends Enumeration with Serializable {
       case t if (t == LIZARDC) => if (isPassive) lizardc2 else lizardc1
       case t if (t == CROCODILE) => if (isPassive) crocodile2 else crocodile1
       case t if (t == SLOTH) => if (isPassive) sloth2 else sloth1
+      case t if (t == DJINN) => {
+        if (isPassive && getGrid.shopImageNumbers._1 == 1) djinn1
+        else if (isPassive) djinn2
+        else djinn3
+      }
       case _ => missing
     }
   }
