@@ -51,8 +51,22 @@ object Main {
       displayModes = displayModes :+ mode
   displayModes = displayModes.sortWith(_.getBitsPerPixel > _.getBitsPerPixel)
   displayModes = displayModes :+ new DisplayMode(width, height)
-  private var displayModeSelector: Int = 0
-  private var fullscreen = false //getDisplayMode.isFullscreenCapable
+  
+  private var fullscreen = false
+  private val options = Source.fromFile("options.txt")
+  try {
+    for (row <- options.getLines.toVector) {
+      if (row.isEmpty || row.head == "#".head || row.head == "/".head) {}
+      else if (row.contains("=")) row match {
+        case r if (r.split("=")(0).trim.toLowerCase == "fullscreen") => {
+          val full = r.split("=")(1).trim.toLowerCase
+          if (full == "true" || full == "yes" || full == "1") fullscreen = true && getDisplayMode.isFullscreenCapable
+          else fullscreen = false
+        }
+        case _ => {}
+      }
+    }
+  } finally options.close
   
   var buttonContinue: Button = null
   var buttonNewGameMenu: Button = null
@@ -293,6 +307,20 @@ object Main {
       Keyboard.getEventKey match {
         case k if (Keyboard.isKeyDown(56) && k == Keyboard.KEY_RETURN && Keyboard.getEventKeyState) => {
           fullscreen = !fullscreen
+          
+          val options = Source.fromFile("options.txt")
+          var lines = Vector[String]()
+          try {
+            for (row <- options.getLines.toVector) {
+              if (row.contains("=") && row.split("=")(0).trim.toLowerCase == "fullscreen") 
+                lines = ("fullscreen=" + fullscreen.toString) +: lines
+              else lines = row +: lines
+            }
+          } finally options.close
+          val file = new PrintWriter("options.txt")
+          try for (row <- lines) file.println(row)
+          finally file.close
+          
           changeResolution
         }
         case k if (k == Keyboard.KEY_ESCAPE && Keyboard.getEventKeyState) => {
@@ -629,7 +657,7 @@ object Main {
   def getShopChances() = shopChances
   def getLastMonster() = lastMonster
   def getShopVisited() = shopVisited
-  def getDisplayMode() = displayModes(displayModeSelector)
+  def getDisplayMode() = displayModes(0)
   def getFullscreen() = fullscreen
   
 }
