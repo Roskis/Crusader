@@ -7,7 +7,7 @@
         <maxHP>2</maxHP>
         <damage>1,1,1</damage>
         <armor>0</armor>
-        <accuracy>100</accuracy>
+        <accuracy>90</accuracy>
         <criticalChance>0</criticalChance>
         <dodge>20</dodge>
         <armorPierce>0</armorPierce>
@@ -22,7 +22,7 @@
         <maxHP>2</maxHP>
         <damage>1,2,0</damage>
         <armor>0</armor>
-        <accuracy>95</accuracy>
+        <accuracy>85</accuracy>
         <criticalChance>2</criticalChance>
         <dodge>30</dodge>
         <armorPierce>0</armorPierce>
@@ -37,7 +37,7 @@
         <maxHP>5</maxHP>
         <damage>1,2,0</damage>
         <armor>0</armor>
-        <accuracy>90</accuracy>
+        <accuracy>80</accuracy>
         <criticalChance>4</criticalChance>
         <dodge>10</dodge>
         <armorPierce>0</armorPierce>
@@ -52,7 +52,7 @@
         <maxHP>5</maxHP>
         <damage>1,2,0</damage>
         <armor>0</armor>
-        <accuracy>90</accuracy>
+        <accuracy>80</accuracy>
         <criticalChance>2</criticalChance>
         <dodge>15</dodge>
         <armorPierce>0</armorPierce>
@@ -67,7 +67,7 @@
         <maxHP>15</maxHP>
         <damage>1,2,0</damage>
         <armor>1</armor>
-        <accuracy>85</accuracy>
+        <accuracy>75</accuracy>
         <criticalChance>4</criticalChance>
         <dodge>10</dodge>
         <armorPierce>0</armorPierce>
@@ -82,7 +82,7 @@
         <maxHP>15</maxHP>
         <damage>1,3,0</damage>
         <armor>1.5</armor>
-        <accuracy>85</accuracy>
+        <accuracy>75</accuracy>
         <criticalChance>5</criticalChance>
         <dodge>12</dodge>
         <armorPierce>1</armorPierce>
@@ -97,7 +97,7 @@
         <maxHP>10</maxHP>
         <damage>1,3,0</damage>
         <armor>0</armor>
-        <accuracy>90</accuracy>
+        <accuracy>80</accuracy>
         <criticalChance>6</criticalChance>
         <dodge>10</dodge>
         <armorPierce>0</armorPierce>
@@ -112,7 +112,7 @@
         <maxHP>15</maxHP>
         <damage>1,3,0</damage>
         <armor>2</armor>
-        <accuracy>90</accuracy>
+        <accuracy>80</accuracy>
         <criticalChance>5</criticalChance>
         <dodge>8</dodge>
         <armorPierce>2</armorPierce>
@@ -127,7 +127,7 @@
         <maxHP>15</maxHP>
         <damage>1,4,0</damage>
         <armor>1</armor>
-        <accuracy>85</accuracy>
+        <accuracy>75</accuracy>
         <criticalChance>5</criticalChance>
         <dodge>8</dodge>
         <armorPierce>1</armorPierce>
@@ -142,7 +142,7 @@
         <maxHP>15</maxHP>
         <damage>1,4,0</damage>
         <armor>0</armor>
-        <accuracy>75</accuracy>
+        <accuracy>65</accuracy>
         <criticalChance>5</criticalChance>
         <dodge>10</dodge>
         <armorPierce>0</armorPierce>
@@ -157,7 +157,7 @@
         <maxHP>20</maxHP>
         <damage>1,5,0</damage>
         <armor>2</armor>
-        <accuracy>80</accuracy>
+        <accuracy>70</accuracy>
         <criticalChance>2</criticalChance>
         <dodge>0</dodge>
         <armorPierce>2</armorPierce>

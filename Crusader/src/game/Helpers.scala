@@ -598,9 +598,12 @@ object Helpers {
   
   /** Simple way to roll multiple dice */
   def roll(amount: Int, number: Int): Int = {
-    var num: Int = 0
-    for (dice <- (0 until amount)) num += roll(number)
-    num
+    if (amount != 0 && number != 0) {
+      var num: Int = 0
+      for (dice <- (0 until amount)) num += roll(number)
+      num
+    }
+    else 0
   }
   
   /** Simple way to roll one dice */

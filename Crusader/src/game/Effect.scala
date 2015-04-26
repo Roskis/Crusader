@@ -2,6 +2,8 @@ package game
 
 import scala.collection.mutable.Buffer
 
+import scala.xml.XML
+
 import Main._
 import Helpers._
 import Direction._
@@ -33,7 +35,7 @@ object Prayers extends Enumeration {
   /** Player is fired with lightning bolt */
   def lightningBolt = {
     var toRemove = 0
-    if (getPlayer.health != 0) toRemove = rnd.nextInt(getPlayer.maxHealth)+1
+    if (getPlayer.health != 0) toRemove = rnd.nextInt(getPlayer.maxHealth.toInt)+1
     getPlayer.health -= toRemove
     addLog("You lost " + toRemove.toInt +  " health.")
   }
@@ -72,7 +74,7 @@ object Prayers extends Enumeration {
   def smite = {
     if (getLastMonster != null) {
       val mon = getLastMonster
-      val damage = roll(getPlayer.getZeal + 1, 3)
+      val damage = roll((getPlayer.getZeal + 1).toInt, 3)
       mon.health -= damage
       if (mon.health <= 0) mon.kill
       addLog(mon.name.toUpperCase.head + mon.name.tail + " takes " + damage.toInt +  " damage.")
@@ -81,14 +83,14 @@ object Prayers extends Enumeration {
   
   /** Give player some gold */
   def goldGain = {
-    val toAdd = roll(getPlayer.getDiligence, 10) + rnd.nextInt(10) + 1
+    val toAdd = roll(getPlayer.getDiligence.toInt, 10) + rnd.nextInt(10) + 1
     getPlayer.gold += toAdd
     addLog("You gain " + toAdd.toInt +  " gold.")
   }
   
   /** Give player some experience */
   def experienceGain = {
-    val toAdd = roll(getPlayer.getDiligence, (getPlayer.totalLevel/4).toInt) + rnd.nextInt(10) + 1
+    val toAdd = roll(getPlayer.getDiligence.toInt, (getPlayer.totalLevel/4).toInt) + rnd.nextInt(10) + 1
     getPlayer.experience += toAdd
     addLog("You gain " + toAdd.toInt + " experience.")
   }
@@ -118,7 +120,7 @@ object Prayers extends Enumeration {
     var monstersToDamage = Buffer[Monster]()
     for (monster <- getMonsterList) if (monster.distance(getPlayer) < 5) monstersToDamage.append(monster)
     for (monster <- monstersToDamage) {
-      monster.health -= roll(getPlayer.getZeal + 1, 3)
+      monster.health -= roll(getPlayer.getZeal.toInt + 1, 3)
       if (monster.health <= 0) monster.kill
     }
     addLog("Burning light surrounds you damaging nearby monsters.")
@@ -280,22 +282,268 @@ object Prayers extends Enumeration {
   
 }
 
+/** TODO */
+object EffectType extends Enumeration with Serializable {
+
+  type Effect = Value
+  val SMALLHEAL, POISON, BIND, FEAR, BLIND, IMMUNITY, BUFF, VISION, TIMESTOP, TEMPCHARITY, 
+  TEMPDILIGENCE, TEMPHUMILITY, TEMPKINDNESS, TEMPPATIENCE, TEMPTEMPERANCE, TEMPZEAL = Value
+
+  private var smallHeal: scala.xml.Node = null
+  private var poison: scala.xml.Node = null
+  private var bind: scala.xml.Node = null
+  private var fear: scala.xml.Node = null
+  private var blind: scala.xml.Node = null
+  private var immunity: scala.xml.Node = null
+  private var buff: scala.xml.Node = null
+  private var vision: scala.xml.Node = null
+  private var timestop: scala.xml.Node = null
+  private var tempCharity: scala.xml.Node = null
+  private var tempDiligence: scala.xml.Node = null
+  private var tempHumility: scala.xml.Node = null
+  private var tempKindness: scala.xml.Node = null
+  private var tempPatience: scala.xml.Node = null
+  private var tempTemperance: scala.xml.Node = null
+  private var tempZeal: scala.xml.Node = null
+  
+  private val xml = XML.loadFile("data/effects.xml")
+  
+  for (i <- xml.child) i match {
+    case o if ((o \ "EffectType").text == "SMALLHEAL") => smallHeal = o
+    case o if ((o \ "EffectType").text == "POISON") => poison = o
+    case o if ((o \ "EffectType").text == "BIND") => bind = o
+    case o if ((o \ "EffectType").text == "FEAR") => fear = o
+    case o if ((o \ "EffectType").text == "BLIND") => blind = o
+    case o if ((o \ "EffectType").text == "IMMUNITY") => immunity = o
+    case o if ((o \ "EffectType").text == "BUFF") => buff = o
+    case o if ((o \ "EffectType").text == "VISION") => vision = o
+    case o if ((o \ "EffectType").text == "TIMESTOP") => timestop = o
+    case o if ((o \ "EffectType").text == "TEMPCHARITY") => tempCharity = o
+    case o if ((o \ "EffectType").text == "TEMPDILIGENCE") => tempDiligence = o
+    case o if ((o \ "EffectType").text == "TEMPHUMILITY") => tempHumility = o
+    case o if ((o \ "EffectType").text == "TEMPKINDNESS") => tempKindness = o
+    case o if ((o \ "EffectType").text == "TEMPPATIENCE") => tempPatience = o
+    case o if ((o \ "EffectType").text == "TEMPTEMPERANCE") => tempTemperance = o
+    case o if ((o \ "EffectType").text == "TEMPZEAL") => tempZeal = o
+    case _ => {}
+  }
+  
+  def getXml(EffectType: Effect): scala.xml.Node = {
+    EffectType match {
+      case t if (t == SMALLHEAL) => smallHeal
+      case t if (t == POISON) => poison
+      case t if (t == BIND) => bind
+      case t if (t == FEAR) => fear
+      case t if (t == BLIND) => blind
+      case t if (t == IMMUNITY) => immunity
+      case t if (t == BUFF) => buff
+      case t if (t == VISION) => vision
+      case t if (t == TIMESTOP) => timestop
+      case t if (t == TEMPCHARITY) => tempCharity
+      case t if (t == TEMPDILIGENCE) => tempDiligence
+      case t if (t == TEMPHUMILITY) => tempHumility
+      case t if (t == TEMPKINDNESS) => tempKindness
+      case t if (t == TEMPPATIENCE) => tempPatience
+      case t if (t == TEMPTEMPERANCE) => tempTemperance
+      case t if (t == TEMPZEAL) => tempZeal
+      case _ => null
+    }
+  }
+  
+  def name(EffectType: Effect): String = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "name").text != "") 
+      (getXml(EffectType) \ "name").text
+    else "Unknown effect name"
+  }  
+  
+  def description(EffectType: Effect): String = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "description").text != "") 
+      (getXml(EffectType) \ "description").text
+    else "Unknown effect name"
+  }
+  
+  def armor(EffectType: Effect): Double = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "armor").text != "") 
+      (getXml(EffectType) \ "armor").text.toDouble
+    else 0.0
+  }
+  
+  def shieldArmor(EffectType: Effect): Double = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "shieldArmor").text != "") 
+      (getXml(EffectType) \ "shieldArmor").text.toDouble
+    else 0.0
+  }
+  
+  def weight(EffectType: Effect): Double = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "weight").text != "") 
+      (getXml(EffectType) \ "weight").text.toDouble
+    else 0
+  }
+  
+  def blockChance(EffectType: Effect): Double = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "blockChance").text != "") 
+      (getXml(EffectType) \ "blockChance").text.toDouble
+    else 0
+  }
+
+  def damage(EffectType: Effect): Tuple3[Int, Int, Int] = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "damage").text != "") {
+      val a = (getXml(EffectType) \ "damage").text.split(",")
+      (a(0).toInt, a(1).toInt, a(2).toInt)
+    }
+    else (0, 0, 0)
+  }
+  
+  def armorPiercing(EffectType: Effect): Double = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "armorPiercing").text != "") 
+      (getXml(EffectType) \ "armorPiercing").text.toDouble
+    else 0
+  }
+  
+  def accuracy(EffectType: Effect): Double = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "accuracy").text != "") 
+      (getXml(EffectType) \ "accuracy").text.toDouble
+    else 0
+  }
+  
+  def critChance(EffectType: Effect): Double = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "critChance").text != "") 
+      (getXml(EffectType) \ "critChance").text.toDouble
+    else 0
+  }
+  
+  def zeal(EffectType: Effect): Double = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "zeal").text != "") 
+      (getXml(EffectType) \ "zeal").text.toDouble
+    else 0.0
+  }
+  
+  def humility(EffectType: Effect): Double = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "humility").text != "") 
+      (getXml(EffectType) \ "humility").text.toDouble
+    else 0.0
+  }
+  
+  def temperance(EffectType: Effect): Double = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "temperance").text != "") 
+      (getXml(EffectType) \ "temperance").text.toDouble
+    else 0.0
+  }
+  
+  def kindness(EffectType: Effect): Double = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "kindness").text != "") 
+      (getXml(EffectType) \ "kindness").text.toDouble
+    else 0.0
+  }
+  
+  def patience(EffectType: Effect): Double = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "patience").text != "") 
+      (getXml(EffectType) \ "patience").text.toDouble
+    else 0.0
+  }
+  
+  def charity(EffectType: Effect): Double = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "charity").text != "") 
+      (getXml(EffectType) \ "charity").text.toDouble
+    else 0.0
+  }
+  
+  def diligence(EffectType: Effect): Double = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "diligence").text != "") 
+      (getXml(EffectType) \ "diligence").text.toDouble
+    else 0.0
+  }
+  
+  def health(EffectType: Effect): Double = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "health").text != "") 
+      (getXml(EffectType) \ "health").text.toDouble
+    else 0.0
+  }
+  
+  def viewRange(EffectType: Effect): Double = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "viewRange").text != "") 
+      (getXml(EffectType) \ "viewRange").text.toDouble
+    else 0.0
+  }
+  
+  def prayChance(EffectType: Effect): Double = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "prayChance").text != "") 
+      (getXml(EffectType) \ "prayChance").text.toDouble
+    else 0.0
+  }
+  
+  def xpModifier(EffectType: Effect): Double = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "xpModifier").text != "") 
+      (getXml(EffectType) \ "xpModifier").text.toDouble
+    else 1.0
+  }
+  
+  def goldModifier(EffectType: Effect): Double = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "goldModifier").text != "") 
+      (getXml(EffectType) \ "goldModifier").text.toDouble
+    else 1.0
+  }
+  
+  def pietyModifier(EffectType: Effect): Double = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "pietyModifier").text != "") 
+      (getXml(EffectType) \ "pietyModifier").text.toDouble
+    else 1.0
+  }
+  
+  def dodge(EffectType: Effect): Double = {
+    if (getXml(EffectType) != null && (getXml(EffectType) \ "dodge").text != "") 
+      (getXml(EffectType) \ "dodge").text.toDouble
+    else 0.0
+  }
+  
+}
+
 /** Temporary effects on characters */
 trait Effect extends Serializable {
-  val name: String
+  
+  val effectType: EffectType.Value
   val target: Character
   var duration: Int
   def caster: Character
-  def turn: Unit
+  def turn: Unit = {
+    duration -= 1
+    if (duration == 0) addLog("Effect of " + name + " has ended.")
+  }
+  
+  def name = EffectType.name(effectType)
+  def description = EffectType.description(effectType)
+  def armor = EffectType.armor(effectType)
+  def shieldArmor = EffectType.shieldArmor(effectType)
+  def weight: Double = EffectType.weight(effectType)
+  def blockChance: Double = EffectType.blockChance(effectType)
+  def armorPiercing: Double = EffectType.armorPiercing(effectType)
+  def accuracy: Double = EffectType.accuracy(effectType)
+  def critChance: Double = EffectType.critChance(effectType)
+  def zeal: Double = EffectType.zeal(effectType)
+  def humility: Double = EffectType.humility(effectType)
+  def temperance: Double = EffectType.temperance(effectType)
+  def kindness: Double = EffectType.kindness(effectType)
+  def patience: Double = EffectType.patience(effectType)
+  def charity: Double = EffectType.charity(effectType)
+  def diligence: Double = EffectType.diligence(effectType)
+  def health: Double = EffectType.health(effectType)
+  def viewRange: Double = EffectType.viewRange(effectType)
+  def prayChance: Double = EffectType.prayChance(effectType)
+  def xpModifier: Double = EffectType.xpModifier(effectType)
+  def goldModifier: Double = EffectType.goldModifier(effectType)
+  def pietyModifier: Double = EffectType.pietyModifier(effectType)
+  def dodge: Double = EffectType.dodge(effectType)
+  def damage: Double = roll(EffectType.damage(effectType)._1, EffectType.damage(effectType)._2) + EffectType.damage(effectType)._3
+  
 }
 
 /** Small heal heal over time */
 class smallHeal(dur: Int, tar: Character) extends Effect with Serializable {
-  val name = "healing salve"
+  val effectType = EffectType.SMALLHEAL
   val target = tar
   var duration = dur
   def caster = null
-  def turn {
+  override def turn {
     val toAdd = roll(2)
     target.health += toAdd
     target match {
@@ -311,11 +559,11 @@ class smallHeal(dur: Int, tar: Character) extends Effect with Serializable {
 
 /** Poison hurts over time */
 class poison(dur: Int, tar: Character, cas: Character) extends Effect with Serializable {
-  val name = "poison"
+  val effectType = EffectType.POISON
   val target = tar
   var duration = dur
   def caster = cas
-  def turn {
+  override def turn {
     val toRemove = roll(2)
     if (roll(3) == 1) {
       target.health -= toRemove
@@ -328,23 +576,19 @@ class poison(dur: Int, tar: Character, cas: Character) extends Effect with Seria
 
 /** Bind entangles its target */
 class bind(dur: Int, tar: Character, cas: Character) extends Effect with Serializable {
-  val name = "Bind"
+  val effectType = EffectType.BIND
   val target = tar
   var duration = dur
   def caster = cas
-  def turn {
-    duration -= 1
-    if (duration == 0) addLog("Effect of " + name + " has ended.")
-  }
 }
 
 /** Fear spell's effect */
 class fear(dur: Int, tar: Character, cas: Character) extends Effect with Serializable {
-  val name = "Fear"
+  val effectType = EffectType.FEAR
   val target = tar
   var duration = dur
   def caster = cas
-  def turn {
+  override def turn {
     tar.move(getCoordinates(getDirection(caster.getCoordinate, tar.getCoordinate), tar))
     duration -= 1
     if (duration == 0) addLog("Effect of " + name + " has ended.")
@@ -353,144 +597,96 @@ class fear(dur: Int, tar: Character, cas: Character) extends Effect with Seriali
 
 /** Miss spell's effect */
 class blind(dur: Int, tar: Character, cas: Character) extends Effect with Serializable {
-  val name = "Miss"
+  val effectType = EffectType.BLIND
   val target = tar
   var duration = dur
   def caster = cas
-  def turn {
-    duration -= 1
-    if (duration == 0) addLog("Effect of " + name + " has ended.")
-  }
 }
 
 /** Immunity from attacks */
 class immunity(dur: Int, tar: Character) extends Effect with Serializable {
-  val name = "Immunity"
+  val effectType = EffectType.IMMUNITY
   val target = tar
   var duration = dur
   def caster = null
-  def turn = {
-    duration -= 1
-    if (duration == 0) addLog("Effect of " + name + " has ended.")
-  }
 }
 
 /** General buff */
 class buff(dur: Int, tar: Character) extends Effect with Serializable {
-  val name = "General buff"
+  val effectType = EffectType.BUFF
   val target = tar
   var duration = dur
   def caster = null
-  def turn = {
-    duration -= 1
-    if (duration == 0) addLog("Effect of " + name + " has ended.")
-  }
 }
 
 /** Increased range of vision */
 class vision(dur: Int, tar: Character) extends Effect with Serializable {
-  val name = "Increased vision"
+  val effectType = EffectType.VISION
   val target = tar
   var duration = dur
   def caster = null
-  def turn = {
-    duration -= 1
-    if (duration == 0) addLog("Effect of " + name + " has ended.")
-  }
 }
 
 /** Timestop for player */
 class timestop(dur: Int, tar: Character) extends Effect with Serializable {
-  val name = "Timestop"
+  val effectType = EffectType.TIMESTOP
   val target = tar
   var duration = dur
   def caster = null
-  def turn = {
-    duration -= 1
-    if (duration == 0) addLog("Effect of " + name + " has ended.")
-  }
 }
 
 /** Temporary charity boost */
 class tempCharity(dur: Int, tar: Character) extends Effect with Serializable {
-  val name = "Charity boost"
+  val effectType = EffectType.TEMPCHARITY
   val target = tar
   var duration = dur
   def caster = null
-  def turn = {
-    duration -= 1
-    if (duration == 0) addLog("Effect of " + name + " has ended.")
-  }
 }
 
 /** Temporary diligene boost */
 class tempDiligence(dur: Int, tar: Character) extends Effect with Serializable {
-  val name = "Diligence boost"
+  val effectType = EffectType.TEMPDILIGENCE
   val target = tar
   var duration = dur
   def caster = null
-  def turn = {
-    duration -= 1
-    if (duration == 0) addLog("Effect of " + name + " has ended.")
-  }
 }
 
 /** Temporary humility boost */
 class tempHumility(dur: Int, tar: Character) extends Effect with Serializable {
-  val name = "Humility boost"
+  val effectType = EffectType.TEMPHUMILITY
   val target = tar
   var duration = dur
   def caster = null
-  def turn = {
-    duration -= 1
-    if (duration == 0) addLog("Effect of " + name + " has ended.")
-  }
 }
 
 /** Temporary kindness boost */
 class tempKindness(dur: Int, tar: Character) extends Effect with Serializable {
-  val name = "Kindness boost"
+  val effectType = EffectType.TEMPKINDNESS
   val target = tar
   var duration = dur
   def caster = null
-  def turn = {
-    duration -= 1
-    if (duration == 0) addLog("Effect of " + name + " has ended.")
-  }
 }
 
 /** Temporary patience boost */
 class tempPatience(dur: Int, tar: Character) extends Effect with Serializable {
-  val name = "Patience boost"
+  val effectType = EffectType.TEMPPATIENCE
   val target = tar
   var duration = dur
   def caster = null
-  def turn = {
-    duration -= 1
-    if (duration == 0) addLog("Effect of " + name + " has ended.")
-  }
 }
 
 /** Temporary temperance boost */
 class tempTemperance(dur: Int, tar: Character) extends Effect with Serializable {
-  val name = "Temperance boost"
+  val effectType = EffectType.TEMPTEMPERANCE
   val target = tar
   var duration = dur
   def caster = null
-  def turn = {
-    duration -= 1
-    if (duration == 0) addLog("Effect of " + name + " has ended.")
-  }
 }
 
 /** Temporary zeal boost */
 class tempZeal(dur: Int, tar: Character) extends Effect with Serializable {
-  val name = "Zeal boost"
+  val effectType = EffectType.TEMPZEAL
   val target = tar
   var duration = dur
   def caster = null
-  def turn = {
-    duration -= 1
-    if (duration == 0) addLog("Effect of " + name + " has ended.")
-  }
 }

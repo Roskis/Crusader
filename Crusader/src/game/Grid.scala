@@ -504,7 +504,7 @@ class Grid() extends Serializable {
   def FOVRay(x: Float, y: Float) {
     var ox: Float = getPlayer.getX.toFloat + 0.5f + x
     var oy: Float = getPlayer.getY.toFloat + 0.5f + y
-    for (i <- Range(0, getPlayer.viewRadius)) {
+    for (i <- Range(0, getPlayer.viewRadius.toInt)) {
       map(ox.toInt)(oy.toInt).visible = true
       map(ox.toInt)(oy.toInt).explored = true
       if (map(ox.toInt)(oy.toInt).blockVision) return

@@ -92,9 +92,9 @@ trait Character extends Object with Serializable {
   var piety: Double
   var effectList: Buffer[Effect]
   def armor: Double
-  def accuracy: Int
+  def accuracy: Double
   def ap: Double
-  def crit: Int
+  def crit: Double
   def move(coord: Coordinate): Unit
   
 }
@@ -116,13 +116,13 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   var gold: Double = 0
   var piety: Double = 0
   
-  var zeal: Int = 0
-  var humility: Int = 0
-  var temperance: Int = 0
-  var kindness: Int = 0
-  var patience: Int = 0
-  var charity: Int = 0
-  var diligence: Int = 0
+  var zeal: Double = 0
+  var humility: Double = 0
+  var temperance: Double = 0
+  var kindness: Double = 0
+  var patience: Double = 0
+  var charity: Double = 0
+  var diligence: Double = 0
   
   var slotWeapon: Equipment = new Equipment(-100, -100, ItemType.KNIFE, true)
   var slotArmor: Equipment = new Equipment(-100, -100, ItemType.ROBES, true)
@@ -132,52 +132,74 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   var slotUseable: Useable = null
   
   var effectList = Buffer[Effect]()
+  def itemList = {
+    var list = Buffer[Equipment]()
+    if (slotWeapon != null) list.append(slotWeapon)
+    if (slotArmor != null) list.append(slotArmor)
+    if (slotShield != null) list.append(slotShield)
+    if (slotRing != null) list.append(slotRing)
+    if (slotAmulet != null) list.append(slotAmulet)
+    list
+  }
   
-  def getZeal: Int = {
-    var bonus = 0
-    for (effect <- effectList) if (effect.isInstanceOf[tempZeal]) bonus += 1
-    zeal + bonus
+  def getZeal: Double = {
+    var num: Double = zeal
+    for (effect <- effectList) num += EffectType.zeal(effect.effectType)
+    for (item <- itemList) num += ItemType.zeal(item.itemType)
+    num
   }
-  def getHumility: Int = {
-    var bonus = 0
-    for (effect <- effectList) if (effect.isInstanceOf[tempHumility]) bonus += 1
-    humility + bonus
+  
+  def getHumility: Double = {
+    var num: Double = humility
+    for (effect <- effectList) num += EffectType.humility(effect.effectType)
+    for (item <- itemList) num += ItemType.humility(item.itemType)
+    num
   }
-  def getTemperance: Int = {
-    var bonus = 0
-    for (effect <- effectList) if (effect.isInstanceOf[tempTemperance]) bonus += 1
-    temperance + bonus
+  
+  def getTemperance: Double = {
+    var num: Double = temperance
+    for (effect <- effectList) num += EffectType.temperance(effect.effectType)
+    for (item <- itemList) num += ItemType.temperance(item.itemType)
+    num
   }
-  def getKindness: Int = {
-    var bonus = 0
-    for (effect <- effectList) if (effect.isInstanceOf[tempKindness]) bonus += 1
-    kindness + bonus
+  
+  def getKindness: Double = {
+    var num: Double = kindness
+    for (effect <- effectList) num += EffectType.kindness(effect.effectType)
+    for (item <- itemList) num += ItemType.kindness(item.itemType)
+    num
   }
-  def getPatience: Int = {
-    var bonus = 0
-    for (effect <- effectList) if (effect.isInstanceOf[tempPatience]) bonus += 1
-    patience + bonus
+  
+  def getPatience: Double = {
+    var num: Double = patience
+    for (effect <- effectList) num += EffectType.patience(effect.effectType)
+    for (item <- itemList) num += ItemType.patience(item.itemType)
+    num
   }
-  def getCharity: Int = {
-    var bonus = 0
-    for (effect <- effectList) if (effect.isInstanceOf[tempCharity]) bonus += 1
-    charity + bonus
+  
+  def getCharity: Double = {
+    var num: Double = charity
+    for (effect <- effectList) num += EffectType.charity(effect.effectType)
+    for (item <- itemList) num += ItemType.charity(item.itemType)
+    num
   }
-  def getDiligence: Int = {
-    var bonus = 0
-    for (effect <- effectList) if (effect.isInstanceOf[tempDiligence]) bonus += 1
-    diligence + bonus
+  
+  def getDiligence: Double = {
+    var num: Double = diligence
+    for (effect <- effectList) num += EffectType.diligence(effect.effectType)
+    for (item <- itemList) num += ItemType.diligence(item.itemType)
+    num
   }
   
   /** Amount of piety defines view range */
-  def viewRadius: Int = {
-    var radius = (piety/100).toInt
+  def viewRadius: Double = {
+    var radius = (piety/100)
     if (radius > 5) radius = 5
     else if (radius < - 2) radius = -2
     radius += 5
-    var visionBuff = false
-    for (effect <- effectList) if (effect.isInstanceOf[vision]) visionBuff = true
-    if (visionBuff) radius += 3
+    for (effect <- effectList) radius += EffectType.viewRange(effect.effectType)
+    for (item <- itemList) radius += ItemType.viewRange(item.itemType)
+    if (radius < 2) radius = 2
     radius
   }
   
@@ -217,29 +239,51 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   }
   
   /** Modifier applied to prays */
-  def prayChance = {
-    var chance:Double = 20
-    chance += getCharity*2.5
-    if (getX == getGrid.getAltar.getX && getY == getGrid.getAltar.getY && getLevel%5 == 0) chance += 40
-    else if (getX == getGrid.getAltar.getX && getY == getGrid.getAltar.getY) chance += 20
-    else if (getLevel%5 == 0) chance += 10
-    var isBuffed = false
-    for (effect <- effectList) if (effect.isInstanceOf[buff]) isBuffed = true
-    if (isBuffed) chance += 20
-    chance
+  def prayChance: Double = {
+    var num: Double = 20 + getCharity*2.5
+    for (effect <- effectList) num += EffectType.prayChance(effect.effectType)
+    for (item <- itemList) num += ItemType.prayChance(item.itemType)
+    if (getX == getGrid.getAltar.getX && getY == getGrid.getAltar.getY && getLevel%5 == 0) num += 40
+    else if (getX == getGrid.getAltar.getX && getY == getGrid.getAltar.getY) num += 20
+    else if (getLevel%5 == 0) num += 10
+    num
   }
   
   /** Modifier applied to all expirience gained */
-  def giveXP(amount: Double) = experience += amount * (1+0.1*getDiligence)
+  def giveXP(amount: Double) = {
+    var num: Double = 1
+    for (effect <- effectList) num *= EffectType.xpModifier(effect.effectType)
+    for (item <- itemList) num *= ItemType.xpModifier(item.itemType)
+    num
+    experience += amount * (1 + 0.1*getDiligence) * num
+  }
   
   /** Modifier applied to all gold gained */
-  def giveGold(amount: Double) = gold += amount * (1+0.1*getDiligence)
+  def giveGold(amount: Double) = {
+    var num: Double = 1
+    for (effect <- effectList) num *= EffectType.goldModifier(effect.effectType)
+    for (item <- itemList) num *= ItemType.goldModifier(item.itemType)
+    num
+    gold += amount * (1 + 0.1*getDiligence) * num
+  }
   
   /** Modifier applied to all piety gained */
-  def givePiety(amount: Double) = piety += amount * (1+0.1*getCharity)
+  def givePiety(amount: Double) = {
+    var num: Double = 1
+    for (effect <- effectList) num *= EffectType.pietyModifier(effect.effectType)
+    for (item <- itemList) num *= ItemType.pietyModifier(item.itemType)
+    num
+    piety += amount * (1 + 0.1*getCharity) * num
+  }
   
   /** Player's maximum health */
-  def maxHealth: Int = 20+8*getKindness
+  def maxHealth: Double = {
+    var num: Double = 0
+    for (effect <- effectList) num += EffectType.health(effect.effectType)
+    for (item <- itemList) num += ItemType.health(item.itemType)
+    num
+    20 + 8*getKindness + num
+  }
   
   /** Title of player */
   def title: String = {
@@ -261,124 +305,115 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   }
   
   /** Total level of player */
-  def totalLevel: Int = getZeal + getHumility + getTemperance + getKindness + getPatience + getCharity + getDiligence
+  def totalLevel: Double = getZeal + getHumility + getTemperance + getKindness + getPatience + getCharity + getDiligence
   
   /** Return smallest level xp requirement */
-  def smallestLevel(): Int = {
-    var skills = List(getZeal, getHumility, getTemperance, getKindness, getPatience, getCharity, getDiligence)
+  def smallestLevel(): Double = {
+    var skills = List(zeal, humility, temperance, kindness, patience, charity, diligence)
     skills = skills.sortWith(_ < _)
-    xpNeededForLevel(skills(0))
+    xpNeededForLevel(skills(0).toInt)
   }
   
   /** Method to deal damage to monsters */
   def attack(target: Monster) {
-    if (rnd.nextInt(100) <= accuracy - target.dodge) {
-      target.takeDamage(damage(rnd.nextInt(100) <= crit), ap, this)
-    }
-    else target.takeDamage(smallestDamage, ap, this)
+    if (rnd.nextInt(100) >= accuracy) addLog(name.toUpperCase.head + name.tail + " misses.")
+    else if (rnd.nextInt(100) <= target.dodge) addLog(target.name.toUpperCase.head + target.name.tail + " dodges.")
+    else target.takeDamage(damage(rnd.nextInt(100) <= crit), ap, this)
   }
   
   /** Damage is based on player's weapon */
-  def damage(crit: Boolean): Int = {
-    var weapondmg = 0
-    if (slotWeapon != null) weapondmg = roll(slotWeapon.damage._1, slotWeapon.damage._2) + slotWeapon.damage._3
-    else weapondmg = roll(2)
-    var isBuffed = false
-    for (effect <- effectList) if (effect.isInstanceOf[buff]) isBuffed = true
-    if (isBuffed) weapondmg += roll(3)
-    if (crit) weapondmg += (getZeal+2) + roll(getZeal+2)
-    else weapondmg += roll(getZeal+2)
-    weapondmg
-  }
-  
-  /** Return small damage */
-  def smallestDamage: Int = {
-    var num = 0
-    val zealroll = roll(getZeal+2)
-    var weaponroll = 0
-    if (slotWeapon != null) weaponroll = roll(slotWeapon.damage._1, slotWeapon.damage._2) + slotWeapon.damage._3
-    else weaponroll = roll(2)
-    if (rnd.nextInt(4) != 0) if (zealroll < weaponroll) num = zealroll else num = weaponroll
+  def damage(crit: Boolean): Double = {
+    var num: Double = 0
+    for (effect <- effectList) num += effect.damage
+    if (slotWeapon != null) for (item <- itemList) num += item.damage
+    else {
+      num += roll(2)
+      for (item <- itemList) num += item.damage
+    }
+    if (crit) num += (getZeal+2) + roll((getZeal+2).toInt)
+    else num += roll((getZeal+2).toInt)
     num
   }
   
-  def takeDamage(damage: Int, armorPierce: Double, attacker: Object) = {
-    var isImmune = false
-    for (effect <- effectList) if (effect.isInstanceOf[immunity]) isImmune = true
-    var effectiveArmor = armor
+  def takeDamage(damage: Double, armorPierce: Double, attacker: Object) = {
+    var effectiveArmor: Double = armor
     if (rnd.nextInt(100) <= blockChance) effectiveArmor += shieldArmor
+    effectiveArmor -= armorPierce
     if (effectiveArmor < 0) effectiveArmor = 0
     var effectiveDamage = (damage - effectiveArmor)
     if (effectiveDamage < 0) effectiveDamage = 0
-    if (!isImmune) {
-      health -= effectiveDamage
-      addLog(attacker.name.toUpperCase.head + attacker.name.tail + " deals " + 
-          effectiveDamage.toInt.toString + " damage to " + name + ".")
-    }
-    else {
-      addLog(name.toUpperCase.head + name.tail + " is immune to attacks.")
-    }
+    health -= effectiveDamage
+    addLog(attacker.name.toUpperCase.head + attacker.name.tail + " deals " + 
+        effectiveDamage.toInt.toString + " damage to " + name + ".")
   }
   
   def armor: Double = {
-    val patienceBonus: Double = {
+    var num: Double = {
       if (getPatience > 7) 2
       else if (getPatience > 5) 1.5
       else if (getPatience > 3) 1
       else if (getPatience > 1) 0.5
       else 0
     }
-    var isBuffed = false
-    for (effect <- effectList) if (effect.isInstanceOf[buff]) isBuffed = true
-    if (slotArmor != null) {
-      if (isBuffed) slotArmor.armor + patienceBonus + 1
-      else slotArmor.armor + patienceBonus
-    }
-    else {
-      if (isBuffed) patienceBonus + 1
-      else patienceBonus
-    }
+    for (effect <- effectList) num += EffectType.armor(effect.effectType)
+    for (item <- itemList) num += ItemType.armor(item.itemType)
+    num
   }
   
   /** Armor poercing of weapon used */
-  def ap: Double = if (slotWeapon != null) slotWeapon.armorPiercing else 0
+  def ap: Double = {
+    var num: Double = 0
+    for (effect <- effectList) num += EffectType.armorPiercing(effect.effectType)
+    for (item <- itemList) num += ItemType.armorPiercing(item.itemType)
+    num
+  }
   
   /** Critical chance of weapon used */
-  def crit: Int = if (slotWeapon != null) slotWeapon.critChance else 2
+  def crit: Double = {
+    var num: Double = 2
+    for (effect <- effectList) num += EffectType.critChance(effect.effectType)
+    for (item <- itemList) num += ItemType.critChance(item.itemType)
+    num
+  }
   
   /** Block chance of shield used */
-  def blockChance: Int = if (slotShield != null) slotShield.blockChance else 0
+  def blockChance: Double = {
+    var num: Double = 0
+    for (effect <- effectList) num += EffectType.blockChance(effect.effectType)
+    for (item <- itemList) num += ItemType.blockChance(item.itemType)
+    num
+  }
   
   /** Shield Armor */
-  def shieldArmor: Double = if (slotShield != null) slotShield.shieldArmor else 0
+  def shieldArmor: Double = {
+    var num: Double = 0
+    for (effect <- effectList) num += EffectType.shieldArmor(effect.effectType)
+    for (item <- itemList) num += ItemType.shieldArmor(item.itemType)
+    num
+  }
   
   /** Total weight of items after patience bonus */
-  def totalWeight: Int = {
-    var num: Int = 0
-    if (slotWeapon != null) num += slotWeapon.weight
-    if (slotArmor != null) num += slotArmor.weight
-    if (slotShield != null) num += slotShield.weight
-    if (slotRing != null) num += slotRing.weight
-    if (slotAmulet != null) num += slotAmulet.weight
-    if (slotUseable != null) num += slotUseable.weight
+  def totalWeight: Double = {
+    var num: Double = 0
+    for (effect <- effectList) num += EffectType.weight(effect.effectType)
+    for (item <- itemList) num += ItemType.weight(item.itemType)
     ((1 - (0.05*getPatience)).toInt * num)
   }
   
   /** Return dodge of player */
-  def dodge: Int = {
-    var isBuffed = false
-    for (effect <- effectList) if (effect.isInstanceOf[buff]) isBuffed = true
-    if (isBuffed) (getHumility+2)*2 - totalWeight
-    else getHumility*2 - totalWeight
+  def dodge: Double = {
+    var num: Double = getHumility*2 - totalWeight
+    for (effect <- effectList) num += EffectType.dodge(effect.effectType)
+    for (item <- itemList) num += ItemType.dodge(item.itemType)
+    num
   }
   
   /** Return accuracy of player */
-  def accuracy: Int = {
-    var blinded = false
-    for (effect <- effectList) if (effect.isInstanceOf[blind]) blinded = true
-    if (slotWeapon != null && !blinded) slotWeapon.accuracy + getTemperance*2
-    else if (blinded) 10 + getTemperance*2
-    else 100 + getTemperance*2
+  def accuracy: Double = {
+    var num: Double = if (slotWeapon != null) 0 + getTemperance*2 else 100 + getTemperance*2
+    for (effect <- effectList) num += EffectType.accuracy(effect.effectType)
+    for (item <- itemList) num += ItemType.accuracy(item.itemType)
+    num
   }
   
   /** Move to given coordinates or go to next map */
@@ -510,9 +545,9 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   var experience = MonsterType.experience(mType).toDouble
   var gold = MonsterType.gold(mType).toDouble
   var piety = MonsterType.piety(mType).toDouble
-  var dodge = MonsterType.dodge(mType)
-  var blockChance = 0
-  var shieldArmor = 0
+  var dodge: Double = MonsterType.dodge(mType)
+  var blockChance: Double = 0
+  var shieldArmor: Double = 0
   var usedAbility = false
   var effectList = Buffer[Effect]()
   var spellcd = 1
@@ -523,11 +558,10 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   getMonsterList.append(this)
   
   /** Accuracy of the monster */
-  def accuracy = {
-    var blinded = false
-    for (effect <- effectList) if (effect.isInstanceOf[blind]) blinded = true
-    if (!blinded) MonsterType.accuracy(mType)
-    else 10
+  def accuracy: Double = {
+    var acc = MonsterType.accuracy(mType)
+    for (effect <- effectList) acc+= EffectType.accuracy(effect.effectType)
+    acc
   }
   
   /** When monster dies this method is called */
@@ -555,10 +589,12 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   }
   
   /** Takes damage from attack */
-  def takeDamage(damage: Int, armorPierce: Double, attacker: Object) = {
+  def takeDamage(damage: Double, armorPierce: Double, attacker: Object) = {
     updateLastMonster(this)
-    var effectiveArmor = armor
+    var effectiveArmor: Double = armor
+    for (effect <- effectList) effectiveArmor+= EffectType.armor(effect.effectType)
     if (rnd.nextInt(100) <= blockChance) effectiveArmor += shieldArmor
+    effectiveArmor -= armorPierce
     if (effectiveArmor < 0) effectiveArmor = 0
     var effectiveDamage = (damage - effectiveArmor)
     if (effectiveDamage < 0) effectiveDamage = 0
@@ -571,23 +607,18 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   
   /** Method to deal damage to player */
   def attack(target: Player) {
-    if (rnd.nextInt(100) <= accuracy - target.dodge) {
-      target.takeDamage(damageroll(rnd.nextInt(100) <= crit), ap, this)
-    }
-    else target.takeDamage(smallDamage, ap, this)
+    if (rnd.nextInt(100) >= accuracy) addLog(name.toUpperCase.head + name.tail + " misses.")
+    else if (rnd.nextInt(100) <= target.dodge) addLog(target.name.toUpperCase.head + target.name.tail + " dodges.")
+    else target.takeDamage(damageroll(rnd.nextInt(100) <= crit), ap, this)
   }
   
   /** Damage is based on player's weapon */
-  def damageroll(crit: Boolean): Int = {
-    val dmg = roll(damage._1, damage._2) + damage._3
+  def damageroll(crit: Boolean): Double = {
+    var dmg: Double = 0
+    for (effect <- effectList) dmg += effect.damage
+    dmg += damage
     if (crit) dmg + dmg
     else dmg
-  }
-  
-  /** Return small damage */
-  def smallDamage: Int = {
-    val dmg = roll(damage._1, damage._2) + damage._3
-    if (rnd.nextInt(4) != 0) (dmg/2).toInt else 0
   }
   
   /** Monster's turn depends on it's ai */
@@ -893,9 +924,9 @@ object MonsterType extends Enumeration with Serializable {
   }
   
   /** returns max health of the given monster */
-  def maxHP(MonsterType: Monster): Int = {
+  def maxHP(MonsterType: Monster): Double = {
     if (getXml(MonsterType) != null) (getXml(MonsterType) \ "maxHP").text.toInt
-    else 0
+    else 0.0
   }
   
   /** returns damage of the given monster 
@@ -903,12 +934,12 @@ object MonsterType extends Enumeration with Serializable {
    * Tuple3 includes number of dices, their number of eyes and additional flat bonus 
    * (num of dices, eyes, flat). Examples 2d3+5 = (2, 3, 5) and 1d4 = (1, 4, 0).
    *  */
-  def damage(MonsterType: Monster): Tuple3[Int, Int, Int] = {
+  def damage(MonsterType: Monster): Double = {
     if (getXml(MonsterType) != null) {
       val a = (getXml(MonsterType) \ "damage").text.split(",")
-      (a(0).toInt, a(1).toInt, a(2).toInt)
+      roll(a(0).toInt, a(1).toInt) + a(2).toInt
     }
-    else (1, 1, 0)
+    else 0.0
   }
   
   /** returns armor of the given monster */
@@ -918,45 +949,45 @@ object MonsterType extends Enumeration with Serializable {
   }
   
   /** returns accuracy of the given monster */
-  def accuracy(MonsterType: Monster): Int = {
+  def accuracy(MonsterType: Monster): Double = {
     if (getXml(MonsterType) != null) (getXml(MonsterType) \ "accuracy").text.toInt
-    else 0
+    else 0.0
   }
   
   /** returns critical chance of the given monster */
-  def criticalChance(MonsterType: Monster): Int = {
+  def criticalChance(MonsterType: Monster): Double = {
     if (getXml(MonsterType) != null) (getXml(MonsterType) \ "criticalChance").text.toInt
-    else 0
+    else 0.0
   }
   
   /** returns dodge chance of the given monster */
-  def dodge(MonsterType: Monster): Int = {
+  def dodge(MonsterType: Monster): Double = {
     if (getXml(MonsterType) != null) (getXml(MonsterType) \ "dodge").text.toInt
     else 0
   }
   
   /** returns armor pierce of the given monster */
-  def armorPierce(MonsterType: Monster): Int = {
+  def armorPierce(MonsterType: Monster): Double = {
     if (getXml(MonsterType) != null) (getXml(MonsterType) \ "armorPierce").text.toInt
-    else 0
+    else 0.0
   }
   
   /** returns gold of the given monster */
-  def gold(MonsterType: Monster): Int = {
+  def gold(MonsterType: Monster): Double = {
     if (getXml(MonsterType) != null) (getXml(MonsterType) \ "gold").text.toInt
-    else 0
+    else 0.0
   }
   
   /** returns experience of the given monster */
-  def experience(MonsterType: Monster): Int = {
+  def experience(MonsterType: Monster): Double = {
     if (getXml(MonsterType) != null) (getXml(MonsterType) \ "experience").text.toInt
-    else 0
+    else 0.0
   }
   
   /** returns piety of the given monster */
-  def piety(MonsterType: Monster): Int = {
+  def piety(MonsterType: Monster): Double = {
     if (getXml(MonsterType) != null) (getXml(MonsterType) \ "piety").text.toInt
-    else 0
+    else 0.0
   }
   
   /** monsters might give item drops when dying */
@@ -984,11 +1015,34 @@ object MonsterType extends Enumeration with Serializable {
 /** All of the game's items will be under this trait */
 trait Item extends Object with Serializable {
   
-  var price: Int
   var inShop: Boolean
   var equipped: Boolean
   val itemType: ItemType.Value
-  val weight: Int
+  def image = ItemType.imageGround(itemType)
+  def imageEquipped = ItemType.imageEquipped(itemType)
+  def price: Double = ItemType.price(itemType)
+  def armor = ItemType.armor(itemType)
+  def shieldArmor = ItemType.shieldArmor(itemType)
+  def weight: Double = ItemType.weight(itemType)
+  def blockChance: Double = ItemType.blockChance(itemType)
+  def armorPiercing: Double = ItemType.armorPiercing(itemType)
+  def accuracy: Double = ItemType.accuracy(itemType)
+  def critChance: Double = ItemType.critChance(itemType)
+  def zeal: Double = ItemType.zeal(itemType)
+  def humility: Double = ItemType.humility(itemType)
+  def temperance: Double = ItemType.temperance(itemType)
+  def kindness: Double = ItemType.kindness(itemType)
+  def patience: Double = ItemType.patience(itemType)
+  def charity: Double = ItemType.charity(itemType)
+  def diligence: Double = ItemType.diligence(itemType)
+  def health: Double = ItemType.health(itemType)
+  def viewRange: Double = ItemType.viewRange(itemType)
+  def prayChance: Double = ItemType.prayChance(itemType)
+  def xpModifier: Double = ItemType.xpModifier(itemType)
+  def goldModifier: Double = ItemType.goldModifier(itemType)
+  def pietyModifier: Double = ItemType.pietyModifier(itemType)
+  def dodge: Double = ItemType.dodge(itemType)
+  def damage: Double
   
   def buy = {
     getPlayer.gold -= price
@@ -996,7 +1050,6 @@ trait Item extends Object with Serializable {
     pickUp
   }
   
-  def imageEquipped: Texture
   def unequip: Unit
   def use: Unit
   
@@ -1060,21 +1113,12 @@ class Equipment(startX: Int, startY: Int, equipmentType: ItemType.Value, isEquip
   var description = ItemType.description(itemType)
   var x = startX * 32
   var y = startY * 32
-  def image = ItemType.imageGround(itemType)
-  def imageEquipped = ItemType.imageEquipped(itemType)
   var blockMovement = false
   var blockVision = false
-  var price = ItemType.price(itemType)
-  var inShop = false
-  val armor = ItemType.armor(itemType)
-  val shieldArmor = ItemType.shieldArmor(itemType)
-  val weight = ItemType.weight(itemType)
-  val blockChance = ItemType.blockChance(itemType)
-  val damage = ItemType.damage(itemType)
-  val armorPiercing = ItemType.armorPiercing(itemType)
-  val accuracy = ItemType.accuracy(itemType)
-  val critChance = ItemType.critChance(itemType)
   var equipped: Boolean = isEquipped
+  var inShop = false
+  
+  def damage: Double = roll(ItemType.damage(itemType)._1, ItemType.damage(itemType)._2) + ItemType.damage(itemType)._3
   
   if (!equipped) {
     init
@@ -1372,15 +1416,16 @@ object ItemType extends Enumeration with Serializable {
   }
   
   /** returns weight of the given equipment */
-  def weight(ItemType: Item): Int = {
-    if (getXml(ItemType) != null) (getXml(ItemType) \ "weight").text.toInt
+  def weight(ItemType: Item): Double = {
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "weight").text != "") 
+      (getXml(ItemType) \ "weight").text.toDouble
     else 0
   }
   
   /** returns block chance of the given equipment */
-  def blockChance(ItemType: Item): Int = {
+  def blockChance(ItemType: Item): Double = {
     if (getXml(ItemType) != null && (getXml(ItemType) \ "blockChance").text != "") 
-      (getXml(ItemType) \ "blockChance").text.toInt
+      (getXml(ItemType) \ "blockChance").text.toDouble
     else 0
   }
   
@@ -1394,34 +1439,34 @@ object ItemType extends Enumeration with Serializable {
       val a = (getXml(ItemType) \ "damage").text.split(",")
       (a(0).toInt, a(1).toInt, a(2).toInt)
     }
-    else (1, 1, 0)
+    else (0, 0, 0)
   }
   
   /** returns armor piercing of the given equipment */
-  def armorPiercing(ItemType: Item): Int = {
+  def armorPiercing(ItemType: Item): Double = {
     if (getXml(ItemType) != null && (getXml(ItemType) \ "armorPiercing").text != "") 
-      (getXml(ItemType) \ "armorPiercing").text.toInt
+      (getXml(ItemType) \ "armorPiercing").text.toDouble
     else 0
   }
   
   /** returns accuracy of the given equipment */
-  def accuracy(ItemType: Item): Int = {
+  def accuracy(ItemType: Item): Double = {
     if (getXml(ItemType) != null && (getXml(ItemType) \ "accuracy").text != "") 
-      (getXml(ItemType) \ "accuracy").text.toInt
+      (getXml(ItemType) \ "accuracy").text.toDouble
     else 0
   }
   
   /** returns critical chance of the given equipment */
-  def critChance(ItemType: Item): Int = {
+  def critChance(ItemType: Item): Double = {
     if (getXml(ItemType) != null && (getXml(ItemType) \ "critChance").text != "") 
-      (getXml(ItemType) \ "critChance").text.toInt
+      (getXml(ItemType) \ "critChance").text.toDouble
     else 0
   }
   
   /** returns price of the given equipment */
-  def price(ItemType: Item): Int = {
+  def price(ItemType: Item): Double = {
     if (getXml(ItemType) != null && (getXml(ItemType) \ "price").text != "") 
-      (getXml(ItemType) \ "price").text.toInt
+      (getXml(ItemType) \ "price").text.toDouble
     else 0
   }
   
@@ -1439,24 +1484,106 @@ object ItemType extends Enumeration with Serializable {
     else "Unknown item description"
   }
   
+  
+  def zeal(ItemType: Item): Double = {
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "zeal").text != "") 
+      (getXml(ItemType) \ "zeal").text.toDouble
+    else 0.0
+  }
+  
+  def humility(ItemType: Item): Double = {
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "humility").text != "") 
+      (getXml(ItemType) \ "humility").text.toDouble
+    else 0.0
+  }
+  
+  def temperance(ItemType: Item): Double = {
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "temperance").text != "") 
+      (getXml(ItemType) \ "temperance").text.toDouble
+    else 0.0
+  }
+  
+  def kindness(ItemType: Item): Double = {
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "kindness").text != "") 
+      (getXml(ItemType) \ "kindness").text.toDouble
+    else 0.0
+  }
+  
+  def patience(ItemType: Item): Double = {
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "patience").text != "") 
+      (getXml(ItemType) \ "patience").text.toDouble
+    else 0.0
+  }
+  
+  def charity(ItemType: Item): Double = {
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "charity").text != "") 
+      (getXml(ItemType) \ "charity").text.toDouble
+    else 0.0
+  }
+  
+  def diligence(ItemType: Item): Double = {
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "diligence").text != "") 
+      (getXml(ItemType) \ "diligence").text.toDouble
+    else 0.0
+  }
+  
+  def health(ItemType: Item): Double = {
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "health").text != "") 
+      (getXml(ItemType) \ "health").text.toDouble
+    else 0.0
+  }
+  
+  def viewRange(ItemType: Item): Double = {
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "viewRange").text != "") 
+      (getXml(ItemType) \ "viewRange").text.toDouble
+    else 0.0
+  }
+  
+  def prayChance(ItemType: Item): Double = {
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "prayChance").text != "") 
+      (getXml(ItemType) \ "prayChance").text.toDouble
+    else 0.0
+  }
+  
+  def xpModifier(ItemType: Item): Double = {
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "xpModifier").text != "") 
+      (getXml(ItemType) \ "xpModifier").text.toDouble
+    else 1.0
+  }
+  
+  def goldModifier(ItemType: Item): Double = {
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "goldModifier").text != "") 
+      (getXml(ItemType) \ "goldModifier").text.toDouble
+    else 1.0
+  }
+  
+  def pietyModifier(ItemType: Item): Double = {
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "pietyModifier").text != "") 
+      (getXml(ItemType) \ "pietyModifier").text.toDouble
+    else 1.0
+  }
+  
+  def dodge(ItemType: Item): Double = {
+    if (getXml(ItemType) != null && (getXml(ItemType) \ "dodge").text != "") 
+      (getXml(ItemType) \ "dodge").text.toDouble
+    else 0.0
+  }
+  
 }
 
 /** Player usable consumables */
 class Useable(startX: Int, startY: Int, val itemType: ItemType.Value, isEquipped: Boolean) extends Item with Serializable {
 
   val rnd = getRnd
-  val weight = ItemType.weight(itemType)
   var name = ItemType.name(itemType)
   var description = ItemType.description(itemType)
   var x = startX * 32
   var y = startY * 32
-  def image = ItemType.imageGround(itemType)
-  def imageEquipped = ItemType.imageEquipped(itemType)
   var blockMovement = false
   var blockVision = false
-  var price = ItemType.price(itemType)
   var inShop = false
   var equipped = isEquipped
+  def damage: Double = roll(ItemType.damage(itemType)._1, ItemType.damage(itemType)._2) + ItemType.damage(itemType)._3
   
   if (!equipped) {
     init

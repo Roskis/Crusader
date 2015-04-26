@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <effect>
+        <EffectType>SMALLHEAL</EffectType>
+        <name>minor heal effect</name>
+        <description>TODO</description>
+    </effect>
+    <effect>
+        <EffectType>POISON</EffectType>
+        <name>poison</name>
+        <description>TODO</description>
+    </effect>
+    <effect>
+        <EffectType>BIND</EffectType>
+        <name>bind</name>
+        <description>TODO</description>
+        <dodge>-50</dodge>
+    </effect>
+    <effect>
+        <EffectType>FEAR</EffectType>
+        <name>fear</name>
+        <description>TODO</description>
+    </effect>
+    <effect>
+        <EffectType>BLIND</EffectType>
+        <name>blind</name>
+        <description>TODO</description>
+        <accuracy>-50</accuracy>
+    </effect>
+    <effect>
+        <EffectType>IMMUNITY</EffectType>
+        <name>immunity</name>
+        <description>TODO</description>
+        <armor>100</armor>
+    </effect>
+    <effect>
+        <EffectType>BUFF</EffectType>
+        <name>general buff</name>
+        <description>TODO</description>
+        <armor>1</armor>
+        <dodge>5</dodge>
+        <prayChance>20</prayChance>
+        <damage>1,3,0</damage>
+    </effect>
+    <effect>
+        <EffectType>VISION</EffectType>
+        <name>increased vision</name>
+        <description>TODO</description>
+        <viewRange>3</viewRange>
+    </effect>
+    <effect>
+        <EffectType>TIMESTOP</EffectType>
+        <name>timestop</name>
+        <description>TODO</description>
+    </effect>
+    <effect>
+        <EffectType>TEMPCHARITY</EffectType>
+        <name>charity boost</name>
+        <description>TODO</description>
+        <charity>1</charity>
+    </effect>
+    <effect>
+        <EffectType>TEMPDILIGENCE</EffectType>
+        <name>diligence boost</name>
+        <description>TODO</description>
+        <diligence>1</diligence>
+    </effect>
+    <effect>
+        <EffectType>TEMPHUMILITY</EffectType>
+        <name>humility boost</name>
+        <description>TODO</description>
+        <humility>1</humility>
+    </effect>
+    <effect>
+        <EffectType>TEMPKINDNESS</EffectType>
+        <name>kindness boost</name>
+        <description>TODO</description>
+        <kindness>1</kindness>
+    </effect>
+    <effect>
+        <EffectType>TEMPPATIENCE</EffectType>
+        <name>patience boost</name>
+        <description>TODO</description>
+        <patience>1</patience>
+    </effect>
+    <effect>
+        <EffectType>TEMPTEMPERANCE</EffectType>
+        <name>temperance boost</name>
+        <description>TODO</description>
+        <temperance>1</temperance>
+    </effect>
+    <effect>
+        <EffectType>TEMPZEAL</EffectType>
+        <name>zeal boost</name>
+        <description>TODO</description>
+        <zeal>1</zeal>
+    </effect>
+</root>

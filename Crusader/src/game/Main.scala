@@ -170,33 +170,33 @@ object Main {
       while (Keyboard.next) {}
     }
     else if (player.health > 0) {
-      if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.charity) && 
+      if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.charity.toInt) && 
           player.charity < 10 && !prevMouseState && buttonCharity.isMouseWithin) {
-        player.experience -= xpNeededForLevel(player.charity)
+        player.experience -= xpNeededForLevel(player.charity.toInt)
         player.charity += 1
-      } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.diligence) && 
+      } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.diligence.toInt) && 
           player.diligence < 10 && !prevMouseState && buttonDiligence.isMouseWithin) {
-        player.experience -= xpNeededForLevel(player.diligence)
+        player.experience -= xpNeededForLevel(player.diligence.toInt)
         player.diligence += 1
-      } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.humility) && 
+      } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.humility.toInt) && 
           player.humility < 10 && !prevMouseState && buttonHumility.isMouseWithin) {
-        player.experience -= xpNeededForLevel(player.humility)
+        player.experience -= xpNeededForLevel(player.humility.toInt)
         player.humility += 1
-      } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.kindness) && 
+      } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.kindness.toInt) && 
           player.kindness < 10 && !prevMouseState && buttonKindness.isMouseWithin) {
-        player.experience -= xpNeededForLevel(player.kindness)
+        player.experience -= xpNeededForLevel(player.kindness.toInt)
         player.kindness += 1
-      } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.patience) && 
+      } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.patience.toInt) && 
           player.patience < 10 && !prevMouseState && buttonPatience.isMouseWithin) {
-        player.experience -= xpNeededForLevel(player.patience)
+        player.experience -= xpNeededForLevel(player.patience.toInt)
         player.patience += 1
-      } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.temperance) && 
+      } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.temperance.toInt) && 
           player.temperance < 10 && !prevMouseState && buttonTemperance.isMouseWithin) {
-        player.experience -= xpNeededForLevel(player.temperance)
+        player.experience -= xpNeededForLevel(player.temperance.toInt)
         player.temperance += 1
-      } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.zeal) && 
+      } else if (Mouse.isButtonDown(0) && player.experience >= xpNeededForLevel(player.zeal.toInt) && 
           player.zeal < 10 && !prevMouseState && buttonZeal.isMouseWithin) {
-        player.experience -= xpNeededForLevel(player.zeal)
+        player.experience -= xpNeededForLevel(player.zeal.toInt)
         player.zeal += 1
       } else while (Keyboard.next) {
         Keyboard.getEventKey match {
@@ -205,38 +205,38 @@ object Main {
             while (Keyboard.next) {} 
           }
           case k if (k == Keyboard.KEY_1 && Keyboard.getEventKeyState && 
-              player.experience >= xpNeededForLevel(player.charity) && player.charity < 10) => {
-            player.experience -= xpNeededForLevel(player.charity)
+              player.experience >= xpNeededForLevel(player.charity.toInt) && player.charity < 10) => {
+            player.experience -= xpNeededForLevel(player.charity.toInt)
             player.charity += 1
           }
           case k if (k == Keyboard.KEY_2 && Keyboard.getEventKeyState && 
-              player.experience >= xpNeededForLevel(player.diligence) && player.diligence < 10) => {
-            player.experience -= xpNeededForLevel(player.diligence)
+              player.experience >= xpNeededForLevel(player.diligence.toInt) && player.diligence < 10) => {
+            player.experience -= xpNeededForLevel(player.diligence.toInt)
             player.diligence += 1
           }
           case k if (k == Keyboard.KEY_3 && Keyboard.getEventKeyState && 
-              player.experience >= xpNeededForLevel(player.humility) && player.humility < 10) => {
-            player.experience -= xpNeededForLevel(player.humility)
+              player.experience >= xpNeededForLevel(player.humility.toInt) && player.humility < 10) => {
+            player.experience -= xpNeededForLevel(player.humility.toInt)
             player.humility += 1
           }
           case k if (k == Keyboard.KEY_4 && Keyboard.getEventKeyState && 
-              player.experience >= xpNeededForLevel(player.kindness) && player.kindness < 10) => {
-            player.experience -= xpNeededForLevel(player.kindness)
+              player.experience >= xpNeededForLevel(player.kindness.toInt) && player.kindness < 10) => {
+            player.experience -= xpNeededForLevel(player.kindness.toInt)
             player.kindness += 1
           }
           case k if (k == Keyboard.KEY_5 && Keyboard.getEventKeyState && 
-              player.experience >= xpNeededForLevel(player.patience) && player.patience < 10) => {
-            player.experience -= xpNeededForLevel(player.patience)
+              player.experience >= xpNeededForLevel(player.patience.toInt) && player.patience < 10) => {
+            player.experience -= xpNeededForLevel(player.patience.toInt)
             player.patience += 1
           }
           case k if (k == Keyboard.KEY_6 && Keyboard.getEventKeyState && 
-              player.experience >= xpNeededForLevel(player.temperance) && player.temperance < 10) => {
-            player.experience -= xpNeededForLevel(player.temperance)
+              player.experience >= xpNeededForLevel(player.temperance.toInt) && player.temperance < 10) => {
+            player.experience -= xpNeededForLevel(player.temperance.toInt)
             player.temperance += 1
           }
           case k if (k == Keyboard.KEY_7 && Keyboard.getEventKeyState && 
-              player.experience >= xpNeededForLevel(player.zeal) && player.zeal < 10) => {
-            player.experience -= xpNeededForLevel(player.zeal)
+              player.experience >= xpNeededForLevel(player.zeal.toInt) && player.zeal < 10) => {
+            player.experience -= xpNeededForLevel(player.zeal.toInt)
             player.zeal += 1
           }
           case _ => {}
@@ -614,7 +614,7 @@ object Main {
   def getPrayerChances() = {
     var chances = Map(PARTIALRESTORATION -> 80, FULLRESTORATION -> 20, STAIRS -> 10, SMITE -> 10, 
         GOLDGAIN -> 10, EXPERIENCEGAIN -> 10, CLAIRVOYANCE -> 10, ITEM -> 1, FEAR -> 5, 
-        AOEDAMAGE -> 5, BLINDINGLIGHT -> 5, REVEALSECRET -> 10, IMMUNITY -> 5, BUFF -> 20, 
+        AOEDAMAGE -> 5, BLINDINGLIGHT -> 50000, REVEALSECRET -> 10, IMMUNITY -> 5, BUFF -> 20, 
         VISION -> 10, LEVELUP -> 2, TIMESTOP -> 1, TEMPBOOST -> 10)
     if (player.piety < 0) {
       chances += (DEMENTIA -> 10)
