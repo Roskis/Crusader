@@ -243,6 +243,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
     var num: Double = 20 + getCharity*2.5
     for (effect <- effectList) num += EffectType.prayChance(effect.effectType)
     for (item <- itemList) num += ItemType.prayChance(item.itemType)
+    for (neighbor <- getGrid.neighbors(getTile, 8)) for (obj <- neighbor.objectList) if (obj.isInstanceOf[Monster]) num += 10
     if (getX == getGrid.getAltar.getX && getY == getGrid.getAltar.getY && getLevel%5 == 0) num += 40
     else if (getX == getGrid.getAltar.getX && getY == getGrid.getAltar.getY) num += 20
     else if (getLevel%5 == 0) num += 10
@@ -305,7 +306,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   }
   
   /** Total level of player */
-  def totalLevel: Double = getZeal + getHumility + getTemperance + getKindness + getPatience + getCharity + getDiligence
+  def totalLevel: Double = zeal + humility + temperance + kindness + patience + charity + diligence
   
   /** Return smallest level xp requirement */
   def smallestLevel(): Double = {
@@ -330,7 +331,10 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
       num += roll(2)
       for (item <- itemList) num += item.damage
     }
-    if (crit) num += (getZeal+2) + roll((getZeal+2).toInt)
+    if (crit) {
+      addLog(name.toUpperCase.head + name.tail + " manages to make critical strike.")
+      num += (getZeal+2) + roll((getZeal+2).toInt)
+    }
     else num += roll((getZeal+2).toInt)
     num
   }
@@ -460,7 +464,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
           }
           case item: Item => {
             if (item.inShop && getGrid.getDjinn.mode == "passive") 
-              addLog(item.name.toUpperCase.head + item.name.tail + " is " + item.price + " gold.")
+              addLog(item.name.toUpperCase.head + item.name.tail + " is " + item.price.toInt + " gold.")
             else if (ItemType.slot(item.itemType) == "item" && slotUseable == null) item.pickUp
           }
           case _ => {}
@@ -612,12 +616,14 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     else target.takeDamage(damageroll(rnd.nextInt(100) <= crit), ap, this)
   }
   
-  /** Damage is based on player's weapon */
   def damageroll(crit: Boolean): Double = {
     var dmg: Double = 0
     for (effect <- effectList) dmg += effect.damage
     dmg += damage
-    if (crit) dmg + dmg
+    if (crit) {
+      addLog(name.toUpperCase.head + name.tail + " manages to make critical strike.")
+      dmg + dmg
+    }
     else dmg
   }
   
@@ -633,7 +639,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
       monsterType match {
         case m if (m == MonsterType.BAT) => batAI
         case m if (m == MonsterType.RAT) => ratAI
-        case m if (m == MonsterType.SNAKE) => snakeAI
+        case m if (m == MonsterType.SNAKEB) => snakeAI
         case m if (m == MonsterType.LIZARDC) => lizardMageAI
         case m if (m == MonsterType.SLOTH) => slothAI
         case m if (m == MonsterType.SPIDER) => spiderAI
@@ -822,12 +828,13 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
 object MonsterType extends Enumeration with Serializable {
 
   type Monster = Value
-  val RAT, BAT, SNAKE, SPIDER, GOBLINA, GOBLINB, HOUND, LIZARDA, LIZARDB, LIZARDC, CROCODILE, 
-  SLOTH, DJINN = Value
+  val RAT, BAT, SNAKEA, SNAKEB, SPIDER, GOBLINA, GOBLINB, HOUND, LIZARDA, LIZARDB, LIZARDC, 
+  CROCODILE, SLOTH, DJINN = Value
   
   private var rat: scala.xml.Node = null
   private var bat: scala.xml.Node = null
-  private var snake: scala.xml.Node = null
+  private var snakea: scala.xml.Node = null
+  private var snakeb: scala.xml.Node = null
   private var spider: scala.xml.Node = null
   private var goblina: scala.xml.Node = null
   private var goblinb: scala.xml.Node = null
@@ -844,7 +851,8 @@ object MonsterType extends Enumeration with Serializable {
   for (i <- xml.child) i match {
     case o if ((o \ "MonsterType").text == "RAT") => rat = o
     case o if ((o \ "MonsterType").text == "BAT") => bat = o
-    case o if ((o \ "MonsterType").text == "SNAKE") => snake = o
+    case o if ((o \ "MonsterType").text == "SNAKEA") => snakea = o
+    case o if ((o \ "MonsterType").text == "SNAKEB") => snakeb = o
     case o if ((o \ "MonsterType").text == "SPIDER") => spider = o
     case o if ((o \ "MonsterType").text == "GOBLINA") => goblina = o
     case o if ((o \ "MonsterType").text == "GOBLINB") => goblinb = o
@@ -863,7 +871,8 @@ object MonsterType extends Enumeration with Serializable {
     MonsterType match {
       case t if (t == RAT) => rat
       case t if (t == BAT) => bat
-      case t if (t == SNAKE) => snake
+      case t if (t == SNAKEA) => snakea
+      case t if (t == SNAKEB) => snakeb
       case t if (t == SPIDER) => spider
       case t if (t == GOBLINA) => goblina
       case t if (t == GOBLINB) => goblinb
@@ -883,14 +892,14 @@ object MonsterType extends Enumeration with Serializable {
     var chances = Map[Monster, Int]()
     level match {
       case l if (l == 1) => chances = 
-        Map(RAT -> 10, BAT -> 50, SNAKE -> 25, SPIDER -> 25, GOBLINA -> 5, GOBLINB -> 1, 
-            HOUND -> 2)
+        Map(RAT -> 10, BAT -> 50, SNAKEA -> 25, SNAKEB -> 10, SPIDER -> 25, GOBLINA -> 5, 
+            GOBLINB -> 1, HOUND -> 2)
       case l if (l == 2) => chances = 
-        Map(RAT -> 10, BAT -> 25, SNAKE -> 25, SPIDER -> 25, GOBLINA -> 16, GOBLINB -> 4, 
-            HOUND -> 10)
+        Map(RAT -> 10, BAT -> 25, SNAKEA -> 25, SNAKEB -> 10, SPIDER -> 25, GOBLINA -> 16, 
+            GOBLINB -> 4, HOUND -> 10)
       case l if (l == 3) => chances = 
-        Map(RAT -> 10, BAT -> 15, SNAKE -> 10, SPIDER -> 10, GOBLINA -> 20, GOBLINB -> 5, 
-            HOUND -> 15, LIZARDA -> 10, LIZARDB -> 4, LIZARDC -> 2, CROCODILE -> 1)
+        Map(RAT -> 10, BAT -> 15, SNAKEA -> 10, SNAKEB -> 2, SPIDER -> 10, GOBLINA -> 20, 
+            GOBLINB -> 5, HOUND -> 15, LIZARDA -> 10, LIZARDB -> 4, LIZARDC -> 2, CROCODILE -> 1)
       case l if (l == 4) => chances = 
         Map(RAT -> 10, GOBLINA -> 8, GOBLINB -> 2, HOUND -> 5, LIZARDA -> 20, LIZARDB -> 8, 
             LIZARDC -> 2, CROCODILE -> 5)
@@ -904,7 +913,8 @@ object MonsterType extends Enumeration with Serializable {
     MonsterType match {
       case t if (t == RAT) => if (isPassive) rat2 else rat1
       case t if (t == BAT) => if (isPassive) bat2 else bat1
-      case t if (t == SNAKE) => if (isPassive) snake2 else snake1
+      case t if (t == SNAKEA) => if (isPassive) snakea2 else snakea1
+      case t if (t == SNAKEB) => if (isPassive) snakeb2 else snakeb1
       case t if (t == SPIDER) => if (isPassive) spider2 else spider1
       case t if (t == GOBLINA) => if (isPassive) goblina2 else goblina1
       case t if (t == GOBLINB) => if (isPassive) goblinb2 else goblinb1
@@ -993,8 +1003,9 @@ object MonsterType extends Enumeration with Serializable {
   /** monsters might give item drops when dying */
   def drop(MonsterType: Monster, x: Int, y: Int) {
     MonsterType match {
-      case t if (t == RAT) => new Useable(x, y, ItemType.RATMEAT, false)
-      case t if (t == GOBLINA || t == GOBLINB) => new Useable(x, y, ItemType.SMALLHEALPOTION, false)
+      case t if (t == RAT) => if (rnd.nextInt(2) == 0) new Useable(x, y, ItemType.RATMEAT, false)
+      case t if (t == GOBLINA) => if (rnd.nextInt(3) == 0) new Useable(x, y, ItemType.SMALLHEALPOTION, false)
+      case t if (t == GOBLINB) => if (rnd.nextInt(2) == 0) new Useable(x, y, ItemType.SMALLHEALPOTION, false)
       case _ => {}
     }
   }

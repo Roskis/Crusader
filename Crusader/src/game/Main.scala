@@ -612,25 +612,40 @@ object Main {
   
   /** Get more good effects when piety is higher and more bad ones with negative piety */
   def getPrayerChances() = {
-    var chances = Map(PARTIALRESTORATION -> 80, FULLRESTORATION -> 20, STAIRS -> 10, SMITE -> 10, 
-        GOLDGAIN -> 10, EXPERIENCEGAIN -> 10, CLAIRVOYANCE -> 10, ITEM -> 1, FEAR -> 5, 
-        AOEDAMAGE -> 5, BLINDINGLIGHT -> 50000, REVEALSECRET -> 10, IMMUNITY -> 5, BUFF -> 20, 
-        VISION -> 10, LEVELUP -> 2, TIMESTOP -> 1, TEMPBOOST -> 10)
-    if (player.piety < 0) {
-      chances += (DEMENTIA -> 10)
-      chances += (EXPERIENCELOSS -> 10)
-      chances += (GOLDLOSS -> 10)
-      chances += (LIGHTNINGBOLT -> 10)
-      chances += (LEVELDOWN -> 10)
-    }
-    if (player.piety < 1000) {
+    var chances = Map(STAIRS -> 10, SMITE -> 10, GOLDGAIN -> 10, EXPERIENCEGAIN -> 10, 
+        CLAIRVOYANCE -> 10, ITEM -> 1, FEAR -> 5, AOEDAMAGE -> 5, BLINDINGLIGHT -> 5, 
+        REVEALSECRET -> 10, IMMUNITY -> 5, BUFF -> 20, VISION -> 10, LEVELUP -> 2, TIMESTOP -> 1, 
+        TEMPBOOST -> 10)
+    if (player.piety < -1000) {
       chances += (DEMENTIA -> 100)
       chances += (EXPERIENCELOSS -> 100)
       chances += (GOLDLOSS -> 100)
       chances += (LIGHTNINGBOLT -> 100)
       chances += (LEVELDOWN -> 100)
     }
-    if (player.piety > 200) chances += (FULLRESTORATION -> 20)
+    else if (player.piety < -500) {
+      chances += (DEMENTIA -> 50)
+      chances += (EXPERIENCELOSS -> 50)
+      chances += (GOLDLOSS -> 50)
+      chances += (LIGHTNINGBOLT -> 50)
+      chances += (LEVELDOWN -> 50)
+    }
+    else if (player.piety < -100) {
+      chances += (DEMENTIA -> 20)
+      chances += (EXPERIENCELOSS -> 20)
+      chances += (GOLDLOSS -> 20)
+      chances += (LIGHTNINGBOLT -> 20)
+      chances += (LEVELDOWN -> 20)
+    }
+    else if (player.piety < 0) {
+      chances += (DEMENTIA -> 10)
+      chances += (EXPERIENCELOSS -> 10)
+      chances += (GOLDLOSS -> 10)
+      chances += (LIGHTNINGBOLT -> 10)
+      chances += (LEVELDOWN -> 10)
+    }
+    else if (player.piety > 200) chances += (PARTIALRESTORATION -> 80, FULLRESTORATION -> 40)
+    else if (player.piety >= 0) chances += (PARTIALRESTORATION -> 80, FULLRESTORATION -> 20)
     chances
   } 
   

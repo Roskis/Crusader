@@ -31,7 +31,22 @@
         <piety>1</piety>
     </monster>
     <monster>
-        <MonsterType>SNAKE</MonsterType>
+        <MonsterType>SNAKEA</MonsterType>
+        <name>snake</name>
+        <description>TODO</description>
+        <maxHP>5</maxHP>
+        <damage>1,2,0</damage>
+        <armor>0</armor>
+        <accuracy>80</accuracy>
+        <criticalChance>4</criticalChance>
+        <dodge>10</dodge>
+        <armorPierce>0</armorPierce>
+        <gold>3</gold>
+        <experience>3</experience>
+        <piety>2</piety>
+    </monster>
+    <monster>
+        <MonsterType>SNAKEB</MonsterType>
         <name>snake</name>
         <description>TODO</description>
         <maxHP>5</maxHP>

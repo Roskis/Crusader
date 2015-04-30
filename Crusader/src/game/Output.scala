@@ -466,23 +466,43 @@ object Output {
     else if (Mouse.getX > 1088 && Mouse.getX < 1120 && (getHeight - Mouse.getY) > 308 && 
         (getHeight - Mouse.getY) < 338 && getPlayer.slotWeapon != null) 
       text = getPlayer.slotWeapon.name.toUpperCase.head + getPlayer.slotWeapon.name.tail
+    else if (Mouse.getX > 1088 && Mouse.getX < 1120 && (getHeight - Mouse.getY) > 308 && 
+        (getHeight - Mouse.getY) < 338) text = "Weapon slot"
     else if (Mouse.getX > 1152 && Mouse.getX < 1182 && (getHeight - Mouse.getY) > 308 && 
         (getHeight - Mouse.getY) < 338 && getPlayer.slotArmor != null) 
       text = getPlayer.slotArmor.name.toUpperCase.head + getPlayer.slotArmor.name.tail
+    else if (Mouse.getX > 1152 && Mouse.getX < 1182 && (getHeight - Mouse.getY) > 308 && 
+        (getHeight - Mouse.getY) < 338) text = "Armor slot"
     else if (Mouse.getX > 1216 && Mouse.getX < 1248 && (getHeight - Mouse.getY) > 308 && 
         (getHeight - Mouse.getY) < 338 && getPlayer.slotShield != null) 
       text = getPlayer.slotShield.name.toUpperCase.head + getPlayer.slotShield.name.tail
+    else if (Mouse.getX > 1216 && Mouse.getX < 1248 && (getHeight - Mouse.getY) > 308 && 
+        (getHeight - Mouse.getY) < 338) text = "Shield slot"
     else if (Mouse.getX > 1088 && Mouse.getX < 1120 && (getHeight - Mouse.getY) > 361 && 
         (getHeight - Mouse.getY) < 391 && getPlayer.slotRing != null) 
       text = getPlayer.slotRing.name.toUpperCase.head + getPlayer.slotRing.name.tail
+    else if (Mouse.getX > 1088 && Mouse.getX < 1120 && (getHeight - Mouse.getY) > 361 && 
+        (getHeight - Mouse.getY) < 391) text = "Ring slot"
     else if (Mouse.getX > 1152 && Mouse.getX < 1182 && (getHeight - Mouse.getY) > 361 && 
         (getHeight - Mouse.getY) < 391 && getPlayer.slotAmulet != null) 
       text = getPlayer.slotAmulet.name.toUpperCase.head + getPlayer.slotAmulet.name.tail
+    else if (Mouse.getX > 1152 && Mouse.getX < 1182 && (getHeight - Mouse.getY) > 361 && 
+        (getHeight - Mouse.getY) < 391) text = "Amulet slot"
     else if (Mouse.getX > 1216 && Mouse.getX < 1248 && (getHeight - Mouse.getY) > 361 && 
         (getHeight - Mouse.getY) < 391 && getPlayer.slotUseable != null) 
       text = getPlayer.slotUseable.name.toUpperCase.head + getPlayer.slotUseable.name.tail
-    if (left) font.drawString(Mouse.getX - 10 - font.getWidth(text), getHeight - Mouse.getY - 10, text, Color.white)
-    else font.drawString(Mouse.getX + 20, getHeight - Mouse.getY - 5, text, Color.white)
+    else if (Mouse.getX > 1216 && Mouse.getX < 1248 && (getHeight - Mouse.getY) > 361 && 
+        (getHeight - Mouse.getY) < 391) text = "Item slot"
+    if (left) {
+      if (text != "") drawQuadTex(greyBackground, Mouse.getX - 12 - font.getWidth(text), 
+          getHeight - Mouse.getY - 5, font.getWidth(text) + 4, font.getHeight(text) - 5)
+      font.drawString(Mouse.getX - 10 - font.getWidth(text), getHeight - Mouse.getY - 10, text, Color.black)
+    }
+    else {
+      if (text != "") drawQuadTex(greyBackground, Mouse.getX + 18, getHeight - Mouse.getY, 
+          font.getWidth(text) + 4, font.getHeight(text) - 5)
+      font.drawString(Mouse.getX + 20, getHeight - Mouse.getY - 5, text, Color.black)
+    }
   }
   
   /** Draw the character level up screen */
