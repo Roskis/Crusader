@@ -467,6 +467,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
               addLog(item.name.toUpperCase.head + item.name.tail + " is " + item.price.toInt + " gold.")
             else if (ItemType.slot(item.itemType) == "item" && slotUseable == null) item.pickUp
           }
+          case pasobj: PassiveObject if (pasobj.pType == PassiveType.STAIRS) => {goToNextLevel}
           case _ => {}
         }
       }
@@ -495,6 +496,7 @@ class PassiveObject(objectName: String, objectDescription: String, startX: Int, 
     passiveType: PassiveType.Value) extends Object with Serializable {
   
   val rnd = getRnd
+  val pType = passiveType
   var name = objectName
   var description = objectDescription
   var x = startX * 32
@@ -512,7 +514,7 @@ class PassiveObject(objectName: String, objectDescription: String, startX: Int, 
 object PassiveType extends Enumeration with Serializable {
 
   type Passive = Value
-  val ALTAR1, ALTAR2, BIGTREE1, TREE1, ROCK1, ROCK2 = Value
+  val ALTAR1, ALTAR2, BIGTREE1, TREE1, ROCK1, ROCK2, STAIRS = Value
 
   /** returns texture of the given monster */
   def image(PassiveType: Passive): Texture = {
@@ -523,6 +525,7 @@ object PassiveType extends Enumeration with Serializable {
       case t if (t == TREE1) => tree1
       case t if (t == ROCK1) => rock1
       case t if (t == ROCK2) => rock2
+      case t if (t == STAIRS) => portalEp1
       case _ => missing
     }
   }
@@ -668,7 +671,8 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   
   /** AI for spider */
   def spiderAI = {
-    if (distance(getPlayer) > 6 && mode == "passive") {}
+    if (distance(getPlayer) > 6 && mode == "aggressive") {mode = "passive"}
+    else if (distance(getPlayer) > 6 && mode == "passive") {}
     else if (distance(getPlayer) < 2 && rnd.nextInt(6) == 0) {
       addLog(name.toUpperCase.head + name.tail + " binds " + getPlayer.name + " with its sticky web.")
       getPlayer.effectList = getPlayer.effectList :+ new bind(roll(1)+1, getPlayer, this)
@@ -681,7 +685,8 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   
   /** AI for snake */
   def snakeAI = {
-    if (distance(getPlayer) > 3 && mode == "passive") {
+    if (distance(getPlayer) > 7 && mode == "aggressive") {mode = "passive"}
+    else if (distance(getPlayer) > 3 && mode == "passive") {
       if (distance(getPlayer) < 5 && rnd.nextInt(5) == 0) 
         addLog(name.toUpperCase.head + name.tail + " hisses.")
     }
@@ -698,7 +703,8 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   
   /** AI for lizard mages */
   def lizardMageAI = {
-    if (distance(getPlayer) > 7 && mode == "passive") {}
+    if (distance(getPlayer) > 7 && mode == "aggressive") {mode = "passive"}
+    else if (distance(getPlayer) > 7 && mode == "passive") {}
     else if (getGrid.getTile(getX, getY).visible && distance(getPlayer) <= 4 && spellcd <= 0) {
       if (spellchannel <= 0) {
         spellcd = 5
@@ -759,7 +765,8 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   
   /** Simple ai for most of the monsters */
   def basicAI = {
-    if (distance(getPlayer) > 7 && mode == "passive") {}
+    if (distance(getPlayer) > 7 && mode == "aggressive") {mode = "passive"}
+    else if (distance(getPlayer) > 7 && mode == "passive") {}
     else {
       mode = "aggressive"
       tryAttack

@@ -6,6 +6,8 @@ import scala.util.Random
 import org.lwjgl.input.{Keyboard, Mouse}
 import org.lwjgl.opengl.{Display, DisplayMode}
 
+import Math.abs
+
 import Helpers._
 import Direction._
 import GameState._
@@ -39,6 +41,7 @@ object Main {
   private var episode: Int = 1
   private var level: Int = 1
   private var turn: Int = 0
+  private var goNextLevel = false
   
   private val bbp: Int = 32
   private val frameRate: Int = 60
@@ -148,6 +151,7 @@ object Main {
   
   /** Advance one level */
   def nextMap() {
+    goNextLevel = false
     drawQuadTex(loading, (getWidth-loading.getImageWidth)/2, (getHeight-loading.getImageHeight)/2, 
         loading.getImageWidth, loading.getImageHeight)
     Display.update
@@ -497,6 +501,7 @@ object Main {
   
   /** Play one turn */
   def playTurn() {
+    if (goNextLevel) nextMap
     for (effect <- player.effectList) effect.turn
     player.effectList.filter(_.duration <= 0) foreach {player.effectList -= _}
     var timestop = false
@@ -616,36 +621,11 @@ object Main {
         CLAIRVOYANCE -> 10, ITEM -> 1, FEAR -> 5, AOEDAMAGE -> 5, BLINDINGLIGHT -> 5, 
         REVEALSECRET -> 10, IMMUNITY -> 5, BUFF -> 20, VISION -> 10, LEVELUP -> 2, TIMESTOP -> 1, 
         TEMPBOOST -> 10)
-    if (player.piety < -1000) {
-      chances += (DEMENTIA -> 100)
-      chances += (EXPERIENCELOSS -> 100)
-      chances += (GOLDLOSS -> 100)
-      chances += (LIGHTNINGBOLT -> 100)
-      chances += (LEVELDOWN -> 100)
-    }
-    else if (player.piety < -500) {
-      chances += (DEMENTIA -> 50)
-      chances += (EXPERIENCELOSS -> 50)
-      chances += (GOLDLOSS -> 50)
-      chances += (LIGHTNINGBOLT -> 50)
-      chances += (LEVELDOWN -> 50)
-    }
-    else if (player.piety < -100) {
-      chances += (DEMENTIA -> 20)
-      chances += (EXPERIENCELOSS -> 20)
-      chances += (GOLDLOSS -> 20)
-      chances += (LIGHTNINGBOLT -> 20)
-      chances += (LEVELDOWN -> 20)
-    }
-    else if (player.piety < 0) {
-      chances += (DEMENTIA -> 10)
-      chances += (EXPERIENCELOSS -> 10)
-      chances += (GOLDLOSS -> 10)
-      chances += (LIGHTNINGBOLT -> 10)
-      chances += (LEVELDOWN -> 10)
-    }
-    else if (player.piety > 200) chances += (PARTIALRESTORATION -> 80, FULLRESTORATION -> 40)
-    else if (player.piety >= 0) chances += (PARTIALRESTORATION -> 80, FULLRESTORATION -> 20)
+    if (player.piety < 0) chances += (DEMENTIA -> abs(player.piety/10).toInt, 
+          EXPERIENCELOSS -> abs(player.piety/10).toInt, GOLDLOSS -> abs(player.piety/10).toInt, 
+          LIGHTNINGBOLT -> abs(player.piety/10).toInt, LEVELDOWN -> abs(player.piety/10).toInt)
+    else chances += (PARTIALRESTORATION -> (80 + (player.piety/2.5).toInt), 
+        FULLRESTORATION -> (20 + (player.piety/2.5).toInt))
     chances
   } 
   
@@ -674,5 +654,6 @@ object Main {
   def getShopVisited() = shopVisited
   def getDisplayMode() = displayModes(0)
   def getFullscreen() = fullscreen
+  def goToNextLevel() = goNextLevel = true
   
 }

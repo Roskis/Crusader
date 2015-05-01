@@ -395,6 +395,10 @@ object Output {
               for (obj <- t.getObjectList) {
                 if (obj.isInstanceOf[Item]) whatToDraw = "item"
                 else if (obj.isInstanceOf[Monster]) whatToDraw = "monster"
+                else if (obj match {
+                  case pasobj: PassiveObject if (pasobj.pType == PassiveType.STAIRS) => true
+                  case _ => {false}
+                  }) whatToDraw = "stairs"
                 else if (obj.blockMovement) whatToDraw = "wall"
               }
               if (whatToDraw == "monster" && t.visible) 
@@ -403,6 +407,8 @@ object Output {
                 drawQuadTex(minimapItem, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
               else if (whatToDraw == "wall") 
                 drawQuadTex(minimapWall, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
+              else if (whatToDraw == "stairs")
+                drawQuadTex(minimapStairs, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
               else drawQuadTex(minimapFloor, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
           }
           case t if (t.explored && t.getType == TileType.WALL) => 
@@ -410,9 +416,15 @@ object Output {
           case t if (t.explored && (t.getType == TileType.DJINNDOORH || t.getType == TileType.DJINNDOORV || 
               t.getType == TileType.DJINNFLOOR || t.getType == TileType.DJINNWALL)) => 
             drawQuadTex(minimapDjinn, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
-          case t if (t.explored && t.getType == TileType.STAIRS) => 
-            drawQuadTex(minimapStairs, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
-          case t if (t.explored) => drawQuadTex(minimapFog, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
+          case t if (t.explored) => {
+            var s = false
+            for (obj <- t.getObjectList) obj match {
+              case pasobj: PassiveObject if (pasobj.pType == PassiveType.STAIRS) => s = true
+              case _ => {}
+            }
+            if (s) drawQuadTex(minimapStairs, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
+            else drawQuadTex(minimapFog, middleX-mapSize*2+i*4, middleY-mapSize*2+j*4, 4, 4)
+          }
           case _ => {}
         }
       }

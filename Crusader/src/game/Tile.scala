@@ -26,6 +26,7 @@ class Tile(Xcoord: Int, Ycoord: Int, var tileType: TileType.Value) extends Seria
   var explored: Boolean = false
   var label: Int = 0
   var visible: Boolean = false
+  var extraToDraw = Buffer[(Extra.Type, Int, Int)]()
   
   /** check if this tile or anything on it blocks movement */
   def blockMovement():Boolean = {
@@ -41,12 +42,17 @@ class Tile(Xcoord: Int, Ycoord: Int, var tileType: TileType.Value) extends Seria
     boo
   }
   
+  /** add extra to be drawn with this tile */
+  def addExtra(extra: Extra.Type, x: Int, y: Int) = extraToDraw.append((extra, x, y))
+  
+  /** remove extra from this tile */
+  def removeExtra(tex: Texture) = extraToDraw.filter(_._1 == tex) foreach {extraToDraw -= _}
+  
   /** add object to this tile */
   def addObject(obj: Object) = {
     objectList.append(obj)
     if (obj.isInstanceOf[Player] && 
         (tileType == TileType.DJINNDOORH || tileType == TileType.DJINNDOORV)) shopGreet
-    else if (obj.isInstanceOf[Player] && tileType == TileType.STAIRS) nextMap
     else if (obj.isInstanceOf[Player] && tileType == TileType.SECRETDOOR) {
       addLog("You have found a secret!")
       tileType = TileType.FLOOR
@@ -62,7 +68,7 @@ class Tile(Xcoord: Int, Ycoord: Int, var tileType: TileType.Value) extends Seria
   def removeObject(obj: Object) = objectList.filter(_ == obj) foreach {objectList -= _}
   
   /** getter for object's in this tile */
-  def getObjectList = objectList
+  def getObjectList = objectList.reverse
   
   /** Draw everything on this tile */
   def drawObjects = {
@@ -78,8 +84,12 @@ class Tile(Xcoord: Int, Ycoord: Int, var tileType: TileType.Value) extends Seria
   }
   
   /** Draw Tile */
-  def draw = if (explored) drawQuadTex(image, x - (getPlayer.getX - 16) * 32, 
-      y - (getPlayer.getY - 8) * 32, image.getImageWidth, image.getImageHeight)
+  def draw = if (explored) {
+    drawQuadTex(image, x - (getPlayer.getX - 16) * 32, y - (getPlayer.getY - 8) * 32, 
+        image.getImageWidth, image.getImageHeight)
+    for (extra <- extraToDraw) drawQuadTex(Extra.image(extra._1), x - (getPlayer.getX - 16) * 32 + extra._2, 
+        y - (getPlayer.getY - 8) * 32 + extra._3, Extra.image(extra._1).getImageWidth, Extra.image(extra._1).getImageHeight)
+  }
   
   /** Draw Fog */
   def drawFog = {
@@ -118,19 +128,56 @@ class Tile(Xcoord: Int, Ycoord: Int, var tileType: TileType.Value) extends Seria
   
 }
 
+object Extra extends Enumeration {
+  type Type = Value
+  val GRASS1, GRASS2, GRASS3, FLOWER1, FLOWER2, FLOWER3, FLOWER4, FLOWER5, LAKE1, LAKE2, 
+  LAKE3, LAKE4, BIGFLOWER1, BIGFLOWER2, BIGFLOWER3, BIGFLOWER4, BIGFLOWER5, BIGFLOWER6, BUSH1, BUSH2, 
+  BUSH3, BUSH4, BUSH5, BUSH6, BUSH7 = Value
+  
+  def image(extra: Type): Texture = {
+    extra match {
+      case t if (t == GRASS1) => grass1
+      case t if (t == GRASS2) => grass2
+      case t if (t == GRASS3) => grass3
+      case t if (t == FLOWER1) => flower1
+      case t if (t == FLOWER2) => flower2
+      case t if (t == FLOWER3) => flower3
+      case t if (t == FLOWER4) => flower4
+      case t if (t == FLOWER5) => flower5
+      case t if (t == LAKE1) => lake1
+      case t if (t == LAKE2) => lake2
+      case t if (t == LAKE3) => lake3
+      case t if (t == LAKE4) => lake4
+      case t if (t == BIGFLOWER1) => bigFlower1
+      case t if (t == BIGFLOWER2) => bigFlower2
+      case t if (t == BIGFLOWER3) => bigFlower3
+      case t if (t == BIGFLOWER4) => bigFlower4
+      case t if (t == BIGFLOWER5) => bigFlower5
+      case t if (t == BIGFLOWER6) => bigFlower6
+      case t if (t == BUSH1) => bush1
+      case t if (t == BUSH2) => bush2
+      case t if (t == BUSH3) => bush3
+      case t if (t == BUSH4) => bush4
+      case t if (t == BUSH5) => bush5
+      case t if (t == BUSH6) => bush6
+      case t if (t == BUSH7) => bush7
+      case _ => missing
+    }
+  }
+}
+
 /** There is a defined number of Tiletypes */
 object TileType extends Enumeration {
 
   type Type = Value
-  val FLOOR, WALL, STAIRS, DJINNDOORH, DJINNDOORV, DJINNFLOOR, DJINNWALL, SECRETDOOR, BOSSDOOR = Value
+  val FLOOR, WALL, DJINNDOORH, DJINNDOORV, DJINNFLOOR, DJINNWALL, SECRETDOOR, BOSSDOOR = Value
   private val rnd = Main.getRnd
   
   /** returns texture of the given tile type */
   def image(tileType: Type): Texture = {
     tileType match {
-      case t if (t == FLOOR) => grass1
+      case t if (t == FLOOR) => floorEp1
       case t if (t == WALL) => wall1
-      case t if (t == STAIRS) => Stairs
       case t if (t == DJINNDOORH) => DjinnDoorH
       case t if (t == DJINNDOORV) => DjinnDoorV
       case t if (t == DJINNFLOOR) => {
@@ -154,7 +201,6 @@ object TileType extends Enumeration {
     tileType match {
       case t if (t == FLOOR) => false
       case t if (t == WALL) => true
-      case t if (t == STAIRS) => false
       case t if (t == DJINNDOORH) => false
       case t if (t == DJINNDOORV) => false
       case t if (t == DJINNFLOOR) => false
@@ -170,7 +216,6 @@ object TileType extends Enumeration {
     tileType match {
       case t if (t == FLOOR) => false
       case t if (t == WALL) => true
-      case t if (t == STAIRS) => false
       case t if (t == DJINNDOORH) => true
       case t if (t == DJINNDOORV) => true
       case t if (t == DJINNFLOOR) => false
