@@ -508,8 +508,8 @@ object Main {
     for (effect <- player.effectList) if (effect.isInstanceOf[timestop]) timestop = true
     if (!timestop) for (monster <- monsterList) monster.turn
     turn += 1
-    if (player.health <= 0 && player.piety >= 500) {
-      player.piety = player.piety/2 - 500
+    if (player.health <= 0 && player.piety >= 200) {
+      player.piety = player.piety/2 - 200
       if (player.piety < 0) player.piety = 0
       player.experience = 0
       player.health = player.maxHealth
@@ -623,7 +623,7 @@ object Main {
         TEMPBOOST -> 10)
     if (player.piety < 0) chances += (DEMENTIA -> abs(player.piety/10).toInt, 
           EXPERIENCELOSS -> abs(player.piety/10).toInt, GOLDLOSS -> abs(player.piety/10).toInt, 
-          LIGHTNINGBOLT -> abs(player.piety/10).toInt, LEVELDOWN -> abs(player.piety/10).toInt)
+          LIGHTNINGBOLT -> abs(player.piety/5).toInt, LEVELDOWN -> abs(player.piety/10).toInt)
     else chances += (PARTIALRESTORATION -> (80 + (player.piety/2.5).toInt), 
         FULLRESTORATION -> (20 + (player.piety/2.5).toInt))
     chances

@@ -56,6 +56,7 @@ class Tile(Xcoord: Int, Ycoord: Int, var tileType: TileType.Value) extends Seria
     else if (obj.isInstanceOf[Player] && tileType == TileType.SECRETDOOR) {
       addLog("You have found a secret!")
       tileType = TileType.FLOOR
+      getGrid.addGrass(this)
     }
     else if (obj.isInstanceOf[Player] && tileType == TileType.BOSSDOOR) {
       if (getLevel == 5) getGrid.getTile(6, 13).tileType = TileType.WALL

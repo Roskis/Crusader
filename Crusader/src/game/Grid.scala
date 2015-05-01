@@ -356,7 +356,7 @@ class Grid() extends Serializable {
       next = getTile(tunnel(n))
       neigh = neighbors(next, 8)
       neigh -= current
-      for (ne <- neigh) if (ne.getType == TileType.FLOOR) boo = false
+      for (ne <- neigh) if (!ne.blockMovement) boo = false
     }
     while (boo)
     getPlayer.setX(next.getX)
@@ -383,7 +383,7 @@ class Grid() extends Serializable {
     }
     while (boo)
     setTile(new Tile(next.getX, next.getY, TileType.FLOOR))
-    stairs = new PassiveObject("Stairs", "TODO", next.getX, next.getY, STAIRS)
+    stairs = new PassiveObject("Portal", "TODO", next.getX, next.getY, STAIRS)
   }
   
   /** Move stairs to player's location */
@@ -404,7 +404,7 @@ class Grid() extends Serializable {
       neigh = neighbors(secretTile, 8)
       for (n <- neigh) if (!n.blockMovement) boo = true
       }
-    while (boo)
+    while (boo || secretTile.distance(getPlayer) < 5)
     val goto = giveRandomFloor
     val tunnel = line(secretTile, goto)
     var n = 0

@@ -12,8 +12,8 @@
         <dodge>20</dodge>
         <armorPierce>0</armorPierce>
         <gold>0</gold>
-        <experience>1</experience>
-        <piety>2</piety>
+        <experience>2</experience>
+        <piety>4</piety>
     </monster>
     <monster>
         <MonsterType>BAT</MonsterType>
@@ -26,9 +26,9 @@
         <criticalChance>2</criticalChance>
         <dodge>30</dodge>
         <armorPierce>0</armorPierce>
-        <gold>1</gold>
-        <experience>1</experience>
-        <piety>1</piety>
+        <gold>2</gold>
+        <experience>2</experience>
+        <piety>2</piety>
     </monster>
     <monster>
         <MonsterType>SNAKEA</MonsterType>
@@ -41,9 +41,9 @@
         <criticalChance>4</criticalChance>
         <dodge>10</dodge>
         <armorPierce>0</armorPierce>
-        <gold>3</gold>
-        <experience>3</experience>
-        <piety>2</piety>
+        <gold>6</gold>
+        <experience>6</experience>
+        <piety>4</piety>
     </monster>
     <monster>
         <MonsterType>SNAKEB</MonsterType>
@@ -56,9 +56,9 @@
         <criticalChance>4</criticalChance>
         <dodge>10</dodge>
         <armorPierce>0</armorPierce>
-        <gold>3</gold>
-        <experience>3</experience>
-        <piety>2</piety>
+        <gold>6</gold>
+        <experience>6</experience>
+        <piety>4</piety>
     </monster>
     <monster>
         <MonsterType>SPIDER</MonsterType>
@@ -71,9 +71,9 @@
         <criticalChance>2</criticalChance>
         <dodge>15</dodge>
         <armorPierce>0</armorPierce>
-        <gold>2</gold>
-        <experience>2</experience>
-        <piety>4</piety>
+        <gold>4</gold>
+        <experience>4</experience>
+        <piety>8</piety>
     </monster>
     <monster>
         <MonsterType>GOBLINA</MonsterType>
@@ -86,9 +86,9 @@
         <criticalChance>4</criticalChance>
         <dodge>10</dodge>
         <armorPierce>0</armorPierce>
-        <gold>10</gold>
-        <experience>10</experience>
-        <piety>10</piety>
+        <gold>20</gold>
+        <experience>20</experience>
+        <piety>20</piety>
     </monster>
     <monster>
         <MonsterType>GOBLINB</MonsterType>
@@ -101,9 +101,9 @@
         <criticalChance>5</criticalChance>
         <dodge>12</dodge>
         <armorPierce>1</armorPierce>
-        <gold>15</gold>
-        <experience>15</experience>
-        <piety>15</piety>
+        <gold>30</gold>
+        <experience>30</experience>
+        <piety>30</piety>
     </monster>
     <monster>
         <MonsterType>HOUND</MonsterType>
@@ -116,9 +116,9 @@
         <criticalChance>6</criticalChance>
         <dodge>10</dodge>
         <armorPierce>0</armorPierce>
-        <gold>5</gold>
-        <experience>5</experience>
-        <piety>3</piety>
+        <gold>10</gold>
+        <experience>10</experience>
+        <piety>6</piety>
     </monster>
     <monster>
         <MonsterType>LIZARDA</MonsterType>
@@ -131,9 +131,9 @@
         <criticalChance>5</criticalChance>
         <dodge>8</dodge>
         <armorPierce>2</armorPierce>
-        <gold>10</gold>
-        <experience>15</experience>
-        <piety>15</piety>
+        <gold>20</gold>
+        <experience>30</experience>
+        <piety>30</piety>
     </monster>
     <monster>
         <MonsterType>LIZARDB</MonsterType>
@@ -146,9 +146,9 @@
         <criticalChance>5</criticalChance>
         <dodge>8</dodge>
         <armorPierce>1</armorPierce>
-        <gold>10</gold>
-        <experience>15</experience>
-        <piety>15</piety>
+        <gold>20</gold>
+        <experience>30</experience>
+        <piety>30</piety>
     </monster>
     <monster>
         <MonsterType>LIZARDC</MonsterType>
@@ -161,9 +161,9 @@
         <criticalChance>5</criticalChance>
         <dodge>10</dodge>
         <armorPierce>0</armorPierce>
-        <gold>10</gold>
-        <experience>15</experience>
-        <piety>15</piety>
+        <gold>20</gold>
+        <experience>30</experience>
+        <piety>30</piety>
     </monster>
     <monster>
         <MonsterType>CROCODILE</MonsterType>
@@ -176,8 +176,8 @@
         <criticalChance>2</criticalChance>
         <dodge>0</dodge>
         <armorPierce>2</armorPierce>
-        <gold>20</gold>
-        <experience>20</experience>
+        <gold>40</gold>
+        <experience>40</experience>
         <piety>0</piety>
     </monster>
     <monster>
@@ -207,7 +207,7 @@
         <dodge>10</dodge>
         <armorPierce>1</armorPierce>
         <gold>0</gold>
-        <experience>50</experience>
-        <piety>0</piety>
+        <experience>100</experience>
+        <piety>-50</piety>
     </monster>
 </root>
