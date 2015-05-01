@@ -93,6 +93,7 @@ class Grid() extends Serializable {
   map(getPlayer.getX)(getPlayer.getY).explored = true
   
   new Monster(15, 13, MonsterType.SLOTH)
+  addFloorExtras
   
   }
   
@@ -122,7 +123,6 @@ class Grid() extends Serializable {
     getTile(altar.getX, altar.getY).addObject(altar)
     addStairsEp1
     addTrees(16)
-    addRocks(4)
     
     do {movePlayerEp1}
     while (!(getTile(getPlayer.getX, getPlayer.getY)).getObjectList.isEmpty || 
@@ -133,7 +133,6 @@ class Grid() extends Serializable {
     
     addMonsters(20)
     makeSecret
-    
     addFloorExtras
     
   }
@@ -283,18 +282,6 @@ class Grid() extends Serializable {
     }
   }
   
-  /** Add a number of rocks */
-  def addRocks(num: Int) = {
-    var rock: PassiveObject = null
-    var coord: Coordinate = null
-    for (n <- Range(0, num)) {
-      do coord = giveRandomNonBlockingCoordinates
-      while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || 
-          !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
-      rock = new PassiveObject("Rock", "TODO", coord.getX, coord.getY, if (rnd.nextBoolean) ROCK1 else ROCK2)
-    }
-  }
-  
   /** Add monsters */
   def addMonsters(num: Int) = {
     var coord: Coordinate = null
@@ -429,27 +416,33 @@ class Grid() extends Serializable {
   
   /** Add some extra to the floortiles */
   def addFloorExtras() = {
+    var currentTile: Tile = null
     for (i <- Range(0, size)) {
       for (j <- Range(0, size)) {
         if (getTile(i,j).getType == TileType.FLOOR) {
-          addGrass(getTile(i, j))
-          rnd.nextInt(600) match {
-            case t if (t < 80) => addFlower(getTile(i, j))
-            case t if (t < 100) => {
-              addFlower(getTile(i, j))
-              addFlower(getTile(i, j))
-            }
-            case t if (t < 102) => addLake(getTile(i,j))
-            case t if (t < 120) => addBigFlower(getTile(i,j))
-            case t if (t < 250) => addBush(getTile(i,j))
-            case t if (t < 270) => {
-              addBush(getTile(i,j))
-              addBush(getTile(i,j))
+          currentTile = getTile(i, j)
+          addGrass(currentTile)
+          rnd.nextInt(1000) match {
+            case t if (t < 100) => addBush(currentTile)
+            case t if (t < 180) => addFlower(currentTile)
+            case t if (t < 220) => addfern(currentTile)
+            case t if (t < 240) => addsmallRock(currentTile)
+            case t if (t < 260) => addBigFlower(currentTile)
+            case t if (t < 280) => {
+              addFlower(currentTile)
+              addFlower(currentTile)
             }
             case t if (t < 300) => {
-              addBush(getTile(i,j))
-              addFlower(getTile(i, j))
+              addBush(currentTile)
+              addBush(currentTile)
             }
+            case t if (t < 320) => {
+              addBush(currentTile)
+              addFlower(currentTile)
+            }
+            case t if (t < 321) => addLake(currentTile)
+            case t if (t < 322) => addBigRock(currentTile)
+            case t if (t < 323) => addBigBush(currentTile)
             case _ => {}
           } 
         }
@@ -468,12 +461,18 @@ class Grid() extends Serializable {
   
   def addFlower(tile: Tile) = {
     tile.addExtra(
-      rnd.nextInt(5) match {
+      rnd.nextInt(11) match {
         case r if (r == 0) => FLOWER1
         case r if (r == 1) => FLOWER2
         case r if (r == 2) => FLOWER3
         case r if (r == 3) => FLOWER4
         case r if (r == 4) => FLOWER5
+        case r if (r == 5) => FLOWER6
+        case r if (r == 6) => FLOWER7
+        case r if (r == 7) => FLOWER8
+        case r if (r == 8) => FLOWER9
+        case r if (r == 9) => FLOWER10
+        case r if (r == 10) => FLOWER11
       }, rnd.nextInt(24)-4, rnd.nextInt(24)-4)
   }
   
@@ -510,6 +509,47 @@ class Grid() extends Serializable {
         case r if (r == 5) => BUSH6
         case r if (r == 6) => BUSH7
       }, rnd.nextInt(16), rnd.nextInt(20)-2)
+  }
+  
+  def addBigRock(tile: Tile) = {
+    tile.addExtra(
+      rnd.nextInt(2) match {
+        case r if (r == 0) => ROCK1
+        case r if (r == 1) => ROCK2
+      }, 0, 0)
+  }
+  
+  def addsmallRock(tile: Tile) = {
+    tile.addExtra(
+      rnd.nextInt(7) match {
+        case r if (r == 0) => SMALLROCK1
+        case r if (r == 1) => SMALLROCK2
+        case r if (r == 2) => SMALLROCK3
+        case r if (r == 3) => SMALLROCK4
+        case r if (r == 4) => SMALLROCK5
+        case r if (r == 5) => SMALLROCK6
+        case r if (r == 6) => SMALLROCK7
+      }, rnd.nextInt(16), rnd.nextInt(16))
+  }
+  
+  def addBigBush(tile: Tile) = {
+    tile.addExtra(
+      rnd.nextInt(4) match {
+        case r if (r == 0) => BIGBUSH1
+        case r if (r == 1) => BIGBUSH2
+        case r if (r == 2) => BIGBUSH3
+        case r if (r == 3) => BIGBUSH4
+      }, 0, 0)
+  }
+  
+  def addfern(tile: Tile) = {
+    tile.addExtra(
+      rnd.nextInt(4) match {
+        case r if (r == 0) => FERN1
+        case r if (r == 1) => FERN2
+        case r if (r == 2) => FERN3
+        case r if (r == 3) => FERN4
+      }, rnd.nextInt(16), rnd.nextInt(16))
   }
   
   /** Returns the neighbors of given tile */

@@ -27,6 +27,8 @@ class Tile(Xcoord: Int, Ycoord: Int, var tileType: TileType.Value) extends Seria
   var label: Int = 0
   var visible: Boolean = false
   var extraToDraw = Buffer[(Extra.Type, Int, Int)]()
+  if (tileType == TileType.DJINNDOORH) addExtra(Extra.DJINNDOORH, 0, 0)
+  else if (tileType == TileType.DJINNDOORV) addExtra(Extra.DJINNDOORV, 0, 0)
   
   /** check if this tile or anything on it blocks movement */
   def blockMovement():Boolean = {
@@ -133,7 +135,9 @@ object Extra extends Enumeration {
   type Type = Value
   val GRASS1, GRASS2, GRASS3, FLOWER1, FLOWER2, FLOWER3, FLOWER4, FLOWER5, LAKE1, LAKE2, 
   LAKE3, LAKE4, BIGFLOWER1, BIGFLOWER2, BIGFLOWER3, BIGFLOWER4, BIGFLOWER5, BIGFLOWER6, BUSH1, BUSH2, 
-  BUSH3, BUSH4, BUSH5, BUSH6, BUSH7 = Value
+  BUSH3, BUSH4, BUSH5, BUSH6, BUSH7, DJINNDOORH, DJINNDOORV, ROCK1, ROCK2, FLOWER6, FLOWER7, FLOWER8, 
+  FLOWER9, FLOWER10, FLOWER11, SMALLROCK1, SMALLROCK2, SMALLROCK3, SMALLROCK4, SMALLROCK5, 
+  SMALLROCK6, SMALLROCK7, BIGBUSH1, BIGBUSH2, BIGBUSH3, BIGBUSH4, FERN1, FERN2, FERN3, FERN4 = Value
   
   def image(extra: Type): Texture = {
     extra match {
@@ -145,6 +149,12 @@ object Extra extends Enumeration {
       case t if (t == FLOWER3) => flower3
       case t if (t == FLOWER4) => flower4
       case t if (t == FLOWER5) => flower5
+      case t if (t == FLOWER6) => flower6
+      case t if (t == FLOWER7) => flower7
+      case t if (t == FLOWER8) => flower8
+      case t if (t == FLOWER9) => flower9
+      case t if (t == FLOWER10) => flower10
+      case t if (t == FLOWER11) => flower11
       case t if (t == LAKE1) => lake1
       case t if (t == LAKE2) => lake2
       case t if (t == LAKE3) => lake3
@@ -162,6 +172,25 @@ object Extra extends Enumeration {
       case t if (t == BUSH5) => bush5
       case t if (t == BUSH6) => bush6
       case t if (t == BUSH7) => bush7
+      case t if (t == DJINNDOORH) => DjinnDoorH
+      case t if (t == DJINNDOORV) => DjinnDoorV
+      case t if (t == ROCK1) => rock1
+      case t if (t == ROCK2) => rock2
+      case t if (t == SMALLROCK1) => smallRock1
+      case t if (t == SMALLROCK2) => smallRock2
+      case t if (t == SMALLROCK3) => smallRock3
+      case t if (t == SMALLROCK4) => smallRock4
+      case t if (t == SMALLROCK5) => smallRock5
+      case t if (t == SMALLROCK6) => smallRock6
+      case t if (t == SMALLROCK7) => smallRock7
+      case t if (t == BIGBUSH1) => bigBush1
+      case t if (t == BIGBUSH2) => bigBush2
+      case t if (t == BIGBUSH3) => bigBush3
+      case t if (t == BIGBUSH4) => bigBush4
+      case t if (t == FERN1) => fern1
+      case t if (t == FERN2) => fern2
+      case t if (t == FERN3) => fern3
+      case t if (t == FERN4) => fern4
       case _ => missing
     }
   }
@@ -179,9 +208,9 @@ object TileType extends Enumeration {
     tileType match {
       case t if (t == FLOOR) => floorEp1
       case t if (t == WALL) => wall1
-      case t if (t == DJINNDOORH) => DjinnDoorH
-      case t if (t == DJINNDOORV) => DjinnDoorV
-      case t if (t == DJINNFLOOR) => {
+      //case t if (t == DJINNDOORH) => DjinnDoorH
+      //case t if (t == DJINNDOORV) => DjinnDoorV
+      case t if (t == DJINNFLOOR || t == DJINNDOORH || t == DJINNDOORV) => {
         if (getGrid.shopImageNumbers._3 == 1) DjinnFloor1
         else if (getGrid.shopImageNumbers._3 == 2) DjinnFloor2
         else DjinnFloor3

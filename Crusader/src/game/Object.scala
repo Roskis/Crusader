@@ -514,7 +514,7 @@ class PassiveObject(objectName: String, objectDescription: String, startX: Int, 
 object PassiveType extends Enumeration with Serializable {
 
   type Passive = Value
-  val ALTAR1, ALTAR2, BIGTREE1, TREE1, ROCK1, ROCK2, STAIRS = Value
+  val ALTAR1, ALTAR2, BIGTREE1, TREE1, STAIRS = Value
 
   /** returns texture of the given monster */
   def image(PassiveType: Passive): Texture = {
@@ -523,8 +523,6 @@ object PassiveType extends Enumeration with Serializable {
       case t if (t == ALTAR2) => altar2
       case t if (t == BIGTREE1) => bigTree1
       case t if (t == TREE1) => tree1
-      case t if (t == ROCK1) => rock1
-      case t if (t == ROCK2) => rock2
       case t if (t == STAIRS) => portalEp1
       case _ => missing
     }
