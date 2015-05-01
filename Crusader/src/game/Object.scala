@@ -925,9 +925,14 @@ object MonsterType extends Enumeration with Serializable {
       case t if (t == CROCODILE) => if (isPassive) crocodile2 else crocodile1
       case t if (t == SLOTH) => if (isPassive) sloth2 else sloth1
       case t if (t == DJINN) => {
-        if (isPassive && getGrid.shopImageNumbers._1 == 1) djinn1
-        else if (isPassive) djinn2
-        else djinn3
+        if (isPassive) {
+          if (getGrid.shopImageNumbers._1 == 1) djinn12
+          else if (getGrid.shopImageNumbers._1 == 2) djinn22
+          else djinn32
+        }
+        else if (getGrid.shopImageNumbers._1 == 1) djinn11
+        else if (getGrid.shopImageNumbers._1 == 2) djinn21
+        else djinn31
       }
       case _ => missing
     }
