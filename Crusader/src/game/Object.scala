@@ -818,7 +818,8 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     else {
       val goto = getDirection(new Coordinate(this.getX, this.getY), new Coordinate(getPlayer.getX, getPlayer.getY))
       if (getGrid.getTile(getCoordinates(goto, getX, getY)).blockMovement) {
-        move(getGrid.dijkstra(getTile, getGrid.getTile(getPlayer.getX, getPlayer.getY)).drop(1)(0).getCoordinate)
+        if (!getGrid.dijkstra(getTile, getGrid.getTile(getPlayer.getX, getPlayer.getY)).isEmpty)
+          move(getGrid.dijkstra(getTile, getGrid.getTile(getPlayer.getX, getPlayer.getY)).drop(1)(0).getCoordinate)
       }
       else move(goto)
       }
