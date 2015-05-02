@@ -5,6 +5,7 @@ import java.lang.Math.{abs, sqrt}
 import scala.collection.mutable.Buffer
 
 import org.newdawn.slick.opengl.Texture
+import org.newdawn.slick.Color
 
 import scala.xml.XML
 
@@ -52,6 +53,9 @@ trait Object {
     if (getGrid.isWithinGrid(getX, getY)) getGrid.getTile(getX, getY).addObject(this)
   }
 
+  /** Return information about this object */
+  def infoBox: Buffer[Buffer[(String, Color)]]
+  
   /** Get object's coordinate */
   def getCoordinate() = new Coordinate(getX, getY)
   
@@ -104,7 +108,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   
   val rnd = getRnd
   var name = playerName
-  var description = "TODO"
+  var description = "-"
   var x = startX * 32
   var y = startY * 32
   def image = playerImage
@@ -140,6 +144,10 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
     if (slotRing != null) list.append(slotRing)
     if (slotAmulet != null) list.append(slotAmulet)
     list
+  }
+  
+  def infoBox: Buffer[Buffer[(String, Color)]] = {
+    Buffer[Buffer[(String, Color)]](Buffer(("Name: ", Color.black), (name, Color.black)))
   }
   
   def getZeal: Double = {
@@ -190,7 +198,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
     for (item <- itemList) num += ItemType.diligence(item.itemType)
     num
   }
-  
+    
   /** Amount of piety defines view range */
   def viewRadius: Double = {
     var radius = (piety/100)
@@ -508,19 +516,25 @@ class PassiveObject(objectName: String, objectDescription: String, startX: Int, 
   init
   getPassiveObjectList.append(this)
   
+  def infoBox: Buffer[Buffer[(String, Color)]] = {
+    Buffer[Buffer[(String, Color)]](Buffer(("Name: ", Color.black), (name, Color.black)))
+  }
+  
 }
 
 /** TODO */
 object PassiveType extends Enumeration with Serializable {
 
   type Passive = Value
-  val ALTAR1, ALTAR2, BIGTREE1, TREE1, STAIRS = Value
+  val ALTAR1, ALTAR2, ROCK1, ROCK2, BIGTREE1, TREE1, STAIRS = Value
 
   /** returns texture of the given monster */
   def image(PassiveType: Passive): Texture = {
     PassiveType match {
       case t if (t == ALTAR1) => altar1
       case t if (t == ALTAR2) => altar2
+      case t if (t == ROCK1) => rock1
+      case t if (t == ROCK2) => rock2
       case t if (t == BIGTREE1) => bigTree1
       case t if (t == TREE1) => tree1
       case t if (t == STAIRS) => portalEp1
@@ -561,6 +575,10 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   
   init
   getMonsterList.append(this)
+  
+  def infoBox: Buffer[Buffer[(String, Color)]] = {
+    Buffer[Buffer[(String, Color)]](Buffer(("Name: ", Color.black), (name, Color.black)))
+  }
   
   /** Accuracy of the monster */
   def accuracy: Double = {
@@ -1141,6 +1159,10 @@ class Equipment(startX: Int, startY: Int, equipmentType: ItemType.Value, isEquip
   
   def damage: Double = roll(ItemType.damage(itemType)._1, ItemType.damage(itemType)._2) + ItemType.damage(itemType)._3
   
+  def infoBox: Buffer[Buffer[(String, Color)]] = {
+    Buffer[Buffer[(String, Color)]](Buffer(("Name: ", Color.black), (name, Color.black)))
+  }
+  
   if (!equipped) {
     init
     getEquipmentList.append(this)
@@ -1610,7 +1632,11 @@ class Useable(startX: Int, startY: Int, val itemType: ItemType.Value, isEquipped
     init
     getUseableList.append(this)
   }
-
+  
+  def infoBox: Buffer[Buffer[(String, Color)]] = {
+    Buffer[Buffer[(String, Color)]](Buffer(("Name: ", Color.black), (name, Color.black)))
+  }
+  
   /** Unequip item */
   def unequip {
     if (getPlayer.slotUseable != null) getPlayer.slotUseable = null

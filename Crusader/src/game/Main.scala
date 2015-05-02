@@ -6,6 +6,8 @@ import scala.util.Random
 import org.lwjgl.input.{Keyboard, Mouse}
 import org.lwjgl.opengl.{Display, DisplayMode}
 
+import org.newdawn.slick.Color
+
 import Math.abs
 
 import Helpers._
@@ -28,7 +30,7 @@ object Main {
   private var passiveObjectList = Buffer[PassiveObject]()
   private var equipmentList = Buffer[Equipment]()
   private var useableList = Buffer[Useable]()
-  private var gameLog = Buffer[String]()
+  private var gameLog = Buffer[Buffer[(String, Color)]]()
   private var lastWheel: Int = 0
   private var lastMonster: Monster = null
   private var prevMouseState: Boolean = false
@@ -546,11 +548,9 @@ object Main {
       file.writeInt(episode)
       file.writeBoolean(shopVisited)
       
-      file.writeInt(gameLog.size)
-      for (log <- gameLog) file.writeUTF(log)
-      
-      file.writeInt(2 + monsterList.size + passiveObjectList.size + equipmentList.size + 
+      file.writeInt(3 + monsterList.size + passiveObjectList.size + equipmentList.size + 
           useableList.size)
+      file.writeObject(new GameLog(gameLog))
       file.writeObject(player)
       file.writeObject(grid)
       for (obj <- monsterList) file.writeObject(obj)
@@ -577,10 +577,6 @@ object Main {
         shopVisited = file.readBoolean
         
         toRead = file.readInt
-        gameLog.clear
-        for (log <- 0 until toRead) addLog(file.readUTF)
-        
-        toRead = file.readInt
         for (i <- 0 until toRead) list += file.readObject
       }
       else boo = false
@@ -590,14 +586,15 @@ object Main {
     
     clearLists
     for (obj <- list) obj match {
-            case o: Player => player = o
-            case o: Grid => grid = o
-            case o: Monster => monsterList.append(o)
-            case o: PassiveObject => passiveObjectList.append(o)
-            case o: Equipment => equipmentList.append(o)
-            case o: Useable => useableList.append(o)
-            case _ => {}
-          }
+      case o: Monster => monsterList.append(o)
+      case o: PassiveObject => passiveObjectList.append(o)
+      case o: Equipment => equipmentList.append(o)
+      case o: Useable => useableList.append(o)
+      case o: GameLog => gameLog = o.log
+      case o: Player => player = o
+      case o: Grid => grid = o
+      case _ => {}
+    }
     updateChances
     lastMonster = null
     

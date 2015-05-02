@@ -30,7 +30,7 @@ class Grid() extends Serializable {
       map = Array.ofDim[Tile](size, size)
       do {
         clearLists
-        altar = new PassiveObject("Altar", " TODO ", -100, -100, ALTAR1)
+        altar = new PassiveObject("Altar", "TODO", -100, -100, ALTAR1)
         djinn = new Monster(-100, -100, DJINN)
         djinn.name = djinnName
         makeMap1(45, 4, 4)
@@ -40,7 +40,7 @@ class Grid() extends Serializable {
     else if (getLevel == 5) {
       size = 27
       map = Array.ofDim[Tile](size, size)
-      altar = new PassiveObject("Altar", " TODO ", -100, -100, ALTAR2)
+      altar = new PassiveObject("Altar", "TODO", -100, -100, ALTAR2)
         djinn = new Monster(-100, -100, DJINN)
         djinn.name = djinnName
       makeBoss1
@@ -48,7 +48,7 @@ class Grid() extends Serializable {
     else {
       size = 10
       map = Array.ofDim[Tile](size, size)
-      altar = new PassiveObject("Altar", " TODO ", -100, -100, ALTAR1)
+      altar = new PassiveObject("Altar", "TODO", -100, -100, ALTAR1)
         djinn = new Monster(-100, -100, DJINN)
         djinn.name = djinnName
       testMap
@@ -122,7 +122,6 @@ class Grid() extends Serializable {
     addAltar
     getTile(altar.getX, altar.getY).addObject(altar)
     addStairsEp1
-    addTrees(16)
     
     do {movePlayerEp1}
     while (!(getTile(getPlayer.getX, getPlayer.getY)).getObjectList.isEmpty || 
@@ -264,24 +263,7 @@ class Grid() extends Serializable {
     setTile(new Tile(door.getX, door.getY, 
         if(direction == E || direction == W) TileType.DJINNDOORH else TileType.DJINNDOORV))
   }
-  
-  /** Add a number of trees */
-  def addTrees(num: Int) = {
-    var tree: PassiveObject = null
-    var coord: Coordinate = null
-    for (n <- Range(0, num)) {
-      do coord = giveRandomNonBlockingCoordinates
-      while (!(getTile(coord.getX, coord.getY).getType == TileType.FLOOR) || 
-          !(getTile(coord.getX, coord.getY)).getObjectList.isEmpty)
-      if (rnd.nextBoolean) {
-        tree = new PassiveObject("Tree", "TODO", coord.getX, coord.getY, BIGTREE1)
-        tree.blockMovement = true
-      }
-      else tree = new PassiveObject("Tree", "TODO", coord.getX, coord.getY, TREE1)
-      tree.blockVision = true
-    }
-  }
-  
+    
   /** Add monsters */
   def addMonsters(num: Int) = {
     var coord: Coordinate = null
@@ -422,29 +404,32 @@ class Grid() extends Serializable {
         if (getTile(i,j).getType == TileType.FLOOR) {
           currentTile = getTile(i, j)
           addGrass(currentTile)
-          rnd.nextInt(1000) match {
-            case t if (t < 100) => addBush(currentTile)
-            case t if (t < 180) => addFlower(currentTile)
-            case t if (t < 220) => addfern(currentTile)
-            case t if (t < 240) => addsmallRock(currentTile)
-            case t if (t < 260) => addBigFlower(currentTile)
-            case t if (t < 280) => {
-              addFlower(currentTile)
-              addFlower(currentTile)
-            }
-            case t if (t < 300) => {
-              addBush(currentTile)
-              addBush(currentTile)
-            }
-            case t if (t < 320) => {
-              addBush(currentTile)
-              addFlower(currentTile)
-            }
-            case t if (t < 321) => addLake(currentTile)
-            case t if (t < 322) => addBigRock(currentTile)
-            case t if (t < 323) => addBigBush(currentTile)
-            case _ => {}
-          } 
+          if (currentTile.objectList.isEmpty) {
+            rnd.nextInt(1000) match {
+              case t if (t < 100) => addBush(currentTile)
+              case t if (t < 180) => addFlower(currentTile)
+              case t if (t < 220) => addfern(currentTile)
+              case t if (t < 240) => addsmallRock(currentTile)
+              case t if (t < 260) => addBigFlower(currentTile)
+              case t if (t < 280) => {
+                addFlower(currentTile)
+                addFlower(currentTile)
+              }
+              case t if (t < 300) => {
+                addBush(currentTile)
+                addBush(currentTile)
+              }
+              case t if (t < 320) => {
+                addBush(currentTile)
+                addFlower(currentTile)
+              }
+              case t if (t < 340) => addTree(currentTile)
+              case t if (t < 345) => addBigRock(currentTile)
+              case t if (t < 350) => addBigBush(currentTile)
+              case t if (t < 351) => addLake(currentTile)
+              case _ => {}
+            } 
+          }
         }
       }
     }
@@ -512,11 +497,10 @@ class Grid() extends Serializable {
   }
   
   def addBigRock(tile: Tile) = {
-    tile.addExtra(
-      rnd.nextInt(2) match {
+    new PassiveObject("Rock", "TODO", tile.getX, tile.getY, rnd.nextInt(2) match {
         case r if (r == 0) => ROCK1
         case r if (r == 1) => ROCK2
-      }, 0, 0)
+      })
   }
   
   def addsmallRock(tile: Tile) = {
@@ -550,6 +534,16 @@ class Grid() extends Serializable {
         case r if (r == 2) => FERN3
         case r if (r == 3) => FERN4
       }, rnd.nextInt(16), rnd.nextInt(16))
+  }
+  
+  def addTree(tile: Tile) = {
+    var tree: PassiveObject = null
+    if (rnd.nextBoolean) {
+        tree = new PassiveObject("Tree", "TODO", tile.getX, tile.getY, BIGTREE1)
+        tree.blockMovement = true
+      }
+      else tree = new PassiveObject("Tree", "TODO", tile.getX, tile.getY, TREE1)
+      tree.blockVision = true
   }
   
   /** Returns the neighbors of given tile */

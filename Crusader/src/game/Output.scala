@@ -303,13 +303,19 @@ object Output {
     if (mouseScrollBonus < -getGameLog.size+7) mouseScrollBonus = -getGameLog.size+7
     else if (mouseScrollBonus > 0) mouseScrollBonus = 0
     
-    var tempLog = Buffer[String]()
+    var tempLog = Buffer[Buffer[(String, Color)]]()
     if (getGameLog.size <= 7) tempLog = getGameLog
     else for (line <- Range(getGameLog.size - 7 + mouseScrollBonus, getGameLog.size + mouseScrollBonus)) tempLog.append(getGameLog.apply(line))
-    var num: Int = 0
+    
+    var x = 0
+    var y = 0
     for (line <- tempLog.reverse) {
-      num += 1
-      font.drawString(10, getHeight - 20 - num * 20, line, Color.black)
+      x = 0
+      y += 20
+      for (text <- line) {
+        font.drawString(10 + x, getHeight - 20 - y, text._1, newColor(text._2))
+        x += font.getWidth(text._1)
+      }
     }
   }
   
@@ -464,56 +470,83 @@ object Output {
   /** Draw info box about objects under mouse */
   def drawObjectsUnderMouse() {
     val tile = getGrid.getTile(mouseXCoord, mouseYCoord)
-    var left = true
-    var text = ""
+    var right = true
+    var infoBox = Buffer[Buffer[(String, Color)]]()
     if (Mouse.getX < 1056 && (getHeight - Mouse.getY) < 544 &&  Mouse.isInsideWindow) 
       drawQuadTex(mouseSelector, (Mouse.getX * 1.0 / 32).toInt * 32, 
           ((getHeight - Mouse.getY) * 1.0 / 32).toInt * 32, mouseSelector.getImageWidth, 
           mouseSelector.getImageHeight)
     if (Mouse.getX < 1056 && (getHeight - Mouse.getY) < 544 && tile != null && tile.visible && 
         !tile.getObjectList.isEmpty) {
-      left = false
-      text = tile.getObjectList.head.name.toUpperCase.head + tile.getObjectList.head.name.tail
+      infoBox = tile.getObjectList.head.infoBox
     }
     else if (Mouse.getX > 1088 && Mouse.getX < 1120 && (getHeight - Mouse.getY) > 308 && 
         (getHeight - Mouse.getY) < 338 && getPlayer.slotWeapon != null) 
-      text = getPlayer.slotWeapon.name.toUpperCase.head + getPlayer.slotWeapon.name.tail
+      infoBox = getPlayer.slotWeapon.infoBox
     else if (Mouse.getX > 1088 && Mouse.getX < 1120 && (getHeight - Mouse.getY) > 308 && 
-        (getHeight - Mouse.getY) < 338) text = "Weapon slot"
+        (getHeight - Mouse.getY) < 338) infoBox = Buffer(Buffer(("Weapon slot", Color.black)))
     else if (Mouse.getX > 1152 && Mouse.getX < 1182 && (getHeight - Mouse.getY) > 308 && 
         (getHeight - Mouse.getY) < 338 && getPlayer.slotArmor != null) 
-      text = getPlayer.slotArmor.name.toUpperCase.head + getPlayer.slotArmor.name.tail
+      infoBox = getPlayer.slotArmor.infoBox
     else if (Mouse.getX > 1152 && Mouse.getX < 1182 && (getHeight - Mouse.getY) > 308 && 
-        (getHeight - Mouse.getY) < 338) text = "Armor slot"
+        (getHeight - Mouse.getY) < 338) infoBox = Buffer(Buffer(("Armor slot", Color.black)))
     else if (Mouse.getX > 1216 && Mouse.getX < 1248 && (getHeight - Mouse.getY) > 308 && 
         (getHeight - Mouse.getY) < 338 && getPlayer.slotShield != null) 
-      text = getPlayer.slotShield.name.toUpperCase.head + getPlayer.slotShield.name.tail
+      infoBox = getPlayer.slotShield.infoBox
     else if (Mouse.getX > 1216 && Mouse.getX < 1248 && (getHeight - Mouse.getY) > 308 && 
-        (getHeight - Mouse.getY) < 338) text = "Shield slot"
+        (getHeight - Mouse.getY) < 338) infoBox = Buffer(Buffer(("Shield slot", Color.black)))
     else if (Mouse.getX > 1088 && Mouse.getX < 1120 && (getHeight - Mouse.getY) > 361 && 
         (getHeight - Mouse.getY) < 391 && getPlayer.slotRing != null) 
-      text = getPlayer.slotRing.name.toUpperCase.head + getPlayer.slotRing.name.tail
+      infoBox = getPlayer.slotRing.infoBox
     else if (Mouse.getX > 1088 && Mouse.getX < 1120 && (getHeight - Mouse.getY) > 361 && 
-        (getHeight - Mouse.getY) < 391) text = "Ring slot"
+        (getHeight - Mouse.getY) < 391) infoBox = Buffer(Buffer(("Ring slot", Color.black)))
     else if (Mouse.getX > 1152 && Mouse.getX < 1182 && (getHeight - Mouse.getY) > 361 && 
         (getHeight - Mouse.getY) < 391 && getPlayer.slotAmulet != null) 
-      text = getPlayer.slotAmulet.name.toUpperCase.head + getPlayer.slotAmulet.name.tail
+      infoBox = getPlayer.slotAmulet.infoBox
     else if (Mouse.getX > 1152 && Mouse.getX < 1182 && (getHeight - Mouse.getY) > 361 && 
-        (getHeight - Mouse.getY) < 391) text = "Amulet slot"
+        (getHeight - Mouse.getY) < 391) infoBox = Buffer(Buffer(("Amulet slot", Color.black)))
     else if (Mouse.getX > 1216 && Mouse.getX < 1248 && (getHeight - Mouse.getY) > 361 && 
         (getHeight - Mouse.getY) < 391 && getPlayer.slotUseable != null) 
-      text = getPlayer.slotUseable.name.toUpperCase.head + getPlayer.slotUseable.name.tail
+      infoBox = getPlayer.slotUseable.infoBox
     else if (Mouse.getX > 1216 && Mouse.getX < 1248 && (getHeight - Mouse.getY) > 361 && 
-        (getHeight - Mouse.getY) < 391) text = "Item slot"
-    if (left) {
-      if (text != "") drawQuadTex(greyBackground, Mouse.getX - 12 - font.getWidth(text), 
-          getHeight - Mouse.getY - 5, font.getWidth(text) + 4, font.getHeight(text) - 5)
-      font.drawString(Mouse.getX - 10 - font.getWidth(text), getHeight - Mouse.getY - 10, text, Color.black)
+        (getHeight - Mouse.getY) < 391) infoBox = Buffer(Buffer(("Item slot", Color.black)))
+    
+    var boxHeight = infoBox.size * 20
+    var boxWidth = 0
+    for (row <- infoBox) {
+      var current = 0
+      for (text <- row) current += font.getWidth(text._1)
+      if (current >= boxWidth) boxWidth = current
+      }
+    
+    if (Mouse.getX + boxWidth + 20 > getWidth) right = false
+    
+    if (right && !infoBox.isEmpty) {
+      drawQuadTex(greyBackground, Mouse.getX + 18, getHeight - Mouse.getY, boxWidth + 4, boxHeight)
+      var y = -5
+      var x = 20
+      for (row <- infoBox) {
+        x = 20
+        for (text <- row) {
+          font.drawString(Mouse.getX + x, getHeight - Mouse.getY + y, text._1, text._2)
+          x += font.getWidth(text._1)
+        }
+        y += 20
+      }
     }
-    else {
-      if (text != "") drawQuadTex(greyBackground, Mouse.getX + 18, getHeight - Mouse.getY, 
-          font.getWidth(text) + 4, font.getHeight(text) - 5)
-      font.drawString(Mouse.getX + 20, getHeight - Mouse.getY - 5, text, Color.black)
+    else if (!infoBox.isEmpty) {
+      drawQuadTex(greyBackground, Mouse.getX - 12 - boxWidth, getHeight - Mouse.getY - 5, 
+          boxWidth + 4, boxHeight)
+      var y = -10
+      var x = -10 - boxWidth
+      for (row <- infoBox) {
+        x = -10 - boxWidth
+        for (text <- row) {
+          font.drawString(Mouse.getX + x, getHeight - Mouse.getY + y, text._1, text._2)
+          x += font.getWidth(text._1)
+        }
+        y += 20
+      }
     }
   }
   

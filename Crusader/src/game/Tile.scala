@@ -135,7 +135,7 @@ object Extra extends Enumeration {
   type Type = Value
   val GRASS1, GRASS2, GRASS3, FLOWER1, FLOWER2, FLOWER3, FLOWER4, FLOWER5, LAKE1, LAKE2, 
   LAKE3, LAKE4, BIGFLOWER1, BIGFLOWER2, BIGFLOWER3, BIGFLOWER4, BIGFLOWER5, BIGFLOWER6, BUSH1, BUSH2, 
-  BUSH3, BUSH4, BUSH5, BUSH6, BUSH7, DJINNDOORH, DJINNDOORV, ROCK1, ROCK2, FLOWER6, FLOWER7, FLOWER8, 
+  BUSH3, BUSH4, BUSH5, BUSH6, BUSH7, DJINNDOORH, DJINNDOORV, FLOWER6, FLOWER7, FLOWER8, 
   FLOWER9, FLOWER10, FLOWER11, SMALLROCK1, SMALLROCK2, SMALLROCK3, SMALLROCK4, SMALLROCK5, 
   SMALLROCK6, SMALLROCK7, BIGBUSH1, BIGBUSH2, BIGBUSH3, BIGBUSH4, FERN1, FERN2, FERN3, FERN4 = Value
   
@@ -174,8 +174,6 @@ object Extra extends Enumeration {
       case t if (t == BUSH7) => bush7
       case t if (t == DJINNDOORH) => DjinnDoorH
       case t if (t == DJINNDOORV) => DjinnDoorV
-      case t if (t == ROCK1) => rock1
-      case t if (t == ROCK2) => rock2
       case t if (t == SMALLROCK1) => smallRock1
       case t if (t == SMALLROCK2) => smallRock2
       case t if (t == SMALLROCK3) => smallRock3

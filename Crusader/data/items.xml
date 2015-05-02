@@ -3,7 +3,7 @@
     <item>
         <ItemType>KNIFE</ItemType>
         <name>knife</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>weapon</slot>
         <weight>2</weight>
         <damage>1,2,0</damage>
@@ -14,7 +14,7 @@
     <item>
         <ItemType>ROBES</ItemType>
         <name>robes</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>armor</slot>
         <weight>2</weight>
         <price>2</price>
@@ -22,7 +22,7 @@
     <item>
         <ItemType>IRONARMOR</ItemType>
         <name>iron armor</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>armor</slot>
         <armor>1</armor>
         <weight>25</weight>
@@ -31,7 +31,7 @@
     <item>
         <ItemType>STEELSWORD</ItemType>
         <name>steel sword</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>weapon</slot>
         <weight>12</weight>
         <damage>1,6,0</damage>
@@ -43,7 +43,7 @@
     <item>
         <ItemType>WOODENSHIELD</ItemType>
         <name>wooden shield</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>shield</slot>
         <shieldArmor>0.5</shieldArmor>
         <weight>2</weight>
@@ -53,14 +53,14 @@
     <item>
         <ItemType>RATMEAT</ItemType>
         <name>rat meat</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>item</slot>
         <weight>3</weight>
     </item>
     <item>
         <ItemType>SMALLHEALPOTION</ItemType>
         <name>small healing salve</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>item</slot>
         <weight>2</weight>
         <price>10</price>
@@ -68,7 +68,7 @@
     <item>
         <ItemType>BATTLEAXE</ItemType>
         <name>battle axe</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>weapon</slot>
         <weight>15</weight>
         <damage>1,5,0</damage>
@@ -80,7 +80,7 @@
     <item>
         <ItemType>CLOTH1</ItemType>
         <name>clothes</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>armor</slot>
         <weight>2</weight>
         <price>5</price>
@@ -88,7 +88,7 @@
     <item>
         <ItemType>CLOTH2</ItemType>
         <name>clothes</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>armor</slot>
         <weight>2</weight>
         <price>5</price>
@@ -96,7 +96,7 @@
     <item>
         <ItemType>IRONSHIELD</ItemType>
         <name>iron shield</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>shield</slot>
         <shieldArmor>1</shieldArmor>
         <weight>10</weight>
@@ -106,7 +106,7 @@
     <item>
         <ItemType>KATANA</ItemType>
         <name>katana</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>weapon</slot>1
         <weight>10</weight>
         <damage>1,6,1</damage>
@@ -117,7 +117,7 @@
     <item>
         <ItemType>LARGESHIELD</ItemType>
         <name>large shield</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>shield</slot>
         <shieldArmor>1.5</shieldArmor>
         <weight>15</weight>
@@ -127,7 +127,7 @@
     <item>
         <ItemType>SHORTSWORD</ItemType>
         <name>short sword</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>weapon</slot>
         <weight>8</weight>
         <damage>1,4,0</damage>
@@ -139,7 +139,7 @@
     <item>
         <ItemType>SMALLSHIELD</ItemType>
         <name>small shield</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>shield</slot>
         <shieldArmor>1</shieldArmor>
         <weight>5</weight>
@@ -149,7 +149,7 @@
     <item>
         <ItemType>STEELARMOR</ItemType>
         <name>steel armor</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>armor</slot>
         <armor>1.5</armor>
         <weight>25</weight>
@@ -158,7 +158,7 @@
     <item>
         <ItemType>CLAYMORE</ItemType>
         <name>claymore</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>weapon</slot>
         <is2h>true</is2h>
         <weight>20</weight>
@@ -171,7 +171,7 @@
     <item>
         <ItemType>DUALDAGGER</ItemType>
         <name>dual dagger</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>weapon</slot>
         <is2h>true</is2h>
         <weight>6</weight>
@@ -183,7 +183,7 @@
     <item>
         <ItemType>GOLDARMOR</ItemType>
         <name>gold armor</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>armor</slot>
         <armor>2</armor>
         <weight>30</weight>
@@ -192,7 +192,7 @@
     <item>
         <ItemType>MAGICSWORD</ItemType>
         <name>magic sword</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>weapon</slot>
         <weight>10</weight>
         <damage>1,8,1</damage>
@@ -203,7 +203,7 @@
     <item>
         <ItemType>MONODAGGER</ItemType>
         <name>dagger</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>weapon</slot>
         <weight>3</weight>
         <damage>1,3,0</damage>
@@ -214,7 +214,7 @@
     <item>
         <ItemType>VIKINGARMOR</ItemType>
         <name>viking armor</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>armor</slot>
         <armor>1</armor>
         <weight>15</weight>
@@ -223,7 +223,7 @@
     <item>
         <ItemType>BUFFPOTION</ItemType>
         <name>Potion of power</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>item</slot>
         <weight>2</weight>
         <price>100</price>
@@ -231,7 +231,7 @@
     <item>
         <ItemType>CHARITYPOTION</ItemType>
         <name>Potion of charity</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>item</slot>
         <weight>2</weight>
         <price>200</price>
@@ -239,7 +239,7 @@
     <item>
         <ItemType>DILIGENCEPOTION</ItemType>
         <name>Potion of diligence</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>item</slot>
         <weight>2</weight>
         <price>200</price>
@@ -247,7 +247,7 @@
     <item>
         <ItemType>HUMILITYPOTION</ItemType>
         <name>Potion of humility</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>item</slot>
         <weight>2</weight>
         <price>200</price>
@@ -255,7 +255,7 @@
     <item>
         <ItemType>IMMUNITYPOTION</ItemType>
         <name>Potion of immunity</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>item</slot>
         <weight>2</weight>
         <price>500</price>
@@ -263,7 +263,7 @@
     <item>
         <ItemType>KINDNESSPOTION</ItemType>
         <name>Potion of kindness</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>item</slot>
         <weight>2</weight>
         <price>200</price>
@@ -271,7 +271,7 @@
     <item>
         <ItemType>PATIENCEPOTION</ItemType>
         <name>Potion of patience</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>item</slot>
         <weight>2</weight>
         <price>200</price>
@@ -279,7 +279,7 @@
     <item>
         <ItemType>TEMPERANCEPOTION</ItemType>
         <name>Potion of temperance</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>item</slot>
         <weight>2</weight>
         <price>200</price>
@@ -287,7 +287,7 @@
     <item>
         <ItemType>TIMEPOTION</ItemType>
         <name>Potion of time</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>item</slot>
         <weight>2</weight>
         <price>1000</price>
@@ -295,7 +295,7 @@
     <item>
         <ItemType>VISIONPOTION</ItemType>
         <name>Potion of vision</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>item</slot>
         <weight>2</weight>
         <price>50</price>
@@ -303,7 +303,7 @@
     <item>
         <ItemType>ZEALPOTION</ItemType>
         <name>Potion of zeal</name>
-        <description>TODO</description>
+        <description>-</description>
         <slot>item</slot>
         <weight>2</weight>
         <price>200</price>

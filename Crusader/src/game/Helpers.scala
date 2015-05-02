@@ -2,11 +2,14 @@ package game
 
 import Main._
 import org.lwjgl.input.Mouse
+import org.newdawn.slick.Color
 import org.newdawn.slick.util.ResourceLoader
 import org.newdawn.slick.opengl.{Texture, TextureLoader}
 import java.io.{IOException, InputStream}
 import scala.collection.mutable.Buffer
 import Math.abs
+
+class GameLog(val log: Buffer[Buffer[(String, Color)]]) extends Serializable {}
 
 /** Basic button */
 class Button(val x: Int, val y: Int, val width: Int, val height: Int, val tex: Texture, val tex2: Texture, val tex3: Texture) {
@@ -751,32 +754,50 @@ object Helpers {
     tex
   }
   
-  /** Method to wrap long strings into smaller lines.
-   *
-   * @param text is the long text block needed to split
-   * @param maxLenght is the maximum lenght (in pixels) for one line
-   * @return Buffer containing smaller strings
-   */
-  def wordWrap(text: String, maxLength: Int): Buffer[String] = {
+  /** Add message to gamelogs */
+  def addLog(text: String) = {
     val lines = Buffer[String]()
     var line = ""
     for (word <- text.split(" ")) {
-      if (Output.font.getWidth(line + " " + word) > maxLength) {
+      if (Output.font.getWidth(line + " " + word) > 1030) {
         lines += line
         line = word + " "
       }
       else line += word + " "
     }
     lines += line
-    lines
+    for (line <- lines) {
+      getGameLog.append((Buffer((line, Color.black))))
+      Output.mouseScrollBonus += 1
+    }
   }
   
   /** Add message to gamelogs */
-  def addLog(text: String) = {
-    for (line <- wordWrap(text, 1030)) {
-      getGameLog.append(line)
-      Output.mouseScrollBonus += 1
+  def addLog(textBlock: Buffer[(String, Color)]) = {
+    var line = Buffer[(String, Color)]()
+    var x = 0
+    for (text <- textBlock) {
+      if (x + Output.font.getWidth(text._1) < 1030) {
+        line.append(text)
+        x += Output.font.getWidth(text._1)
+      }
+      else {
+        for (word <- text._1.split(" ")) {
+          if (x + Output.font.getWidth(word) < 1030) {
+            line.append((word + " ", text._2))
+            x += Output.font.getWidth(word + " ")
+          }
+          else {
+            getGameLog.append(line)
+            Output.mouseScrollBonus += 1
+            line = Buffer((word + " ", text._2))
+            x = Output.font.getWidth(word + " ")
+          }
+        }
+      }
     }
+    getGameLog.append(line)
+    Output.mouseScrollBonus += 1
   }
 
   private val firstname = List("John", "Oliver", "Alexander", "William", "Jean", "Peter", "Walter", 
@@ -857,6 +878,26 @@ object Helpers {
         romanNumber(rnd.nextInt(romanNumber.size)) + " " + title(rnd.nextInt(title.size))
         else lastname(rnd.nextInt(lastname.size)) + " " + title(rnd.nextInt(title.size))
         }
+    }
+  }
+  
+  def newColor(color: Color): Color = {
+    color match {
+      case c if (c == Color.black) => new Color(0,0,0,1.0f)
+      case c if (c == Color.transparent) => new Color(0.0f,0.0f,0.0f,0.0f)
+      case c if (c == Color.white) => new Color(1.0f,1.0f,1.0f,1.0f)
+      case c if (c == Color.yellow) => new Color(1.0f,1.0f,0,1.0f)
+      case c if (c == Color.red) => new Color(1.0f,0,0,1.0f)
+      case c if (c == Color.blue) => new Color(0,0,1.0f,1.0f)
+      case c if (c == Color.green) => new Color(0,1.0f,0,1.0f)
+      case c if (c == Color.gray) => new Color(0.5f,0.5f,0.5f,1.0f)
+      case c if (c == Color.cyan) => new Color(0,1.0f,1.0f,1.0f)
+      case c if (c == Color.darkGray) => new Color(0.3f,0.3f,0.3f,1.0f)
+      case c if (c == Color.lightGray) => new Color(0.7f,0.7f,0.7f,1.0f)
+      case c if (c == Color.pink) => new Color(255, 175, 175, 255)
+      case c if (c == Color.orange) => new Color(255, 200, 0, 255)
+      case c if (c == Color.magenta) => new Color(255, 0, 255, 255)
+      case _ => new Color(0,0,0,1.0f)
     }
   }
   

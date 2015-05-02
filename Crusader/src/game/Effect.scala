@@ -64,7 +64,7 @@ object Prayers extends Enumeration {
   
   /** Stairs are moved to the player's location */
   def stairs = {
-    if (getGrid.isWithinGrid(getGrid.getStairs.getX, getGrid.getStairs.getY)) {
+    if (getLevel%5 != 0) {
       getGrid.moveStairsToPlayer
       addLog("Stairs appear near you.")
     }
