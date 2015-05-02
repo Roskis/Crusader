@@ -593,6 +593,11 @@ class Grid() extends Serializable {
     }
     for (j <- Range(0,size)) {
       for (i <- Range(0,size)) {
+        if (getTile(i, j).xDif(getPlayer) <= 16 && getTile(i, j).yDif(getPlayer) <= 8) map(i)(j).drawExtra
+      }
+    }
+    for (j <- Range(0,size)) {
+      for (i <- Range(0,size)) {
         if (getTile(i, j).xDif(getPlayer) <= 16 && getTile(i, j).yDif(getPlayer) <= 8) map(i)(j).drawObjects
       }
     }

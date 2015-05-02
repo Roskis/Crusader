@@ -269,6 +269,13 @@ object Helpers {
   private lazy val ifern2 = loadTexture("Environment/fern2")
   private lazy val ifern3 = loadTexture("Environment/fern3")
   private lazy val ifern4 = loadTexture("Environment/fern4")
+  private lazy val iblood1 = loadTexture("Environment/blood1")
+  private lazy val iblood2 = loadTexture("Environment/blood2")
+  private lazy val iblood3 = loadTexture("Environment/blood3")
+  private lazy val iblood4 = loadTexture("Environment/blood4")
+  private lazy val iblood5 = loadTexture("Environment/blood5")
+  private lazy val iblood6 = loadTexture("Environment/blood6")
+  private lazy val iblood7 = loadTexture("Environment/blood7")
   private lazy val iwall1 = loadTexture("Tiles/wall1")
   private lazy val iStairs = loadTexture("tempStairs")
   private lazy val iDjinnDoorH = loadTexture("Tiles/djinnDoorH")
@@ -496,6 +503,13 @@ object Helpers {
   def fern2 = ifern2
   def fern3 = ifern3
   def fern4 = ifern4
+  def blood1 = iblood1
+  def blood2 = iblood2
+  def blood3 = iblood3
+  def blood4 = iblood4
+  def blood5 = iblood5
+  def blood6 = iblood6
+  def blood7 = iblood7
   def wall1 = iwall1
   def Stairs = iStairs
   def DjinnDoorH = iDjinnDoorH

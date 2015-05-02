@@ -14,6 +14,7 @@ import Main._
 import Output.drawQuadTex
 import Helpers._
 import Prayers._
+import Extra._
 
 /** All of the game's objects will be under this trait */
 trait Object {
@@ -591,7 +592,27 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   def kill() {
     getMonsterList.filter(_ == this) foreach {getMonsterList -= _}
     updateLastMonster(null)
-    getGrid.getTile(getX, getY).removeObject(this)
+    getTile.addExtra(rnd.nextInt(7) match {
+        case r if (r == 0) => BLOOD1
+        case r if (r == 1) => BLOOD2
+        case r if (r == 2) => BLOOD3
+        case r if (r == 3) => BLOOD4
+        case r if (r == 4) => BLOOD5
+        case r if (r == 5) => BLOOD6
+        case r if (r == 6) => BLOOD7
+      }, rnd.nextInt(16), rnd.nextInt(20)-2)
+    if (mType == MonsterType.SLOTH) {
+      for (n <- Range(0, 50)) getTile.addExtra(rnd.nextInt(7) match {
+        case r if (r == 0) => BLOOD1
+        case r if (r == 1) => BLOOD2
+        case r if (r == 2) => BLOOD3
+        case r if (r == 3) => BLOOD4
+        case r if (r == 4) => BLOOD5
+        case r if (r == 5) => BLOOD6
+        case r if (r == 6) => BLOOD7
+      }, rnd.nextInt(16)+rnd.nextInt(101)-50, rnd.nextInt(16)+rnd.nextInt(101)-50)
+    }
+    getTile.removeObject(this)
     MonsterType.drop(monsterType, getX, getY)
     if (distance(getGrid.getAltar) <= 2) {
       getPlayer.giveXP(2 * experience)
@@ -606,9 +627,11 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     y = -100
     addLog(name.toUpperCase.head + name.tail + " dies.")
 
-    if (mType == MonsterType.SLOTH) addLog(getPlayer.name.toUpperCase.head + getPlayer.name.tail + 
-        " killed the first boss! Unfortunately demo ends here. Your Score is " + 
-        getPlayer.gold.toInt + ".")
+    if (mType == MonsterType.SLOTH) {
+      addLog(getPlayer.name.toUpperCase.head + getPlayer.name.tail + 
+          " killed the first boss! Unfortunately demo ends here. Your Score is " +  
+          getPlayer.gold.toInt + ".")
+    }
   }
   
   /** Takes damage from attack */

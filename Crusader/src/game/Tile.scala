@@ -86,12 +86,15 @@ class Tile(Xcoord: Int, Ycoord: Int, var tileType: TileType.Value) extends Seria
     else if (explored) for (obj <- objectList) obj.draw
   }
   
+  def drawExtra = if (explored) {
+    for (extra <- extraToDraw) drawQuadTex(Extra.image(extra._1), x - (getPlayer.getX - 16) * 32 + extra._2, 
+        y - (getPlayer.getY - 8) * 32 + extra._3, Extra.image(extra._1).getImageWidth, Extra.image(extra._1).getImageHeight)
+  }
+  
   /** Draw Tile */
   def draw = if (explored) {
     drawQuadTex(image, x - (getPlayer.getX - 16) * 32, y - (getPlayer.getY - 8) * 32, 
         image.getImageWidth, image.getImageHeight)
-    for (extra <- extraToDraw) drawQuadTex(Extra.image(extra._1), x - (getPlayer.getX - 16) * 32 + extra._2, 
-        y - (getPlayer.getY - 8) * 32 + extra._3, Extra.image(extra._1).getImageWidth, Extra.image(extra._1).getImageHeight)
   }
   
   /** Draw Fog */
@@ -136,11 +139,12 @@ class Tile(Xcoord: Int, Ycoord: Int, var tileType: TileType.Value) extends Seria
 
 object Extra extends Enumeration {
   type Type = Value
-  val GRASS1, GRASS2, GRASS3, FLOWER1, FLOWER2, FLOWER3, FLOWER4, FLOWER5, LAKE1, LAKE2, 
-  LAKE3, LAKE4, BIGFLOWER1, BIGFLOWER2, BIGFLOWER3, BIGFLOWER4, BIGFLOWER5, BIGFLOWER6, BUSH1, BUSH2, 
-  BUSH3, BUSH4, BUSH5, BUSH6, BUSH7, DJINNDOORH, DJINNDOORV, FLOWER6, FLOWER7, FLOWER8, 
-  FLOWER9, FLOWER10, FLOWER11, SMALLROCK1, SMALLROCK2, SMALLROCK3, SMALLROCK4, SMALLROCK5, 
-  SMALLROCK6, SMALLROCK7, BIGBUSH1, BIGBUSH2, BIGBUSH3, BIGBUSH4, FERN1, FERN2, FERN3, FERN4 = Value
+  val GRASS1, GRASS2, GRASS3, FLOWER1, FLOWER2, FLOWER3, FLOWER4, FLOWER5, LAKE1, LAKE2, LAKE3, 
+  LAKE4, BIGFLOWER1, BIGFLOWER2, BIGFLOWER3, BIGFLOWER4, BIGFLOWER5, BIGFLOWER6, BUSH1, BUSH2, 
+  BUSH3, BUSH4, BUSH5, BUSH6, BUSH7, DJINNDOORH, DJINNDOORV, FLOWER6, FLOWER7, FLOWER8, FLOWER9, 
+  FLOWER10, FLOWER11, SMALLROCK1, SMALLROCK2, SMALLROCK3, SMALLROCK4, SMALLROCK5, SMALLROCK6, 
+  SMALLROCK7, BIGBUSH1, BIGBUSH2, BIGBUSH3, BIGBUSH4, FERN1, FERN2, FERN3, FERN4, BLOOD1, BLOOD2, 
+  BLOOD3, BLOOD4, BLOOD5, BLOOD6, BLOOD7 = Value
   
   def image(extra: Type): Texture = {
     extra match {
@@ -192,6 +196,13 @@ object Extra extends Enumeration {
       case t if (t == FERN2) => fern2
       case t if (t == FERN3) => fern3
       case t if (t == FERN4) => fern4
+      case t if (t == BLOOD1) => blood1
+      case t if (t == BLOOD2) => blood2
+      case t if (t == BLOOD3) => blood3
+      case t if (t == BLOOD4) => blood4
+      case t if (t == BLOOD5) => blood5
+      case t if (t == BLOOD6) => blood6
+      case t if (t == BLOOD7) => blood7
       case _ => missing
     }
   }
