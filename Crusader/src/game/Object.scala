@@ -795,8 +795,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     else {
       val goto = getDirection(new Coordinate(this.getX, this.getY), new Coordinate(getPlayer.getX, getPlayer.getY))
       if (getGrid.getTile(getCoordinates(goto, getX, getY)).blockMovement) {
-        if (rnd.nextBoolean) move(getAdjacentDirections(goto)._1)
-        else move(getAdjacentDirections(goto)._2)
+        move(getGrid.dijkstra(getTile, getGrid.getTile(getPlayer.getX, getPlayer.getY)).drop(1)(0).getCoordinate)
       }
       else move(goto)
       }

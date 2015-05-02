@@ -101,6 +101,9 @@ class Tile(Xcoord: Int, Ycoord: Int, var tileType: TileType.Value) extends Seria
       image.getImageWidth, image.getImageHeight)
   }
   
+  /** getter for coordinate */
+  def getCoordinate: Coordinate = new Coordinate(getX, getY)
+  
   /** x and y setters */
   def setX(newX: Int) = x = newX * 32
   def setY(newY: Int) = y = newY * 32

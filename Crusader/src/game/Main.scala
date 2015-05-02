@@ -411,11 +411,12 @@ object Main {
       var path = getGrid.dijkstra(player.getTile, getGrid.getTile(mx, my)).drop(1)
       var enemies = false
       if (mx == getPlayer.getX && my == getPlayer.getY) playTurn
-      if (getGrid.isWithinGrid(mx, my) && getGrid.getTile(mx, my).explored) {
+      if (getGrid.isWithinGrid(mx, my)) {
         while (!(enemies || path.isEmpty)) {
           player.moveOrAttack(path(0))
           playTurn
           path = path.drop(1)
+          getGrid.FOV
           for (enemy <- getMonsterList) if (enemy.getTile.visible) enemies = true
         }
       }
