@@ -472,9 +472,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
             attack(monster)
           }
           case item: Item => {
-            if (item.inShop && getGrid.getDjinn.mode == "passive") 
-              addLog(item.name.toUpperCase.head + item.name.tail + " is " + item.price.toInt + " gold.")
-            else if (ItemType.slot(item.itemType) == "item" && slotUseable == null) item.pickUp
+            if (ItemType.slot(item.itemType) == "item" && slotUseable == null) item.pickUp
           }
           case pasobj: PassiveObject if (pasobj.pType == PassiveType.STAIRS) => {goToNextLevel}
           case _ => {}
@@ -578,7 +576,8 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   getMonsterList.append(this)
   
   def infoBox: Buffer[Buffer[(String, Color)]] = {
-    Buffer[Buffer[(String, Color)]](Buffer(("Name: ", Color.black), (name, Color.black)))
+    Buffer[Buffer[(String, Color)]](Buffer(("Name: ", Color.black), (name, Color.black)), 
+        Buffer(("Description: ", Color.black), (MonsterType.description(mType), Color.black)))
   }
   
   /** Accuracy of the monster */
@@ -818,8 +817,8 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
     else {
       val goto = getDirection(new Coordinate(this.getX, this.getY), new Coordinate(getPlayer.getX, getPlayer.getY))
       if (getGrid.getTile(getCoordinates(goto, getX, getY)).blockMovement) {
-        if (!getGrid.dijkstra(getTile, getGrid.getTile(getPlayer.getX, getPlayer.getY)).isEmpty)
-          move(getGrid.dijkstra(getTile, getGrid.getTile(getPlayer.getX, getPlayer.getY)).drop(1)(0).getCoordinate)
+        if (rnd.nextBoolean) move(getAdjacentDirections(goto)._1)
+        else move(getAdjacentDirections(goto)._2)
       }
       else move(goto)
       }
@@ -1183,7 +1182,29 @@ class Equipment(startX: Int, startY: Int, equipmentType: ItemType.Value, isEquip
   def damage: Double = roll(ItemType.damage(itemType)._1, ItemType.damage(itemType)._2) + ItemType.damage(itemType)._3
   
   def infoBox: Buffer[Buffer[(String, Color)]] = {
-    Buffer[Buffer[(String, Color)]](Buffer(("Name: ", Color.black), (name, Color.black)))
+    var buff: Buffer[Buffer[(String, Color)]] = Buffer(Buffer(("Name: ", Color.black), (name.toUpperCase.head + name.tail, Color.black)), 
+        Buffer(("Description: ", Color.black), (ItemType.description(itemType), Color.black)),
+        Buffer(("Price: ", Color.black), (ItemType.price(itemType).toInt.toString, Color.black)),
+        Buffer(("Weight: ", Color.black), (ItemType.weight(itemType).toInt.toString, Color.black)))
+    if (ItemType.slot(itemType) == "weapon") {
+      var extradmg = ""
+      if (ItemType.damage(itemType)._3 != 0) extradmg = " + " + ItemType.damage(itemType)._3
+      buff.append(Buffer(("Damage: ", Color.black), (ItemType.damage(itemType)._1 + "D" + 
+          ItemType.damage(itemType)._2 + extradmg, Color.black)))
+      buff.append(Buffer(("Accuracy: ", Color.black), (ItemType.accuracy(itemType).toInt.toString, Color.black)))
+      buff.append(Buffer(("Critical chance: ", Color.black), (ItemType.critChance(itemType).toInt.toString, Color.black)))
+      if (ItemType.is2h(itemType)) buff.append(Buffer(("2h: Yes", Color.black)))
+      else buff.append(Buffer(("2h: No", Color.black)))
+      buff.append(Buffer(("Armor pierce: ", Color.black), (ItemType.armorPiercing(itemType).toInt.toString, Color.black)))
+    }
+    else if (ItemType.slot(itemType) == "armor") {
+      buff.append(Buffer(("Armor: ", Color.black), (ItemType.armor(itemType).toInt.toString, Color.black)))
+    }
+    else if (ItemType.slot(itemType) == "shield") {
+      buff.append(Buffer(("Block chance: ", Color.black), (ItemType.blockChance(itemType).toInt.toString, Color.black)))
+      buff.append(Buffer(("Defence: ", Color.black), (ItemType.shieldArmor(itemType).toInt.toString, Color.black)))
+    }
+    buff
   }
   
   if (!equipped) {
