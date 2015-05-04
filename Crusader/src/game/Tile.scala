@@ -60,9 +60,16 @@ class Tile(Xcoord: Int, Ycoord: Int, var tileType: TileType.Value) extends Seria
       tileType = TileType.FLOOR
       getGrid.addGrass(this)
     }
-    else if (obj.isInstanceOf[Player] && tileType == TileType.BOSSDOOR) {
-      if (getLevel == 5) getGrid.getTile(6, 13).tileType = TileType.WALL
-      getGrid.unexploreAll
+    else if (obj.isInstanceOf[Player] && tileType == TileType.BOSSDOOR2) {
+      for (tile <- getGrid.getTiles) if(tile.tileType == TileType.BOSSDOOR1) {
+        for (obj <- tile.getObjectList) obj match {
+          case o: PassiveObject if (o.pType == PassiveType.GATE1) => {
+            Main.getPassiveObjectList.filter(_ == o) foreach {Main.getPassiveObjectList -= _}
+            new PassiveObject("Gate", "TODO", tile.getX, tile.getY, PassiveType.GATE2).blockMovement = true
+          }
+          case _ => {}
+        }
+      }
       tileType = TileType.FLOOR
     }
   }
@@ -212,7 +219,7 @@ object Extra extends Enumeration {
 object TileType extends Enumeration {
 
   type Type = Value
-  val FLOOR, WALL, DJINNDOORH, DJINNDOORV, DJINNFLOOR, DJINNWALL, SECRETDOOR, BOSSDOOR = Value
+  val FLOOR, WALL, DJINNDOORH, DJINNDOORV, DJINNFLOOR, DJINNWALL, SECRETDOOR, BOSSDOOR1, BOSSDOOR2 = Value
   private val rnd = Main.getRnd
   
   /** returns texture of the given tile type */
@@ -220,8 +227,6 @@ object TileType extends Enumeration {
     tileType match {
       case t if (t == FLOOR) => floorEp1
       case t if (t == WALL) => wall1
-      //case t if (t == DJINNDOORH) => DjinnDoorH
-      //case t if (t == DJINNDOORV) => DjinnDoorV
       case t if (t == DJINNFLOOR || t == DJINNDOORH || t == DJINNDOORV) => {
         if (getGrid.shopImageNumbers._3 == 1) DjinnFloor1
         else if (getGrid.shopImageNumbers._3 == 2) DjinnFloor2
@@ -233,7 +238,8 @@ object TileType extends Enumeration {
         else DjinnWall3
       }
       case t if (t == SECRETDOOR) => wall1
-      case t if (t == BOSSDOOR) => grass1
+      case t if (t == BOSSDOOR1) => floorEp1
+      case t if (t == BOSSDOOR2) => floorEp1
       case _ => missing
     }
   }
@@ -248,7 +254,8 @@ object TileType extends Enumeration {
       case t if (t == DJINNFLOOR) => false
       case t if (t == DJINNWALL) => true
       case t if (t == SECRETDOOR) => false
-      case t if (t == BOSSDOOR) => false
+      case t if (t == BOSSDOOR1) => false
+      case t if (t == BOSSDOOR2) => false
       case _ => true
     }
   }
@@ -263,7 +270,8 @@ object TileType extends Enumeration {
       case t if (t == DJINNFLOOR) => false
       case t if (t == DJINNWALL) => true
       case t if (t == SECRETDOOR) => true
-      case t if (t == BOSSDOOR) => false
+      case t if (t == BOSSDOOR1) => false
+      case t if (t == BOSSDOOR2) => false
       case _ => true
     }
   }

@@ -148,7 +148,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
   }
   
   def infoBox: Buffer[Buffer[(String, Color)]] = {
-    Buffer[Buffer[(String, Color)]](Buffer(("Name: ", Color.black), (name, Color.black)))
+    Buffer[Buffer[(String, Color)]](Buffer(("Name: ", Color.black), (name.toUpperCase.head + name.tail, Color.black)))
   }
   
   def getZeal: Double = {
@@ -472,7 +472,7 @@ class Player(playerName: String, startX: Int, startY: Int) extends Character wit
             attack(monster)
           }
           case item: Item => {
-            if (ItemType.slot(item.itemType) == "item" && slotUseable == null) item.pickUp
+            if (ItemType.slot(item.itemType) == "item" && slotUseable == null && !item.inShop) item.pickUp
           }
           case pasobj: PassiveObject if (pasobj.pType == PassiveType.STAIRS) => {goToNextLevel}
           case _ => {}
@@ -525,7 +525,7 @@ class PassiveObject(objectName: String, objectDescription: String, startX: Int, 
 object PassiveType extends Enumeration with Serializable {
 
   type Passive = Value
-  val ALTAR1, ALTAR2, ROCK1, ROCK2, BIGTREE1, TREE1, STAIRS = Value
+  val ALTAR1, ALTAR2, ROCK1, ROCK2, BIGTREE1, TREE1, STAIRS, GATE1, GATE2 = Value
 
   /** returns texture of the given monster */
   def image(PassiveType: Passive): Texture = {
@@ -537,6 +537,8 @@ object PassiveType extends Enumeration with Serializable {
       case t if (t == BIGTREE1) => bigTree1
       case t if (t == TREE1) => tree1
       case t if (t == STAIRS) => portalEp1
+      case t if (t == GATE1) => gate1
+      case t if (t == GATE2) => gate2
       case _ => missing
     }
   }
@@ -576,7 +578,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   getMonsterList.append(this)
   
   def infoBox: Buffer[Buffer[(String, Color)]] = {
-    Buffer[Buffer[(String, Color)]](Buffer(("Name: ", Color.black), (name, Color.black)), 
+    Buffer[Buffer[(String, Color)]](Buffer(("Name: ", Color.black), (name.toUpperCase.head + name.tail, Color.black)), 
         Buffer(("Description: ", Color.black), (MonsterType.description(mType), Color.black)))
   }
   
@@ -776,8 +778,8 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
   
   /** AI for sloth demon */
   def slothAI = {
-    if (distance(getPlayer) > 6 && mode == "aggressive") {mode = "passive"}
-    else if (distance(getPlayer) > 6 && mode == "passive") {
+    if (distance(getPlayer) > 4 && mode == "aggressive") {mode = "passive"}
+    else if (distance(getPlayer) > 4 && mode == "passive") {
       if (rnd.nextInt(5) == 0) health += 1
       if (health > MonsterType.maxHP(mType)) health = MonsterType.maxHP(mType)
     }
@@ -1678,7 +1680,12 @@ class Useable(startX: Int, startY: Int, val itemType: ItemType.Value, isEquipped
   }
   
   def infoBox: Buffer[Buffer[(String, Color)]] = {
-    Buffer[Buffer[(String, Color)]](Buffer(("Name: ", Color.black), (name, Color.black)))
+    var buff: Buffer[Buffer[(String, Color)]] = Buffer(Buffer(("Name: ", Color.black), (name.toUpperCase.head + name.tail, Color.black)), 
+        Buffer(("Description: ", Color.black), (ItemType.description(itemType), Color.black)),
+        Buffer(("Price: ", Color.black), (ItemType.price(itemType).toInt.toString, Color.black)),
+        Buffer(("Weight: ", Color.black), (ItemType.weight(itemType).toInt.toString, Color.black)))
+
+    buff
   }
   
   /** Unequip item */

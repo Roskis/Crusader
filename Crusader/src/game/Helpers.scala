@@ -175,8 +175,8 @@ object Helpers {
   private lazy val ilizardc2 = loadTexture("Monsters/lizardc2")
   private lazy val icrocodile1 = loadTexture("Monsters/crocodile1")
   private lazy val icrocodile2 = loadTexture("Monsters/crocodile2")
-  private lazy val isloth1 = loadTexture("tempSloth")
-  private lazy val isloth2 = loadTexture("tempSloth")
+  private lazy val isloth1 = loadTexture("Monsters/slothDemon1")
+  private lazy val isloth2 = loadTexture("Monsters/slothDemon2")
   private lazy val iknifeG = loadTexture("Items/knifeG")
   private lazy val iknifeE = loadTexture("Player/knifeE")
   private lazy val irobesG = loadTexture("Items/robesG")
@@ -276,6 +276,8 @@ object Helpers {
   private lazy val iblood5 = loadTexture("Environment/blood5")
   private lazy val iblood6 = loadTexture("Environment/blood6")
   private lazy val iblood7 = loadTexture("Environment/blood7")
+  private lazy val igate1 = loadTexture("Environment/gate1")
+  private lazy val igate2 = loadTexture("Environment/gate2")
   private lazy val iwall1 = loadTexture("Tiles/wall1")
   private lazy val iStairs = loadTexture("tempStairs")
   private lazy val iDjinnDoorH = loadTexture("Tiles/djinnDoorH")
@@ -510,6 +512,8 @@ object Helpers {
   def blood5 = iblood5
   def blood6 = iblood6
   def blood7 = iblood7
+  def gate1 = igate1
+  def gate2 = igate2
   def wall1 = iwall1
   def Stairs = iStairs
   def DjinnDoorH = iDjinnDoorH

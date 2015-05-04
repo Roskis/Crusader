@@ -41,60 +41,79 @@ class Grid() extends Serializable {
       size = 27
       map = Array.ofDim[Tile](size, size)
       altar = new PassiveObject("Altar", "TODO", -100, -100, ALTAR2)
-        djinn = new Monster(-100, -100, DJINN)
-        djinn.name = djinnName
+      djinn = new Monster(-100, -100, DJINN)
+      djinn.name = djinnName
       makeBoss1
     }
     else {
       size = 10
       map = Array.ofDim[Tile](size, size)
       altar = new PassiveObject("Altar", "TODO", -100, -100, ALTAR1)
-        djinn = new Monster(-100, -100, DJINN)
-        djinn.name = djinnName
+      djinn = new Monster(-100, -100, DJINN)
+      djinn.name = djinnName
       testMap
     }
   }
 
   /** Temporary bossmap */
   def makeBoss1() {
-    map(size/2+3)(size/2) = new Tile(size/2+3, size/2, TileType.FLOOR)
+    map(size/2)(size/2-3) = new Tile(size/2, size/2-3, TileType.FLOOR)
     for (i <- Range(0,size)) {
       for (j <- Range(0,size)) {
-        setTile(new Tile(i, j, if (map(size/2+3)(size/2).distance(new Coordinate(i, j)) <= 9 || 
-            (i > 0 && i < 6 && j > size/2-3 && j < size/2+1)) TileType.FLOOR else TileType.WALL)
+        setTile(new Tile(i, j, if (map(size/2)(size/2-3).distance(new Coordinate(i, j)) <= 9) TileType.FLOOR else TileType.WALL)
         )
       }
     }
-  map(6)(13).tileType = TileType.FLOOR
-  map(7)(13).tileType = TileType.BOSSDOOR
-  map(1)(11).tileType = TileType.WALL
-  map(5)(11).tileType = TileType.WALL
-  map(3)(10).tileType = TileType.FLOOR
-  altar.setX(3)
-  altar.setY(11)
-  getTile(3, 11).addObject(altar)
-  
-  for (x <- Range(1,6)) {
-    for (y <- Range(14,19)) {
-      map(x)(y).tileType = TileType.DJINNFLOOR
-      if (((x == 1 || x == 5) && y > 14 && y < 18) || (y == 18 && x < 5 && x > 1)) addShopItem(new Coordinate(x, y)).inShop=true
+
+    for (i <- Range(9,17)) {
+      for (j <- Range(21,26)) {
+        if (i < 13) getTile(i,j).tileType = TileType.DJINNFLOOR else getTile(i,j).tileType = TileType.FLOOR
+      }
     }
-  }
-  map(1)(14).tileType = TileType.FLOOR
-  map(5)(14).tileType = TileType.FLOOR
-  map(1)(18).tileType = TileType.WALL
-  map(5)(18).tileType = TileType.WALL
-  djinn.setX(3)
-  djinn.setY(16)
-  getTile(3, 16).addObject(djinn)
-  
-  getPlayer.setX(1)
-  getPlayer.setY(13)
-  map(getPlayer.getX)(getPlayer.getY).explored = true
-  
-  new Monster(15, 13, MonsterType.SLOTH)
-  addFloorExtras
-  
+    
+    getTile(13,20).tileType = TileType.BOSSDOOR1
+    getTile(13, 20).addObject(new PassiveObject("Gate", "TODO", 13, 20, PassiveType.GATE1))
+    addGrass(getTile(13, 20))
+    getTile(13,19).tileType = TileType.BOSSDOOR2
+    addGrass(getTile(13, 19))
+    getTile(16,21).tileType = TileType.WALL
+    getTile(16,25).tileType = TileType.WALL
+    altar.setX(15)
+    altar.setY(23)
+    getTile(15, 23).addObject(altar)
+    
+    getTile(9,21).tileType = TileType.WALL
+    getTile(9,25).tileType = TileType.WALL
+    
+    djinn.setX(11)
+    djinn.setY(23)
+    getTile(11, 23).addObject(djinn)
+    
+    addShopItem(new Coordinate(10, 21)).inShop=true
+    addShopItem(new Coordinate(11, 21)).inShop=true
+    addShopItem(new Coordinate(12, 21)).inShop=true
+    addShopItem(new Coordinate(9, 22)).inShop=true
+    addShopItem(new Coordinate(9, 23)).inShop=true
+    addShopItem(new Coordinate(9, 24)).inShop=true
+    addShopItem(new Coordinate(10, 25)).inShop=true
+    addShopItem(new Coordinate(11, 25)).inShop=true
+    addShopItem(new Coordinate(12, 25)).inShop=true
+    
+    getPlayer.setX(13)
+    getPlayer.setY(23)
+    map(getPlayer.getX)(getPlayer.getY).explored = true
+    
+    new Monster(13, 9, MonsterType.SLOTH)
+
+    addFloorExtras
+    
+    for (i <- Range(12,17)) {
+      for (j <- Range(21,26)) {
+        getTile(i,j).objectList.filter(_.blockMovement) foreach {getTile(i,j).objectList -= _}
+        getTile(i,j).objectList.filter(_.blockVision) foreach {getTile(i,j).objectList -= _}
+      }
+    }
+    
   }
   
   /** Make first episode map.
@@ -583,6 +602,16 @@ class Grid() extends Serializable {
   
   /** Getter for size */
   def getSize() = size
+  
+  def getTiles(): Buffer[Tile] = {
+    val buff = Buffer[Tile]()
+    for (j <- Range(0,size)) {
+      for (i <- Range(0,size)) {
+        buff.append(getTile(j,i))
+      }
+    }
+    buff
+  }
   
   /** Draw the whole map */
   def draw() {
