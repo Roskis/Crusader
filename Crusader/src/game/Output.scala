@@ -165,12 +165,10 @@ object Output {
         (getHeight-emptyBackground.getImageHeight)/2, emptyBackground.getImageWidth, emptyBackground.getImageHeight)
     val text1 = "Credits:"
     font.drawString(getWidth/2-font.getWidth(text1)/2, getHeight/3, text1, Color.black)
-    val text2 = "Project lead: Antti Karkinen"
+    val text2 = "Project lead & Programming: Antti Karkinen"
     font.drawString(getWidth/2-font.getWidth(text2)/2, getHeight/3+25, text2, Color.black)
-    val text3 = "Programming: Antti Karkinen"
+    val text3 = "Artist: Johanna Karkinen"
     font.drawString(getWidth/2-font.getWidth(text3)/2, getHeight/3+50, text3, Color.black)
-    val text4 = "Artist: Johanna Karkinen"
-    font.drawString(getWidth/2-font.getWidth(text4)/2, getHeight/3+75, text4, Color.black)
     
     if (buttonBackCre.isMouseWithin) {
       drawQuadTex(buttonBackCre.tex3, buttonBackCre.getDrawX, buttonBackCre.getDrawY, 

@@ -65,7 +65,9 @@ class Tile(Xcoord: Int, Ycoord: Int, var tileType: TileType.Value) extends Seria
         for (obj <- tile.getObjectList) obj match {
           case o: PassiveObject if (o.pType == PassiveType.GATE1) => {
             Main.getPassiveObjectList.filter(_ == o) foreach {Main.getPassiveObjectList -= _}
-            new PassiveObject("Gate", "TODO", tile.getX, tile.getY, PassiveType.GATE2).blockMovement = true
+            val gate = new PassiveObject("Gate", "TODO", tile.getX, tile.getY, PassiveType.GATE2)
+            gate.blockMovement = true
+            gate.blockVision = true
           }
           case _ => {}
         }

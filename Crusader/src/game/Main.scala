@@ -539,7 +539,7 @@ object Main {
   }
   
   /** Save current game */
-  def saveGame = {
+  def saveGame() = {
     val file = new ObjectOutputStream(new FileOutputStream("save.dat"))
     try {
       file.writeUTF(version)
@@ -565,7 +565,7 @@ object Main {
   }
   
   /** Load game */
-  def loadGame:Boolean = {
+  def loadGame(): Boolean = {
     var boo = true
     var list = Buffer[java.lang.Object]()
     val file = new ObjectInputStream(new FileInputStream("save.dat"))

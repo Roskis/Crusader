@@ -603,7 +603,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
         case r if (r == 6) => BLOOD7
       }, rnd.nextInt(16), rnd.nextInt(20)-2)
     if (mType == MonsterType.SLOTH) {
-      for (n <- Range(0, 50)) getTile.addExtra(rnd.nextInt(7) match {
+      for (n <- Range(0, 50)) getGrid.getTile(getX+rnd.nextInt(3)-1, getY+rnd.nextInt(3)-1).addExtra(rnd.nextInt(7) match {
         case r if (r == 0) => BLOOD1
         case r if (r == 1) => BLOOD2
         case r if (r == 2) => BLOOD3
@@ -611,7 +611,7 @@ class Monster(startX: Int, startY: Int, monsterType: MonsterType.Value) extends 
         case r if (r == 4) => BLOOD5
         case r if (r == 5) => BLOOD6
         case r if (r == 6) => BLOOD7
-      }, rnd.nextInt(16)+rnd.nextInt(101)-50, rnd.nextInt(16)+rnd.nextInt(101)-50)
+      }, rnd.nextInt(16)+rnd.nextInt(33)-16, rnd.nextInt(20)-2+rnd.nextInt(33)-16)
     }
     getTile.removeObject(this)
     MonsterType.drop(monsterType, getX, getY)
@@ -1200,11 +1200,11 @@ class Equipment(startX: Int, startY: Int, equipmentType: ItemType.Value, isEquip
       buff.append(Buffer(("Armor pierce: ", Color.black), (ItemType.armorPiercing(itemType).toInt.toString, Color.black)))
     }
     else if (ItemType.slot(itemType) == "armor") {
-      buff.append(Buffer(("Armor: ", Color.black), (ItemType.armor(itemType).toInt.toString, Color.black)))
+      buff.append(Buffer(("Armor: ", Color.black), (ItemType.armor(itemType).toString, Color.black)))
     }
     else if (ItemType.slot(itemType) == "shield") {
       buff.append(Buffer(("Block chance: ", Color.black), (ItemType.blockChance(itemType).toInt.toString, Color.black)))
-      buff.append(Buffer(("Defence: ", Color.black), (ItemType.shieldArmor(itemType).toInt.toString, Color.black)))
+      buff.append(Buffer(("Defence: ", Color.black), (ItemType.shieldArmor(itemType).toString, Color.black)))
     }
     buff
   }
